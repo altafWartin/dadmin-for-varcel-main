@@ -1,0 +1,173 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+
+body {
+  margin: 0;
+  line-height: normal;
+}
+
+:root {
+  /* fonts */
+  --font-poppins: Poppins;
+  --font-manrope: Manrope;
+  --font-font-awesome-6-pro: "Font Awesome 6 Pro";
+  --font-plus-jakarta-sans: "Plus Jakarta Sans";
+
+  /* font sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.13rem;
+  --font-size-5xl: 1.5rem;
+  --font-size-sm: 0.88rem;
+  --font-size-3xs: 0.63rem;
+  --font-size-lgi: 1.19rem;
+  --font-size-2xs: 0.69rem;
+  --font-size-xl: 1.25rem;
+
+  /* Colors */
+  --color-ghostwhite: #f5f7fb;
+  --white: #fff;
+  --bodytext-100: #0c063a;
+  --sec-color-3: #605bff;
+  --color-coral: #ff8548;
+  --sec-color-2: #4cd7f6;
+  --bodytext-50: #5d5b73;
+  --color-limegreen: #4cc830;
+  --color-gray-100: #fafafa;
+  --text-100: #1a1a1a;
+  --color-gainsboro-100: #e8e8e8;
+  --stroke: #e2e2e2;
+  --color-chocolate: #cc5214;
+  --color-darkslategray-100: #3b3b3b;
+  --color-darkslategray-200: #373737;
+  --color-hotpink: #ff6bb3;
+  --color-black: #000;
+  --color-whitesmoke: #ededed;
+
+  /* Gaps */
+  --gap-23xl: 2.63rem;
+  --gap-2xl: 1.31rem;
+  --gap-11xl: 1.88rem;
+  --gap-mid: 1.06rem;
+  --gap-mini: 0.94rem;
+  --gap-xl: 1.25rem;
+  --gap-7xs: 0.38rem;
+  --gap-base: 1rem;
+  --gap-5xs: 0.5rem;
+  --gap-9xs: 0.25rem;
+  --gap-13xl: 2rem;
+  --gap-5xl: 1.5rem;
+  --gap-6xs: 0.44rem;
+  --gap-3xl: 1.38rem;
+  --gap-57xl: 4.75rem;
+  --gap-19xl: 2.38rem;
+  --gap-lgi: 1.19rem;
+  --gap-39xl: 3.63rem;
+
+  /* Paddings */
+  --padding-xl: 1.25rem;
+  --padding-21xl: 2.5rem;
+  --padding-2xl: 1.31rem;
+  --padding-4xl: 1.44rem;
+  --padding-6xl: 1.56rem;
+  --padding-12xs: 0.06rem;
+  --padding-3xs: 0.63rem;
+  --padding-base: 1rem;
+  --padding-5xs: 0.5rem;
+  --padding-9xs: 0.25rem;
+  --padding-24xl: 2.69rem;
+  --padding-5xl: 1.5rem;
+  --padding-6xs: 0.44rem;
+  --padding-lgi: 1.19rem;
+  --padding-3xl: 1.38rem;
+  --padding-mini: 0.94rem;
+  --padding-10xs: 0.19rem;
+  --padding-sm: 0.88rem;
+  --padding-xs: 0.75rem;
+  --padding-7xs: 0.38rem;
+  --padding-2xs: 0.69rem;
+  --padding-8xl: 1.69rem;
+  --padding-8xs: 0.31rem;
+  --padding-29xl: 3rem;
+  --padding-25xl: 2.75rem;
+  --padding-smi: 0.81rem;
+  --padding-48xl: 4.19rem;
+  --padding-10xl: 1.81rem;
+  --padding-36xl: 3.44rem;
+  --padding-9xl: 1.75rem;
+  --padding-11xl: 1.88rem;
+  --padding-28xl: 2.94rem;
+  --padding-lg: 1.13rem;
+  --padding-14xl: 2.06rem;
+  --padding-13xl: 2rem;
+  --padding-46xl: 4.06rem;
+  --padding-23xl: 2.63rem;
+  --padding-19xl: 2.38rem;
+  --padding-mid: 1.06rem;
+
+  /* Border radiuses */
+  --br-5xl: 24px;
+  --br-8xs: 5px;
+  --br-3xs: 10px;
+  --br-9xs: 4px;
+  --br-5xs: 8px;
+  --br-31xl: 50px;
+  --br-xl: 20px;
+  --br-base: 16px;
+  --br-7xs: 6px;
+}
+
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+body {
+  @apply leading-[normal] m-0;
+}
+*,
+::before,
+::after {
+  border-width: 0;
+}
+
+@tailwind base;
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--secondary) var(--primary);
+}
+
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 15px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--primary);
+  border-radius: 5px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--secondary);
+  border-radius: 14px;
+  border: 3px solid var(--primary);
+}
+
+@tailwind components;
+@tailwind utilities;

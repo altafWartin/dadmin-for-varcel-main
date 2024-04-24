@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent Page</title>
+</head>
+<body>
+    <iframe id="myIframe" src="https://wmq8y2.csb.app/" height="500px" width="900px" frameborder="0"></iframe>
+    <div>
+        <h1>content</h1>
+        <p id="editorContent"></p>
+    </div>
+    <script>
+
+        // Get the iframe element
+        const iframe = document.getElementById('myIframe');
+
+        // Wait for the iframe to load
+        iframe.onload = function () {
+            // Access the contentWindow of the iframe
+            const iframeWindow = iframe.contentWindow;
+
+            // Get data from the child iframe's local storage
+            const editorContent = iframeWindow.localStorage.getItem("myIframe");
+
+            // Display the data in the parent HTML
+            document.getElementById("editorContent").innerText = editorContent;
+
+            console.log(editorContent,"hi");
+        };
+    </script>
+</body>
+</html>
