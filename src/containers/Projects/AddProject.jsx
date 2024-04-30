@@ -1,24 +1,95 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.svg";
-
 import calendar from "../../assets/Icon/calendar.svg";
 import arrowdown from "../../assets/Icon/arrowdown.svg";
 import setting from "../../assets/Icon/setting.svg";
-
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
+
 
 import dayjs from "dayjs";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { MobileDatePicker } from "@mui/x-date-pickers/MobileDatePicker";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const AddProject = () => {
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const navigate = useNavigate();
+
+  const notifyAddProject = () => toast.success("Project add successfully");
+  const notifyerror = () => toast.error("Project with this name already exists.");
+  // Handle start date change
+  const handleStartDateChange = (newStartDate) => {
+    console.log(newStartDate, "newStart");
+    // Format the newStartDate using dayjs
+    const formattedStartDate = dayjs(newStartDate).format('YYYY-MM-DD');
+    // Set the formattedStartDate as the new start date
+    setStartDate(formattedStartDate);
+  };
+
+  // Handle end date change
+  const handleEndDateChange = (newEndDate) => {
+    // Format the newEndDate using dayjs
+    const formattedEndDate = dayjs(newEndDate).format('YYYY-MM-DD');
+    // Set the formattedEndDate as the new end date
+    setEndDate(formattedEndDate);
+  };
+  console.log("startDate: ", startDate);
+  console.log("endDate: ", endDate);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formData = {
+      name,
+      description,
+      startDate,
+      endDate,
+    };
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/project/add-project",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log(data); // Handle success response
+      notifyAddProject();
+      navigate('/projects')
+      // You can show a success message or redirect the user
+    } catch (error) {
+      notifyerror()
+      console.error("Error:", error); // Handle error
+      // You can show an error message to the user
+    }
+  };
+
   return (
     <div className=" bg-slate-100  pt-10 pl-[260px] h-[95vh]">
+      {" "}
+      <ToastContainer />
       <section class="w-[71.125rem] flex flex-col items-center justify-start py-[0rem] px-[1.25rem] box-border gap-[5rem_0rem] max-w-full text-left text-[1.5rem] text-midnightblue font-poppins lg:gap-[5rem_0rem] mq750:gap-[5rem_0rem]">
         <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full mq750:flex-wrap">
           <div class="flex flex-row items-center justify-start gap-[0rem_0.344rem]">
@@ -61,7 +132,10 @@ const AddProject = () => {
             </div>
           </div>
         </div>
-        <form class="m-0 w-[57.44rem] rounded-3xl bg-white flex flex-col items-center justify-start pt-[2.13rem] pb-[2.75rem] pr-[2.81rem] pl-[2.75rem] box-border relative gap-[1.56rem] max-w-full z-[2] mq1050:pl-[1.38rem] mq1050:pr-[1.38rem] mq1050:box-border mq750:pt-[1.38rem] mq750:pb-[1.81rem] mq750:box-border">
+        <form
+          onSubmit={handleSubmit}
+          class="m-0 w-[57.44rem] rounded-3xl bg-white flex flex-col items-center justify-start pt-[2.13rem] pb-[2.75rem] pr-[2.81rem] pl-[2.75rem] box-border relative gap-[1.56rem] max-w-full z-[2] mq1050:pl-[1.38rem] mq1050:pr-[1.38rem] mq1050:box-border mq750:pt-[1.38rem] mq750:pb-[1.81rem] mq750:box-border"
+        >
           <div class="w-[24.44rem] h-[5.13rem] relative hidden max-w-full z-[0]">
             <div class="absolute w-full top-[1.81rem] right-[0rem] left-[0rem] rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-300"></div>
             <div class="absolute top-[3.31rem] right-[1rem] w-[1rem] h-[0.63rem]">
@@ -109,6 +183,8 @@ const AddProject = () => {
                   id="name"
                   class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                   placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   required
                 />
               </div>
@@ -124,6 +200,8 @@ const AddProject = () => {
                   id="name"
                   class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                   placeholder="Description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   required
                 />
               </div>
@@ -138,9 +216,7 @@ const AddProject = () => {
                   Start Date
                 </label>
                 <div className="w-full ">
-                  <LocalizationProvider
-                    dateAdapter={AdapterDayjs}
-                  >
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer
                       components={[
                         "DatePicker",
@@ -153,6 +229,11 @@ const AddProject = () => {
                       <DesktopDatePicker
                         className="bg-gray-50  w-full  h-[3.63rem] text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                         defaultValue={dayjs()}
+                        value={startDate}
+                        format="YYYY-MM-DD" // Specify the desired date format here
+
+                        onChange={handleStartDateChange}
+                        renderInput={(params) => <input {...params} />}
                       />
                     </DemoContainer>
                   </LocalizationProvider>
@@ -166,9 +247,7 @@ const AddProject = () => {
                   End Date
                 </label>
                 <div className="w-full ">
-                  <LocalizationProvider
-                    dateAdapter={AdapterDayjs}
-                  >
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DemoContainer
                       components={[
                         "DatePicker",
@@ -181,6 +260,11 @@ const AddProject = () => {
                       <DesktopDatePicker
                         className="bg-gray-50  w-full  h-[3.63rem] text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                         defaultValue={dayjs()}
+                        value={endDate}
+                        format="YYYY-MM-DD" // Specify the desired date format here
+
+                        onChange={handleEndDateChange}
+                        renderInput={(params) => <input {...params} />}
                       />
                     </DemoContainer>
                   </LocalizationProvider>
@@ -189,7 +273,10 @@ const AddProject = () => {
             </div>
           </div>
           <div class="w-[26.63rem] flex flex-row items-start justify-start py-[0rem] pr-[2.19rem] pl-[0rem] box-border max-w-full">
-            <button class="cursor-pointer [border:none] p-[0.94rem] bg-coral-100 flex-1 rounded-lg flex flex-row items-center justify-center box-border max-w-full whitespace-nowrap z-[4] hover:bg-chocolate-100">
+            <button
+              type="submit"
+              class="cursor-pointer [border:none] p-[0.94rem] bg-coral-100 flex-1 rounded-lg flex flex-row items-center justify-center box-border max-w-full whitespace-nowrap z-[4] hover:bg-chocolate-100"
+            >
               <div class="h-[3.13rem] w-[24.44rem] relative rounded-lg bg-coral-100 hidden max-w-full"></div>
               <b class="relative text-[0.88rem] leading-[1.25rem] capitalize font-poppins text-white text-left z-[1]">
                 Add Project

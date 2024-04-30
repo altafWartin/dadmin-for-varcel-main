@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
 import Form from "react-bootstrap/Form";
 import calendar from "../../assets/Icon/calendar.svg";
 import arrowdown from "../../assets/Icon/arrowdown.svg";
@@ -6,23 +8,9 @@ import setting from "../../assets/Icon/setting.svg";
 import close from "../../assets/Icon/close.png";
 import logo from "../../assets/logo.svg";
 import threedots from "../../assets/Icon/threedots.svg";
-import { Link } from "react-router-dom";
-import Sidebar from "../../components/Sidebar/Sidebar";
-import Navbar from "../../components/Navbar/Navbar";
-import Dropdown from "react-bootstrap/Dropdown";
-// import "./Workspaces.css";
 import p2 from "../../assets/Images/p2.svg";
 import p3 from "../../assets/Images/p3.svg";
 import p4 from "../../assets/Images/p4.svg";
-import plusicon from "../../assets/Icon/plusicon.svg";
-import send from "../../assets/Icon/send.svg";
-import icon1 from "../../assets/Icon/icon-1.svg";
-import icon2 from "../../assets/Icon/icon-2.svg";
-import icon3 from "../../assets/Icon/icon-3.svg";
-import icon4 from "../../assets/Icon/icon-4.svg";
-
-import { useNavigate } from "react-router-dom";
-
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -30,45 +18,16 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Checkbox from "@mui/material/Checkbox";
 import Avatar from "@mui/material/Avatar";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const projects = [
-  {
-    index: 0,
-    projectName: "Avala Project",
-  },
-  {
-    index: 1,
-    projectName: "Avala Project",
-  },
-  {
-    index: 2,
-    projectName: "Avala Project",
-  },
-  {
-    index: 3,
-    projectName: "Avala Project",
-  },
-  {
-    index: 4,
-    projectName: "Avala Project",
-  },
-  {
-    index: 5,
-    projectName: "Avala Project",
-  },
-  {
-    index: 6,
-    projectName: "Avala Project",
-  },
-  {
-    index: 7,
-    projectName: "Avala Project",
-  },
-  {
-    index: 8,
-    projectName: "Avala Project",
-  },
-];
+const formatDate = (dateString) => {
+  const dateObject = new Date(dateString);
+  const year = dateObject.getFullYear();
+  const month = (dateObject.getMonth() + 1).toString().padStart(2, "0"); // Adding 1 to get the correct month (0-indexed)
+  const date = dateObject.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${date}`;
+};
 
 const users = [
   {
@@ -122,7 +81,67 @@ const users = [
 ];
 
 const Workspace = () => {
+  const [workspaces, setWorkspaces] = useState([]);
+  const [shouldFetchData, setShouldFetchData] = useState(true);
+
   const [hoveredProjectIndex, setHoveredProjectIndex] = useState(null);
+
+  const notifyDelete = () => toast.success("Project deleted successfully");
+  useEffect(() => {
+    const fetchData = async () => {
+      if (shouldFetchData) {
+        const token = localStorage.getItem("token");
+        try {
+          const response = await fetch(
+            "https://d-admin-backend.onrender.com/api/workspace/all-workspaces",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const data = await response.json();
+          console.log("API Response:", data); // Log the response
+          if (data.success) {
+            setWorkspaces(data.data.rows);
+            setShouldFetchData(false); // Set shouldFetchData to true after successful deletion
+
+          } else {
+            console.error("Failed to fetch projects:", data.message);
+          }
+        } catch (error) {
+          console.error("Error fetching projects:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [shouldFetchData, workspaces]);
+
+  console.log(workspaces);
+
+  const handleEditWorkspace = async (projectId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Make your PATCH request here
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/project/update-project/${projectId}`,
+        {
+          method: "PATCH",
+          Authorization: `Bearer ${token}`,
+        }
+      );
+      const data = await response.json();
+      console.log("Edit project response:", data);
+
+      // Navigate to the /editProject route with project data
+      navigate("/editWorkspace", { state: { project: data } });
+    } catch (error) {
+      console.error("Error editing project:", error);
+      // Handle errors or show an error message to the user
+    }
+  };
 
   const handleMouseEnter = (index) => {
     setHoveredProjectIndex(index);
@@ -146,15 +165,51 @@ const Workspace = () => {
 
     setChecked(newChecked);
   };
-  const [isPopupOpen, setPopupOpen] = useState(false);
+
   const [isAssignPopupOpen, setAssignPopupOpen] = useState(false);
 
-  const openPopup = () => {
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(null);
+
+  const openPopup = (workspaceId) => {
     setPopupOpen(true);
+    setSelectedWorkspaceId(workspaceId); // Assuming you have a state to store the selected project ID
+  };
+  const handleDeleteWorkspace = async (selectedWorkspaceId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/workspace/delete-workspace/${selectedWorkspaceId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // Add any other headers if required, such as authorization headers
+          },
+          // Add body data if your API requires it for deletion
+          // body: JSON.stringify({}),
+        }
+      );
+
+      if (response.ok) {
+        // Handle successful deletion, e.g., update UI or show a success message
+        console.log("Project deleted successfully");
+        closePopup();
+        setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+      } else {
+        // Handle unsuccessful deletion, e.g., show an error message
+        console.error("Failed to delete project");
+      }
+    } catch (error) {
+      // Handle any network errors or exceptions
+      console.error("An error occurred:", error);
+    }
   };
 
   const closePopup = () => {
     setPopupOpen(false);
+    notifyDelete();
   };
 
   const openAssignPopup = () => {
@@ -264,7 +319,10 @@ const Workspace = () => {
                 <button class=" mb-3 w-full  right-[0rem] left-[0rem]  hover:bg-coral-100  rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200">
                   Recreate
                 </button>
-                <button class=" mb-3 w-full  right-[0rem] left-[0rem]  hover:bg-coral-100  rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200">
+                <button
+                  onClick={() => handleDeleteWorkspace(selectedWorkspaceId)}
+                  class="mb-3 w-full top-[0rem] right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
+                >
                   Delete
                 </button>
                 <button
@@ -347,44 +405,47 @@ const Workspace = () => {
             </div>
 
             <tbody className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
-              {projects.map((project) => (
+              {workspaces.map((workspace) => (
                 <div
-                  key={project.index}
+                  key={workspace.index}
                   class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap"
                 >
                   <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
                   <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
                     <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                      Avala Project
+                      {workspace.id}
                     </div>
                   </div>
                   <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
                     <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
                       <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
                         <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          Carter Mango
+                          {workspace.name}
                         </div>
                       </div>
                       <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
                         <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          Sun, 10 May 2022
+                          {formatDate(workspace.created_at)}
                         </div>
                       </div>
                       <div class="w-[7.38rem] flex flex-col items-start justify-start">
                         <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
                           <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
                           <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                            New
+                            {workspace.status}
                           </div>
                         </button>
                       </div>
 
                       <div className="pr-4">
-                        <Form>
-                          <Form.Check // prettier-ignore
+                        <Form className="content-center">
+                          <Form.Check
                             type="switch"
-                            id="custom-switch"
-                            className="custom-switch"
+                            id={`custom-switch-${workspace.id}`}
+                            className="custom-switch content-center"
+                            label={workspace.isActive ? "Active" : "Inactive"}
+                            checked={workspace.isActive}
+                            // onChange={handleSwitchChange}
                           />
                         </Form>
                       </div>
@@ -392,7 +453,7 @@ const Workspace = () => {
                   </div>
                   <div
                     className="hover-div"
-                    onMouseEnter={() => handleMouseEnter(project.index)}
+                    onMouseEnter={() => handleMouseEnter(workspaces.index)}
                     onMouseLeave={handleMouseLeave}
                   >
                     <img
@@ -414,7 +475,7 @@ const Workspace = () => {
                       src={p4}
                     />
 
-                    {hoveredProjectIndex === project.index && (
+                    {hoveredProjectIndex === workspaces.index && (
                       <div className="user-list absolute h-[12rem] overflow-y-auto bg-gray-100 bg-opacity-70 z-10">
                         <List>
                           {users.map((user) => (
@@ -450,18 +511,24 @@ const Workspace = () => {
                   </div>
                   <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
                     <div class="flex flex-row items-center justify-start gap-[1rem]">
-                      <Link to="/editWorkspace" className="no-underline">
+                      <button
+                        onClick={() => handleEditWorkspace(workspace.id)}
+                        className="no-underline  bg-white"
+                      >
                         <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
                           <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
                           <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
                             
                           </div>
                         </div>
-                      </Link>
+                      </button>
                     </div>
 
                     {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                    <button className="bg-white" onClick={openPopup}>
+                    <button
+                      className="bg-white"
+                      onClick={() => openPopup(workspace.id)}
+                    >
                       <img
                         class="h-[1.25rem] w-[1.28rem] relative z-[1]"
                         alt=""

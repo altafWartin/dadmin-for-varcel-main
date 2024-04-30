@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from "react-router-dom";
+
 import Form from "react-bootstrap/Form";
 import calendar from "../../assets/Icon/calendar.svg";
 import arrowdown from "../../assets/Icon/arrowdown.svg";
@@ -6,23 +8,9 @@ import setting from "../../assets/Icon/setting.svg";
 import close from "../../assets/Icon/close.png";
 import logo from "../../assets/logo.svg";
 import threedots from "../../assets/Icon/threedots.svg";
-import { Link } from "react-router-dom";
-import Sidebar from "../../components/Sidebar/Sidebar";
-import Navbar from "../../components/Navbar/Navbar";
-import Dropdown from "react-bootstrap/Dropdown";
-// import "./Projectss.css";
 import p2 from "../../assets/Images/p2.svg";
 import p3 from "../../assets/Images/p3.svg";
 import p4 from "../../assets/Images/p4.svg";
-import plusicon from "../../assets/Icon/plusicon.svg";
-import send from "../../assets/Icon/send.svg";
-import icon1 from "../../assets/Icon/icon-1.svg";
-import icon2 from "../../assets/Icon/icon-2.svg";
-import icon3 from "../../assets/Icon/icon-3.svg";
-import icon4 from "../../assets/Icon/icon-4.svg";
-
-import { useNavigate } from "react-router-dom";
-
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -31,45 +19,16 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Checkbox from "@mui/material/Checkbox";
 import Avatar from "@mui/material/Avatar";
 
-const projects = [
-  {
-    index: 0,
-    projectName: "Avala Project",
-  },
-  {
-    index: 1,
-    projectName: "Avala Project",
-  },
-  {
-    index: 2,
-    projectName: "Avala Project",
-  },
-  {
-    index: 3,
-    projectName: "Avala Project",
-  },
-  {
-    index: 4,
-    projectName: "Avala Project",
-  },
-  {
-    index: 5,
-    projectName: "Avala Project",
-  },
-  {
-    index: 6,
-    projectName: "Avala Project",
-  },
-  {
-    index: 7,
-    projectName: "Avala Project",
-  },
-  {
-    index: 8,
-    projectName: "Avala Project",
-  },
-];
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
+const formatDate = (dateString) => {
+  const dateObject = new Date(dateString);
+  const year = dateObject.getFullYear();
+  const month = (dateObject.getMonth() + 1).toString().padStart(2, "0"); // Adding 1 to get the correct month (0-indexed)
+  const date = dateObject.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${date}`;
+};
 const users = [
   {
     index: 0,
@@ -122,7 +81,63 @@ const users = [
 ];
 
 const Projects = () => {
+  const [projects, setProjects] = useState([]);
+
   const [hoveredProjectIndex, setHoveredProjectIndex] = useState(null);
+
+  const notifyDelete = () => toast.success("Project deleted successfully");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const response = await fetch(
+          "https://d-admin-backend.onrender.com/api/project/all-projects",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await response.json();
+        console.log("API Response:", data); // Log the response
+        if (data.success) {
+          setProjects(data.data.rows);
+        } else {
+          console.error("Failed to fetch projects:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchData();
+  }, [projects]);
+
+  console.log(projects);
+
+  const handleEditProject = async (projectId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Make your PATCH request here
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/project/update-project/${projectId}`,
+        {
+          method: "PATCH",
+          Authorization: `Bearer ${token}`,
+        }
+      );
+      const data = await response.json();
+      console.log("Edit project response:", data);
+
+      // Navigate to the /editProject route with project data
+      navigate("/editProject", { state: { project: data } });
+    } catch (error) {
+      console.error("Error editing project:", error);
+      // Handle errors or show an error message to the user
+    }
+  };
 
   const handleMouseEnter = (index) => {
     setHoveredProjectIndex(index);
@@ -146,15 +161,51 @@ const Projects = () => {
 
     setChecked(newChecked);
   };
-  const [isPopupOpen, setPopupOpen] = useState(false);
+
   const [isAssignPopupOpen, setAssignPopupOpen] = useState(false);
 
-  const openPopup = () => {
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+
+  const openPopup = (projectId) => {
     setPopupOpen(true);
+    setSelectedProjectId(projectId); // Assuming you have a state to store the selected project ID
+  };
+
+  const handleDeleteProject = async (selectedProjectId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/project/delete-project/${selectedProjectId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // Add any other headers if required, such as authorization headers
+          },
+          // Add body data if your API requires it for deletion
+          // body: JSON.stringify({}),
+        }
+      );
+
+      if (response.ok) {
+        // Handle successful deletion, e.g., update UI or show a success message
+        console.log("Project deleted successfully");
+        closePopup();
+      } else {
+        // Handle unsuccessful deletion, e.g., show an error message
+        console.error("Failed to delete project");
+      }
+    } catch (error) {
+      // Handle any network errors or exceptions
+      console.error("An error occurred:", error);
+    }
   };
 
   const closePopup = () => {
     setPopupOpen(false);
+    notifyDelete();
   };
 
   const openAssignPopup = () => {
@@ -177,6 +228,8 @@ const Projects = () => {
 
   return (
     <div>
+      {" "}
+      <ToastContainer />
       <div>
         {isAssignPopupOpen && (
           <div class="fixed top-1/2 left-1/2 h-[28.31rem] transform bg-blend-difference -translate-x-1/2 -translate-y-1/2 z-[9999] w-full max-w-[25.88rem] p-8 bg-white rounded-3xl shadow-lg backdrop-blur-[8px]">
@@ -255,10 +308,13 @@ const Projects = () => {
           <div class="relative h-[17.31rem] text-[0.88rem] text-dimgray font-poppins">
             <div class="w-full relative h-[24.31rem]  text-[0.88rem] text-dimgray font-poppins">
               <div class="absolute w-full top-[9.19rem] right-[0rem] left-[0rem] h-[12.13rem]">
-                <button class="mb-3 w-full top-[0rem] right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200">
+                <button
+                  onClick={() => handleDeleteProject(selectedProjectId)}
+                  class="mb-3 w-full top-[0rem] right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
+                >
                   Delete
                 </button>
-               
+
                 <button
                   onClick={openAssignPopup}
                   class=" mb-2 w-full  right-[0rem] left-[0rem]  hover:bg-coral-100  rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
@@ -347,36 +403,39 @@ const Projects = () => {
                   <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
                   <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
                     <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                      Avala Project
+                      {project.id}
                     </div>
                   </div>
                   <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
                     <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
                       <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
                         <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          Carter Mango
+                          {project.name}
                         </div>
                       </div>
                       <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
                         <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          Sun, 10 May 2022
+                          {formatDate(project.created_at)}
                         </div>
                       </div>
                       <div class="w-[7.38rem] flex flex-col items-start justify-start">
                         <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
                           <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
                           <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                            New
+                            {project.status}
                           </div>
                         </button>
                       </div>
 
                       <div className="pr-4">
-                        <Form>
-                          <Form.Check // prettier-ignore
+                        <Form className="content-center">
+                          <Form.Check
                             type="switch"
-                            id="custom-switch"
-                            className="custom-switch"
+                            id={`custom-switch-${project.id}`}
+                            className="custom-switch content-center"
+                            label={project.isActive ? "Active" : "Inactive"}
+                            checked={project.isActive}
+                            // onChange={handleSwitchChange}
                           />
                         </Form>
                       </div>
@@ -442,18 +501,24 @@ const Projects = () => {
                   </div>
                   <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
                     <div class="flex flex-row items-center justify-start gap-[1rem]">
-                      <Link to="/editProject" className="no-underline">
+                      <button
+                        onClick={() => handleEditProject(project.id)}
+                        className="no-underline  bg-white"
+                      >
                         <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
                           <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
                           <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
                             
                           </div>
                         </div>
-                      </Link>
+                      </button>
                     </div>
 
                     {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                    <button className="bg-white" onClick={openPopup}>
+                    <button
+                      className="bg-white"
+                      onClick={() => openPopup(project.id)}
+                    >
                       <img
                         class="h-[1.25rem] w-[1.28rem] relative z-[1]"
                         alt=""
