@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 // import styles from "./Navbar.module.css";
 import { Link } from "react-router-dom";
 import search from "../../assets/Icon/search.svg";
@@ -19,6 +19,67 @@ import { Dropdown, Ripple, initTE } from "tw-elements";
 initTE({ Dropdown, Ripple });
 
 const Navbar = () => {
+  const [file, setFile] = useState(null);
+  const [uploadStatus, setUploadStatus] = useState("");
+
+  // Function to handle form submission
+  // Function to handle form submission
+  const handleFileUpload = async (event) => {
+    event.preventDefault();
+  
+    try {
+      console.log("Starting file upload...");
+  
+      const formData = new FormData();
+      formData.append("file", file);
+  
+      console.log("FormData created:", formData);
+  
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
+      console.log("Token found:", token);
+  
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/user/update-profile-pic",
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+  
+      console.log("Response received:", response);
+  
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+  
+      const responseData = await response.json();
+      console.log("Response data:", responseData);
+  
+      // Check if the response has the expected structure
+      if (responseData.success && responseData.data) {
+        const updatedUser = responseData.data;
+        console.log("Updated User Data:", updatedUser);
+  
+        // Update user data in local storage
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      } else {
+        throw new Error("Invalid response structure");
+      }
+  
+      setUploadStatus("Image uploaded successfully");
+      console.log("Image uploaded:", responseData);
+    } catch (error) {
+      setUploadStatus("Error uploading image");
+      console.error("Error uploading image:", error);
+    }
+  };
+  
   return (
     <div>
       <header class="self-stretch z-2000  bg-white flex flex-row items-center justify-between py-[1rem] pr-[3rem] pl-[17.75rem] gap-[1.25rem] top-[0] z-[0] sticky text-left text-[0.88rem] text-text-100 font-poppins lg:pl-[1.38rem] lg:pr-[1.5rem] lg:box-border">
@@ -44,74 +105,41 @@ const Navbar = () => {
               alt=""
               src={Notification}
             />
-
-            {/* <img
-              class="h-[2.5rem] w-[2.5rem] relative object-contain min-h-[2.5rem]"
-              loading="eager"
-              alt=""
-              src={help}
-            />
-            <img
-              class="h-[2.5rem] w-[2.5rem] relative object-contain min-h-[2.5rem]"
-              loading="eager"
-              alt=""
-              src={Message}
-            /> */}
           </div>
-          <div class="flex flex-row items-center justify-start py-[0rem] pr-[0.06rem] pl-[0rem] gap-[0.94rem]">
-            <div class="flex flex-col items-end justify-start py-[0rem] pr-[0rem] pl-[0.25rem]">
-              <div class="flex flex-row items-start justify-start py-[0rem] px-[0rem]">
-                <div class="h-[1.31rem] relative font-semibold flex items-center whitespace-nowrap">
-                  Gracetrans
-                </div>
-              </div>
-              <div class="relative text-[0.69rem] text-bodytext-50">
-                @gracetrans
-              </div>
+          <div className="flex flex-row items-center justify-start gap-[0.94rem]">
+          <div className="flex flex-col items-end justify-start">
+            <div className="flex items-center font-semibold">
+              Gracetrans
             </div>
-            <img
-              class="h-[2.75rem] w-[2.75rem] relative rounded-31xl object-cover"
-              alt=""
-              src={Profile}
-            />
-
-            <Link to="/login">
-              <img
-                class="h-[1.25rem] w-[1.25rem] relative"
-                alt=""
-                src={logout}
-              />
-            </Link>
-            {/* <div class="relative" data-te-dropdown-ref>
-              <a
-                class="flex items-center whitespace-nowrap rounded bg-white px-1 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white "
-                href="#"
-                type="button"
-                id="dropdownMenuButton2"
-                data-te-dropdown-toggle-ref
-                aria-expanded="false"
-                data-te-ripple-init
-                data-te-ripple-color="light"
-              >
-               
-              </a>
-              <ul
-                class="absolute z-[1000] float-left m-0 hidden min-w-max list-none overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-left text-base shadow-lg dark:bg-neutral-700 [&[data-te-dropdown-show]]:block"
-                aria-labelledby="dropdownMenuButton2"
-                data-te-dropdown-menu-ref
-              >
-                <li>
-                  <a
-                    class="block w-full justify-center  hover:bg-orange  py-2 text-sm font-normal "
-                    href="#"
-                    data-te-dropdown-item-ref
-                  >
-                    <button className="bg-white mr-8 justify-center  hover:bg-orange "> Logout</button>
-                  </a>
-                </li>
-              </ul>
-            </div> */}
+            <div className="text-[0.69rem] text-bodytext-50">
+              @gracetrans
+            </div>
           </div>
+          <div className="relative">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+              style={{ zIndex: 1 }} // Overlay the input on top of the profile image
+            />
+            <img
+              className="h-[2.75rem] w-[2.75rem] relative rounded-3xl object-cover cursor-pointer"
+              alt="Profile Picture"
+              src={Profile}
+              onClick={() =>
+                document.querySelector('input[type="file"]').click()
+              } // Open file input on profile image click
+            />
+          </div>
+          <Link to="/login">
+            <img
+              className="h-[1.25rem] w-[1.25rem] relative cursor-pointer"
+              alt="Logout"
+              src={logout}
+            />
+          </Link>
+        </div>
         </div>
       </header>
     </div>

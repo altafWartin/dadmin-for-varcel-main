@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import Form from "react-bootstrap/Form";
@@ -29,90 +29,68 @@ const formatDate = (dateString) => {
   const date = dateObject.getDate().toString().padStart(2, "0");
   return `${year}-${month}-${date}`;
 };
-const users = [
-  {
-    index: 0,
-    userName: "User 1",
-    profilePicture: "../../assets/Images/p2.svg",
-  },
-  {
-    index: 1,
-    userName: "User 2",
-    profilePicture: "../../assets/Images/Profile.jpeg",
-  },
-  {
-    index: 2,
-    userName: "User 2",
-    profilePicture:
-      "https://en.wikipedia.org/wiki/Katrina_Kaif#/media/File:Katrina_Kaif_promoting_Bharat_in_2019.jpg",
-  },
-  {
-    index: 3,
-    userName: "User 3",
-    profilePicture:
-      "https://unsplash.com/photos/shallow-focus-photography-of-woman-outdoor-during-day-rDEOVtE7vOs",
-  },
-  {
-    index: 4,
-    userName: "User 2",
-    profilePicture: "/static/images/avatar/2.jpg",
-  },
-  {
-    index: 5,
-    userName: "User 2",
-    profilePicture: "/static/images/avatar/2.jpg",
-  },
-  {
-    index: 6,
-    userName: "User 4",
-    profilePicture: "/static/images/avatar/2.jpg",
-  },
-  {
-    index: 7,
-    userName: "User 2",
-    profilePicture: "/static/images/avatar/2.jpg",
-  },
-  {
-    index: 8,
-    userName: "User 2",
-    profilePicture: "/static/images/avatar/2.jpg",
-  },
-  // Add more objects as needed
-];
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
+  const [shouldFetchData, setShouldFetchData] = useState(true);
 
   const [hoveredProjectIndex, setHoveredProjectIndex] = useState(null);
 
   const notifyDelete = () => toast.success("Project deleted successfully");
 
+  const [users, setUsers] = useState([]);
+
+  console.log("users", users);
+
+  const getAssignUsers = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/project/get-assign-project/5",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      const userData = data.data;
+      console.log("API Response:", data); // Log the response
+      setUsers(userData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("token");
-      try {
-        const response = await fetch(
-          "https://d-admin-backend.onrender.com/api/project/all-projects",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+      if (shouldFetchData) {
+        const token = localStorage.getItem("token");
+        try {
+          const response = await fetch(
+            "https://d-admin-backend.onrender.com/api/project/all-projects",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const data = await response.json();
+          console.log("API Response:", data); // Log the response
+          if (data.success) {
+            setProjects(data.data.rows);
+            setShouldFetchData(false); // Set shouldFetchData to true after successful deletion
+          } else {
+            console.error("Failed to fetch projects:", data.message);
           }
-        );
-        const data = await response.json();
-        console.log("API Response:", data); // Log the response
-        if (data.success) {
-          setProjects(data.data.rows);
-        } else {
-          console.error("Failed to fetch projects:", data.message);
+        } catch (error) {
+          console.error("Error fetching projects:", error);
         }
-      } catch (error) {
-        console.error("Error fetching projects:", error);
       }
     };
 
     fetchData();
-  }, [projects]);
+  }, [shouldFetchData, projects]);
 
   console.log(projects);
 
@@ -130,6 +108,7 @@ const Projects = () => {
       );
       const data = await response.json();
       console.log("Edit project response:", data);
+      setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
 
       // Navigate to the /editProject route with project data
       navigate("/editProject", { state: { project: data } });
@@ -147,17 +126,15 @@ const Projects = () => {
     setHoveredProjectIndex(null);
   };
 
-  const [checked, setChecked] = React.useState([1]);
+  const [checked, setChecked] = useState(
+    users.filter((user) => user.isProjectAssign).map((user) => user.id)
+  );
 
-  const handleToggle = (value) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
+  const handleToggle = (id) => () => {
+    const isChecked = checked.includes(id);
+    const newChecked = isChecked
+      ? checked.filter((checkId) => checkId !== id)
+      : [...checked, id];
 
     setChecked(newChecked);
   };
@@ -192,6 +169,7 @@ const Projects = () => {
       if (response.ok) {
         // Handle successful deletion, e.g., update UI or show a success message
         console.log("Project deleted successfully");
+        setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
         closePopup();
       } else {
         // Handle unsuccessful deletion, e.g., show an error message
@@ -211,6 +189,7 @@ const Projects = () => {
   const openAssignPopup = () => {
     console.log("open assign popup");
     setAssignPopupOpen(true);
+    getAssignUsers();
   };
 
   const closeAssignPopup = () => {
@@ -253,32 +232,32 @@ const Projects = () => {
                   bgcolor: "background.paper",
                 }}
               >
-                {users.map((user) => {
-                  const { index, userName, profilePicture } = user;
-                  const labelId = `checkbox-list-secondary-label-${index}`;
+                {users.map((user, index) => {
+                  const { id, name, isProjectAssign } = user;
+                  const labelId = `checkbox-list-label-${id}`;
 
                   return (
-                    <ListItem
-                      key={index}
-                      secondaryAction={
-                        <Checkbox
-                          edge="end"
-                          onChange={handleToggle(index)}
-                          checked={checked.indexOf(index) !== -1}
-                          inputProps={{ "aria-labelledby": labelId }}
-                        />
-                      }
-                      disablePadding
-                    >
+                    <ListItem key={id} disablePadding>
                       <ListItemButton>
                         <ListItemAvatar>
                           <Avatar
+                            alt={name}
                             src={require("../../assets/Images/Profile.jpeg")}
-                            // src={profilePicture}
-                            alt={userName}
                           />
                         </ListItemAvatar>
-                        <ListItemText id={labelId} primary={userName} />
+                        <ListItemText id={labelId} primary={id} />
+                        <ListItemText id={labelId} primary={name} />
+                        <ListItemText
+                          primary={isProjectAssign ? "Yes" : "No"} // Conditional rendering based on isProjectAssign
+                        />
+                        <Checkbox
+                          edge="end"
+                          checked={isProjectAssign}
+                          tabIndex={-1}
+                          disableRipple
+                          inputProps={{ "aria-labelledby": labelId }}
+                          onChange={handleToggle(id)}
+                        />
                       </ListItemButton>
                     </ListItem>
                   );
