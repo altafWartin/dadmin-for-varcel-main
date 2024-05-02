@@ -36,31 +36,41 @@ const Projects = () => {
 
   const [hoveredProjectIndex, setHoveredProjectIndex] = useState(null);
 
+  
+  const [isAssignPopupOpen, setAssignPopupOpen] = useState(false);
+
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+
+
   const notifyDelete = () => toast.success("Project deleted successfully");
 
   const [users, setUsers] = useState([]);
 
   console.log("users", users);
 
-  const getAssignUsers = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/project/get-assign-project/5",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await response.json();
-      const userData = data.data;
-      console.log("API Response:", data); // Log the response
-      setUsers(userData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+const getAssignUsers = async (selectedProjectId) => {
+  const token = localStorage.getItem("token");
+  try {
+    const response = await fetch(
+      `https://d-admin-backend.onrender.com/api/project/get-assign-project/${selectedProjectId}`, // corrected URL interpolation
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const data = await response.json();
+    const userData = data.data;
+    console.log("API Response:", data); // Log the response
+    setUsers(userData); // Assuming setUsers is a state update function
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,27 +105,8 @@ const Projects = () => {
   console.log(projects);
 
   const handleEditProject = async (projectId) => {
-    try {
-      const token = localStorage.getItem("token");
+    navigate(`/projects/editProject/${projectId}`);
 
-      // Make your PATCH request here
-      const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/project/update-project/${projectId}`,
-        {
-          method: "PATCH",
-          Authorization: `Bearer ${token}`,
-        }
-      );
-      const data = await response.json();
-      console.log("Edit project response:", data);
-      setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
-
-      // Navigate to the /editProject route with project data
-      navigate("/editProject", { state: { project: data } });
-    } catch (error) {
-      console.error("Error editing project:", error);
-      // Handle errors or show an error message to the user
-    }
   };
 
   const handleMouseEnter = (index) => {
@@ -138,11 +129,6 @@ const Projects = () => {
 
     setChecked(newChecked);
   };
-
-  const [isAssignPopupOpen, setAssignPopupOpen] = useState(false);
-
-  const [isPopupOpen, setPopupOpen] = useState(false);
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
 
   const openPopup = (projectId) => {
     setPopupOpen(true);

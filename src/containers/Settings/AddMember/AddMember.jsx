@@ -13,13 +13,9 @@ import setting from "../../../assets/Icon/setting.svg";
 import ArrowRight from "../../../assets/Icon/ArrowRight.svg";
 
 const AddMember = () => {
-  const [formType, setFormType] = useState("signup");
+
   const [token, setToken] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
-  const [error, setError] = useState("");
+
 
   const notify = () => toast.ok("Member add successfully");
 

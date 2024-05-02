@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import logo from "../../assets/logo.svg";
 import calendar from "../../assets/Icon/calendar.svg";
 import arrowdown from "../../assets/Icon/arrowdown.svg";
@@ -16,11 +16,59 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const EditProject = () => {
+  const [id, setId] = useState("")
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [projectData, setProjectData] = useState({});
+  const [status, setStatus] = useState("");
+
+  const { projectId } = useParams();
   const navigate = useNavigate();
+  const [token, setToken] = useState("");
+
+  console.log(projectId, "projectId");
+
+  useEffect(() => {
+    // Get token from localStorage when the component mounts
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+
+    const fetchProjectData = async () => {
+      try {
+        const response = await fetch(
+          `https://d-admin-backend.onrender.com/api/project/get-project/${projectId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${storedToken}`,
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch project data");
+        }
+        const projectData = await response.json();
+        console.log("Project data:", projectData);
+
+        // Populate input fields with project data
+        setId(projectData.data.id ||"")
+        setName(projectData.data.name || "");
+        setDescription(projectData.data.description || "");
+        setStatus(projectData.data.status || "");
+        // setStartDate(projectData.data.startDate );
+        // setEndDate(projectData.data.endDate );
+        setProjectData(projectData);
+      } catch (error) {
+        console.error("Error fetching project data:", error);
+      }
+    };
+
+    fetchProjectData();
+  }, [projectId, token]);
+
 
   const notifyAddProject = () => toast.success("Project add successfully");
   const notifyerror = () =>
@@ -48,6 +96,7 @@ const EditProject = () => {
     e.preventDefault();
 
     const formData = {
+      id,
       name,
       description,
       startDate,
@@ -58,9 +107,9 @@ const EditProject = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/project/add-project",
+        "https://d-admin-backend.onrender.com/api/project/update-project",
         {
-          method: "POST",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -86,7 +135,7 @@ const EditProject = () => {
   };
 
   return (
-    <div className=" bg-slate-100  pt-10 pl-[260px] h-[130vh]">
+    <div className=" bg-slate-100  pt-10 pl-[260px] h-[95vh]">
       {" "}
       <ToastContainer />
       <section class="w-[71.125rem] flex flex-col items-center justify-start py-[0rem] px-[1.25rem] box-border gap-[5rem_0rem] max-w-full text-left text-[1.5rem] text-midnightblue font-poppins lg:gap-[5rem_0rem] mq750:gap-[5rem_0rem]">
@@ -277,7 +326,7 @@ const EditProject = () => {
               <div class="h-[3.13rem] w-[24.44rem] relative rounded-lg bg-coral-100 hidden max-w-full"></div>
               <b class="relative text-[0.88rem] leading-[1.25rem] capitalize font-poppins text-white text-left z-[1]">
                 Save
-          </b>
+              </b>
             </button>
           </div>
         </form>

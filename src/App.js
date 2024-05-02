@@ -47,7 +47,7 @@ function App() {
           <Route path="/editWorkspace" element={<EditWorkspace />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/addNewProject" element={<AddProject />} />
-          <Route path="/editProject" element={<EditProject />} />
+          <Route path="/projects/editProject/:projectId" element={<EditProject />} />
           <Route path="/addNewWorkspace" element={<AddNewWorkspace />} />
           <Route path="/workflow" element={<Workflows />} />
           <Route path="/editWorkflow" element={<EditWorkflow />} />
@@ -59,7 +59,7 @@ function App() {
           <Route path="/editImage" element={<EditImage />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/addMember" element={<AddMember />} />
-          <Route path="/settings/editMemberInfo" element={<EditMemberInfo />} />
+          <Route path="/settings/editMemberInfo/:memberId" element={<EditMemberInfo />} />
           <Route path="/settings/teamMember" element={<TeamMember />} />
           <Route path="/changePassword" element={<ChangePassword />} />
         </Routes>

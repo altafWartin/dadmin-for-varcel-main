@@ -196,7 +196,7 @@ const Settings = () => {
             <h3 class="team-members2">Team members</h3>
             <ul class="user-details-li">
               {members.map((member) => (
-                <li key={member.id} class="user-detai flex mb-2 mr-5">.
+                <li key={member.id} class="user-detai flex mb-2 mr-5">
                   <div class="team-members-l">
                     <Link
                       class="no-underline flex text-gray-900"

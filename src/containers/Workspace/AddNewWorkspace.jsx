@@ -15,18 +15,22 @@ const AddNewWorkspace = () => {
   const [labelName, setLabelName] = useState("");
   const [labelNames, setLabelNames] = useState([]);
 
+  // Function to open popup
   const openPopup = () => {
     setPopupOpen(true);
   };
 
+  // Function to close popup
   const closePopup = () => {
     setPopupOpen(false);
   };
 
+  // Function to handle label input change
   const handleLabelChange = (event) => {
     setLabelName(event.target.value);
   };
 
+  // Function to submit label
   const submitLabel = () => {
     setLabelNames((prevLabelNames) => [...prevLabelNames, labelName]);
     setParamCount(paramCount + 1);
@@ -34,26 +38,83 @@ const AddNewWorkspace = () => {
     closePopup();
   };
 
+  // Function to handle deletion of label
   const handleDelete = (index) => {
-    // Create a copy of the labelNames array
     const updatedLabelNames = [...labelNames];
-    // Remove the element at the specified index
     updatedLabelNames.splice(index, 1);
-    // Update the state with the modified array
     setLabelNames(updatedLabelNames);
-    // Update paramCount to reflect the changes
     setParamCount(paramCount - 1);
   };
 
-
+  // UseEffect to log changes in labelName and labelNames
   useEffect(() => {
     console.log(labelName, "labelName");
     console.log(labelNames, "labelNames");
   }, [labelName, labelNames]);
 
-
-
+  // Function to handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      console.log("Form submitted");
   
+      // Get form input values
+      const nameValue = e.target.elements.name.value;
+      const descriptionValue = e.target.elements.description.value;
+      const sourceValue = e.target.elements.source.value;
+      const repositoryValue = e.target.elements.repository.value;
+      const providersValue = e.target.elements.provider.value;
+      const ideValue = e.target.elements.ide.value;
+  
+      // Prepare dynamicDataValue as an array
+    // Prepare dynamicDataValue as an array
+    const dynamicDataValue = labelNames.map((keyValue) => ({
+      key: keyValue,
+      value: e.target.elements[keyValue]?.value || "",
+    }));
+    
+
+      // Log dynamicDataValue
+      console.log("Dynamic data:", dynamicDataValue);
+  
+      // Check if dynamicDataValue is not empty before sending the request
+      if (dynamicDataValue.length === 0) {
+        throw new Error("Dynamic Data Value cannot be empty.");
+      }
+  
+      // Prepare the body data for the POST request
+      const bodyData = {
+        name: nameValue,
+        description: descriptionValue,
+        source: sourceValue,
+        repository: repositoryValue,
+        provider: providersValue,
+        ide: ideValue,
+        dynamicData: dynamicDataValue,
+      };
+  
+      // Send the POST request
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/workspace/add-workspace",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(bodyData),
+        }
+      );
+  
+      // Parse the response JSON
+      const data = await response.json();
+      console.log("Response data:", data); // Handle response data here
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
+  };
+  
+
   return (
     <>
       <div className="containerBody">
@@ -119,7 +180,6 @@ const AddNewWorkspace = () => {
               </div>
             </div>
             <div class="flex flex-row items-start justify-end gap-[1.38rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
-
               <div class="flex flex-row items-start justify-start gap-[0.25rem]">
                 <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.56rem] pl-[0.5rem] gap-[0.38rem]">
                   <img
@@ -145,7 +205,10 @@ const AddNewWorkspace = () => {
               </div>
             </div>
           </div>
-          <form class="m-0 w-[57.44rem] rounded-3xl bg-white flex flex-col items-center justify-start pt-[2.13rem] pb-[2.75rem] pr-[2.81rem] pl-[2.75rem] box-border relative gap-[1.56rem] max-w-full z-[2] mq1050:pl-[1.38rem] mq1050:pr-[1.38rem] mq1050:box-border mq750:pt-[1.38rem] mq750:pb-[1.81rem] mq750:box-border">
+          <form
+            onSubmit={handleSubmit}
+            class="m-0 w-[57.44rem] rounded-3xl bg-white flex flex-col items-center justify-start pt-[2.13rem] pb-[2.75rem] pr-[2.81rem] pl-[2.75rem] box-border relative gap-[1.56rem] max-w-full z-[2] mq1050:pl-[1.38rem] mq1050:pr-[1.38rem] mq1050:box-border mq750:pt-[1.38rem] mq750:pb-[1.81rem] mq750:box-border"
+          >
             <div class="w-[24.44rem] h-[5.13rem] relative hidden max-w-full z-[0]">
               <div class="absolute w-full top-[1.81rem] right-[0rem] left-[0rem] rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-300"></div>
               <div class="absolute top-[3.31rem] right-[1rem] w-[1rem] h-[0.63rem]">
@@ -205,7 +268,7 @@ const AddNewWorkspace = () => {
                   </label>
                   <input
                     type="text"
-                    id="name"
+                    id="description"
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Description"
                     required
@@ -223,7 +286,7 @@ const AddNewWorkspace = () => {
                   </label>
                   <input
                     type="text"
-                    id="name"
+                    id="source"
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Source"
                     required
@@ -238,7 +301,7 @@ const AddNewWorkspace = () => {
                   </label>
                   <input
                     type="text"
-                    id="name"
+                    id="repository"
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Repository"
                     required
@@ -256,7 +319,7 @@ const AddNewWorkspace = () => {
                   </label>
                   <input
                     type="text"
-                    id="Providers"
+                    id="provider"
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Providers"
                     required
@@ -271,7 +334,7 @@ const AddNewWorkspace = () => {
                   </label>
                   <input
                     type="text"
-                    id="IDE"
+                    id="ide"
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="IDE"
                     required
@@ -294,7 +357,7 @@ const AddNewWorkspace = () => {
                     <div className="flex items-center w-full">
                       <input
                         type="text"
-                        // id={labelNames[index]} // You can set the id if needed
+                        id={labelNames[index]} // You can set the id if needed
                         className="bg-gray-50 border h-[3.13rem] capitalize border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                         placeholder={labelNames[index]}
                         required
@@ -321,7 +384,10 @@ const AddNewWorkspace = () => {
             </div>
 
             <div class="w-[26.63rem] flex flex-row items-start justify-start py-[0rem] pr-[2.19rem] pl-[0rem] box-border max-w-full">
-              <button class="cursor-pointer [border:none] p-[0.94rem] bg-coral-100 flex-1 rounded-lg flex flex-row items-center justify-center box-border max-w-full whitespace-nowrap z-[4] hover:bg-chocolate-100">
+              <button
+                type="submit"
+                class="cursor-pointer [border:none] p-[0.94rem] bg-coral-100 flex-1 rounded-lg flex flex-row items-center justify-center box-border max-w-full whitespace-nowrap z-[4] hover:bg-chocolate-100"
+              >
                 <div class="h-[3.13rem] w-[24.44rem] relative rounded-lg bg-coral-100 hidden max-w-full"></div>
                 <b class="relative text-[0.88rem] leading-[1.25rem] capitalize font-poppins text-white text-left z-[1]">
                   add new workspace
