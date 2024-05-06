@@ -14,34 +14,13 @@ import logo from "../../assets/logo.svg";
 const EditWorkspace = () => {
   const { workspaceId } = useParams();
   const navigate = useNavigate();
-  // Static fields state
-  // Static fields state
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [source, setSource] = useState("");
-  const [dynamicData, setDynamicData] = useState([]);
 
-  const [repository, setRepository] = useState("");
-  const [provider, setProvider] = useState("");
-  const [ide, setIde] = useState("");
-  const [dynamic, setDynamic] = useState(""); // Added dynamic state
-
-  // Dynamic fields state
-  const [dynamicFields, setDynamicFields] = useState([]);
-  const [formData, setFormData] = useState({});
-
-// Function to handle input changes
-const handleInputChange = (name, value) => {
-  setFormData((prevData) => ({
-    ...prevData,
-    [name]: value,
-  }));
-};
-
+  console.log(workspaceId, "--------------------------------");
   useEffect(() => {
     const fetchWorkspaceById = async () => {
       try {
         const token = localStorage.getItem("token");
+
         const response = await fetch(
           `https://d-admin-backend.onrender.com/api/workspace/get-workspace/${workspaceId}`,
           {
@@ -53,120 +32,31 @@ const handleInputChange = (name, value) => {
           }
         );
         const data = await response.json();
-        console.log("Edit project response:", data.data);
+        console.log("Edit project response:", data);
+        console.log(data.data.name);
 
-        // Update static fields state
-        setName(data.data.name);
-        setDescription(data.data.description);
-        setSource(data.data.source);
-        setRepository(data.data.repository);
-        setProvider(data.data.provider);
-        setIde(data.data.ide);
-        setDynamic(data.data.dynamicData); // Set dynamic data to the dynamic state
+     
 
-        // Assuming dynamicFields is an array of objects where each object represents a dynamic field
-        // Update dynamic fields state
-        const updatedDynamicFields = data.data.dynamicData.map((field) => ({
-          key: field.key,
-          value: field.value,
-          // Add more properties as needed
-        }));
-        setDynamicFields(updatedDynamicFields);
+
+        const nameValue = data.data.name;
+
+
       } catch (error) {
         console.error("Error fetching workspace:", error);
         // Handle errors or show an error message to the user
       }
     };
 
+    // Call fetchWorkspaceById only if workspaceId is defined
     if (workspaceId) {
       fetchWorkspaceById();
     }
-  }, [workspaceId]);
-
-  // Effect to log all state variables
-  useEffect(() => {
-    console.log("Static Fields:");
-    console.log(`Name: ${name}`);
-    console.log(`Description: ${description}`);
-    console.log(`Source: ${source}`);
-    console.log(`Repository: ${repository}`);
-    console.log(`Providers: ${provider}`);
-    console.log(`IDE: ${ide}`);
-
-    dynamicFields.map((field, index) => {
-      console.log(`Dynamic Field ${index + 1}:`, field);
-    });
-  }, [name, description, source, repository, provider, ide, dynamicFields]);
+  }, [workspaceId]); // Include workspaceId in the dependency array
 
   const [paramCount, setParamCount] = useState(0);
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [labelName, setLabelName] = useState("");
   const [labelNames, setLabelNames] = useState([]);
-
-  // Function to handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      console.log("Form submitted");
-
-      // Get form input values
-      const id = workspaceId;
-      const nameValue = name;
-      const descriptionValue = description;
-      const sourceValue = source;
-      const repositoryValue = repository;
-      const providersValue = provider;
-      const ideValue = ide;
-
-      // Assuming dynamicData is an array of objects containing key-value pairs
-      const dynamicDataValue = dynamicFields.map((field) => ({
-        key: field.key,
-        value: field.value,
-        // Add more properties as needed
-      }));
-
-      // Log dynamicDataValue
-      console.log("Dynamic data:", dynamicDataValue);
-
-      // Check if dynamicDataValue is not empty before sending the request
-      if (dynamicDataValue.length === 0) {
-        throw new Error("Dynamic Data Value cannot be empty.");
-      }
-
-      // Prepare the body data for the POST request
-      const bodyData = {
-        id: id,
-        name: nameValue,
-        description: descriptionValue,
-        source: sourceValue,
-        repository: repositoryValue,
-        provider: providersValue,
-        ide: ideValue,
-        dynamicData: dynamicDataValue,
-      };
-      console.log("Body data:", bodyData); // Log the body data for debugging
-
-      // Send the POST request
-      const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/workspace/update-workspace",
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify(bodyData),
-        }
-      );
-
-      // Parse the response JSON
-      const data = await response.json();
-      console.log("Response data:", data); // Handle response data here
-    } catch (error) {
-      console.error("Error:", error.message);
-    }
-  };
-
   // Function to open popup
   const openPopup = () => {
     setPopupOpen(true);
@@ -204,66 +94,66 @@ const handleInputChange = (name, value) => {
     console.log(labelNames, "labelNames");
   }, [labelName, labelNames]);
 
-  // // Function to handle form submission
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     console.log("Form submitted");
+  // Function to handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      console.log("Form submitted");
 
-  //     // Get form input values
-  //     const nameValue = e.target.elements.name.value;
-  //     const descriptionValue = e.target.elements.description.value;
-  //     const sourceValue = e.target.elements.source.value;
-  //     const repositoryValue = e.target.elements.repository.value;
-  //     const providersValue = e.target.elements.provider.value;
-  //     const ideValue = e.target.elements.ide.value;
+      // Get form input values
+      const nameValue = e.target.elements.name.value;
+      const descriptionValue = e.target.elements.description.value;
+      const sourceValue = e.target.elements.source.value;
+      const repositoryValue = e.target.elements.repository.value;
+      const providersValue = e.target.elements.provider.value;
+      const ideValue = e.target.elements.ide.value;
 
-  //     // Prepare dynamicDataValue as an array
-  //     // Prepare dynamicDataValue as an array
-  //     const dynamicDataValue = labelNames.map((keyValue) => ({
-  //       key: keyValue,
-  //       value: e.target.elements[keyValue]?.value || "",
-  //     }));
+      // Prepare dynamicDataValue as an array
+      // Prepare dynamicDataValue as an array
+      const dynamicDataValue = labelNames.map((keyValue) => ({
+        key: keyValue,
+        value: e.target.elements[keyValue]?.value || "",
+      }));
 
-  //     // Log dynamicDataValue
-  //     console.log("Dynamic data:", dynamicDataValue);
+      // Log dynamicDataValue
+      console.log("Dynamic data:", dynamicDataValue);
 
-  //     // Check if dynamicDataValue is not empty before sending the request
-  //     if (dynamicDataValue.length === 0) {
-  //       throw new Error("Dynamic Data Value cannot be empty.");
-  //     }
+      // Check if dynamicDataValue is not empty before sending the request
+      if (dynamicDataValue.length === 0) {
+        throw new Error("Dynamic Data Value cannot be empty.");
+      }
 
-  //     // Prepare the body data for the POST request
-  //     const bodyData = {
-  //       name: nameValue,
-  //       description: descriptionValue,
-  //       source: sourceValue,
-  //       repository: repositoryValue,
-  //       provider: providersValue,
-  //       ide: ideValue,
-  //       dynamicData: dynamicDataValue,
-  //     };
+      // Prepare the body data for the POST request
+      const bodyData = {
+        name: nameValue,
+        description: descriptionValue,
+        source: sourceValue,
+        repository: repositoryValue,
+        provider: providersValue,
+        ide: ideValue,
+        dynamicData: dynamicDataValue,
+      };
 
-  //     // Send the POST request
-  //     const response = await fetch(
-  //       "https://d-admin-backend.onrender.com/api/workspace/add-workspace",
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //         body: JSON.stringify(bodyData),
-  //       }
-  //     );
+      // Send the POST request
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/workspace/add-workspace",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(bodyData),
+        }
+      );
 
-  //     // Parse the response JSON
-  //     const data = await response.json();
-  //     console.log("Response data:", data); // Handle response data here
-  //   } catch (error) {
-  //     console.error("Error:", error.message);
-  //   }
-  // };
+      // Parse the response JSON
+      const data = await response.json();
+      console.log("Response data:", data); // Handle response data here
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
+  };
 
   return (
     <>
@@ -404,8 +294,6 @@ const handleInputChange = (name, value) => {
                   <input
                     type="text"
                     id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Name"
                     required
@@ -421,8 +309,6 @@ const handleInputChange = (name, value) => {
                   <input
                     type="text"
                     id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Description"
                     required
@@ -441,8 +327,6 @@ const handleInputChange = (name, value) => {
                   <input
                     type="text"
                     id="source"
-                    value={source}
-                    onChange={(e) => setSource(e.target.value)}
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Source"
                     required
@@ -458,8 +342,6 @@ const handleInputChange = (name, value) => {
                   <input
                     type="text"
                     id="repository"
-                    value={repository}
-                    onChange={(e) => setRepository(e.target.value)}
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Repository"
                     required
@@ -473,13 +355,11 @@ const handleInputChange = (name, value) => {
                     for="Providers"
                     class="block ml-2 text-sm uppercase font-medium text-bodytext-50 dark:text-white"
                   >
-                    Provider
+                    Providers
                   </label>
                   <input
                     type="text"
                     id="provider"
-                    value={provider}
-                    onChange={(e) => setProvider(e.target.value)}
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="Providers"
                     required
@@ -495,8 +375,6 @@ const handleInputChange = (name, value) => {
                   <input
                     type="text"
                     id="ide"
-                    value={ide}
-                    onChange={(e) => setIde(e.target.value)}
                     class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                     placeholder="IDE"
                     required
@@ -523,38 +401,6 @@ const handleInputChange = (name, value) => {
                         className="bg-gray-50 border h-[3.13rem] capitalize border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                         placeholder={labelNames[index]}
                         required
-                        value={formData[labelNames[index]] || ""} // Bind value from form data if available
-                        onChange={(e) =>
-                          handleInputChange(labelNames[index], e.target.value)
-                        } // Pass label name and input value to handleInputChange function
-                      />
-                      <i
-                        className="bi bi-trash ml-2 cursor-pointer mx-4 text-red-500"
-                        onClick={() => handleDelete(index)}
-                      ></i>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Display dynamic data */}
-                {dynamicFields.map((data, index) => (
-                  <div
-                    key={index}
-                    className="flex-1 flex flex-col w-full items-start justify-start pt-[0.25rem] px-[0.5rem] pb-[1.13rem] box-border relative gap-[0.5rem] z-[3]"
-                  >
-                    <label
-                      htmlFor={`dynamicLabel${index}`}
-                      className="block ml-2 text-sm uppercase font-medium text-bodytext-50 dark:text-white"
-                    >
-                      {data.key}
-                    </label>
-                    <div className="flex items-center w-full">
-                      <input
-                        type="text"
-                        id={`dynamicLabel${index}`}
-                        value={data.value}
-                        className="bg-gray-50 border h-[3.13rem] capitalize border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                        readOnly
                       />
                       <i
                         className="bi bi-trash ml-2 cursor-pointer mx-4 text-red-500"

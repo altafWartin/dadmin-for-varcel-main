@@ -86,7 +86,7 @@ const Workspace = () => {
 
   const [hoveredProjectIndex, setHoveredProjectIndex] = useState(null);
 
-  const notifyDelete = () => toast.success("Project deleted successfully");
+  const notifyDelete = () => toast.success("Workspace deleted successfully");
   useEffect(() => {
     const fetchData = async () => {
       if (shouldFetchData) {
@@ -105,7 +105,6 @@ const Workspace = () => {
           if (data.success) {
             setWorkspaces(data.data.rows);
             setShouldFetchData(false); // Set shouldFetchData to true after successful deletion
-
           } else {
             console.error("Failed to fetch projects:", data.message);
           }
@@ -120,27 +119,8 @@ const Workspace = () => {
 
   console.log(workspaces);
 
-  const handleEditWorkspace = async (projectId) => {
-    try {
-      const token = localStorage.getItem("token");
-
-      // Make your PATCH request here
-      const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/project/update-project/${projectId}`,
-        {
-          method: "PATCH",
-          Authorization: `Bearer ${token}`,
-        }
-      );
-      const data = await response.json();
-      console.log("Edit project response:", data);
-
-      // Navigate to the /editProject route with project data
-      navigate("/editWorkspace", { state: { project: data } });
-    } catch (error) {
-      console.error("Error editing project:", error);
-      // Handle errors or show an error message to the user
-    }
+  const handleEditWorkspace = async (workspaceId) => {
+    navigate(`/workspace/editWorkspace/${workspaceId}`);
   };
 
   const handleMouseEnter = (index) => {
@@ -170,6 +150,7 @@ const Workspace = () => {
 
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(null);
+  const [message, setMessage] = useState("");
 
   const openPopup = (workspaceId) => {
     setPopupOpen(true);
@@ -177,6 +158,7 @@ const Workspace = () => {
   };
   const handleDeleteWorkspace = async (selectedWorkspaceId) => {
     try {
+      console.log(`Deleting ${selectedWorkspaceId}`);
       const token = localStorage.getItem("token");
 
       const response = await fetch(
@@ -195,8 +177,19 @@ const Workspace = () => {
       if (response.ok) {
         // Handle successful deletion, e.g., update UI or show a success message
         console.log("Project deleted successfully");
+        setMessage(successMessage);
+        // Set shouldFetchData to true after successful deletion
+
+        // Get the response data
+        const data = await response.json();
+        console.log("Response data:", data);
+        notifyDelete();
+        // Save the success message from the response data
+        const successMessage = data.message; // Adjust the key according to your API response structure
+        console.log("Success message:", successMessage);
         closePopup();
-        setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+        setShouldFetchData(true);
+        // You can display or store the success message as needed
       } else {
         // Handle unsuccessful deletion, e.g., show an error message
         console.error("Failed to delete project");
@@ -232,6 +225,8 @@ const Workspace = () => {
 
   return (
     <div>
+      {" "}
+      <ToastContainer />
       <div>
         {isAssignPopupOpen && (
           <div class="fixed top-1/2 left-1/2 h-[28.31rem] transform bg-blend-difference -translate-x-1/2 -translate-y-1/2 z-[9999] w-full max-w-[25.88rem] p-8 bg-white rounded-3xl shadow-lg backdrop-blur-[8px]">
@@ -360,7 +355,7 @@ const Workspace = () => {
                 to="/addNewWorkspace"
                 class="cursor-pointer no-underline [border:none] py-[0.38rem] pr-[1.38rem] pl-[1.81rem] bg-coral-100 rounded-3xs flex flex-row items-center justify-end whitespace-nowrap hover:bg-chocolate-100"
               >
-                <div class="h-[2rem] w-[7.63rem] relative rounded-3xs bg-coral-100 hidden"></div>
+       
                 <div class="relative text-[0.94rem] leading-[1.25rem] font-semibold font-poppins text-white text-left z-[1]">
                   Add New
                 </div>

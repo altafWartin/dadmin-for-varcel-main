@@ -2,15 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Link, Route, useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import "./Settings.css";
 import calendar from "../../assets/Icon/calendar.svg";
 import orgcalendar from "../../assets/Icon/orgcalendar.svg";
 import EditButton from "../../assets/Icon/EditButton.svg";
-import arrowdown from "../../assets/Icon/arrowdown.svg"
+import arrowdown from "../../assets/Icon/arrowdown.svg";
 import setting from "../../assets/Icon/setting.svg";
 import Deleteiconn from "../../assets/Icon/Deleteiconn.svg";
 import clipboard from "../../assets/Icon/clipboard-text.svg";
@@ -18,19 +17,18 @@ import clock from "../../assets/Icon/clock.svg";
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 import file2 from "../../assets/Images/File 2.png";
 
-
 const Settings = () => {
   const [members, setMembers] = useState([]);
   const [token, setToken] = useState("");
   const navigate = useNavigate();
+  const [shouldFetchData, setShouldFetchData] = useState(true);
 
   useEffect(() => {
     fetchMembers();
-  }, [members]);
-
+  }, [shouldFetchData]);
 
   const notifyDelete = () => toast.success("User deleted successfully");
- 
+
   const fetchMembers = () => {
     const token = localStorage.getItem("token");
 
@@ -43,6 +41,7 @@ const Settings = () => {
       .then((data) => {
         if (data.success) {
           setMembers(data.data.rows);
+          setShouldFetchData(false); // Set shouldFetchData to true after successful deletion
         } else {
           console.error("Failed to fetch members:", data.message);
         }
@@ -88,6 +87,8 @@ const Settings = () => {
         }
         // Assuming you have access to the updatedMembers array and can update its state
         setMembers(updatedMembers);
+        setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+
         console.log("Active status updated successfully");
       })
       .catch((error) => {
@@ -98,24 +99,30 @@ const Settings = () => {
       });
   };
 
-  
   const handleDeleteMember = (memberId) => {
     const token = localStorage.getItem("token");
 
-    fetch(`https://d-admin-backend.onrender.com/api/user/delete-member/${memberId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    fetch(
+      `https://d-admin-backend.onrender.com/api/user/delete-member/${memberId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
           // Update the list of members after successful deletion
-          const updatedMembers = members.filter((member) => member.id !== memberId);
+          const updatedMembers = members.filter(
+            (member) => member.id !== memberId
+          );
           setMembers(updatedMembers);
+          setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+
           console.log("Member deleted successfully.");
-          notifyDelete()
+          notifyDelete();
         } else {
           console.error("Failed to delete member:", data.message);
         }
@@ -125,6 +132,9 @@ const Settings = () => {
       });
   };
 
+  const navigateToTeamMember = (memberId) => {
+    navigate(`/settings/teamMember/${memberId}`);
+  };
 
   return (
     <div className="containerBody">
@@ -198,9 +208,9 @@ const Settings = () => {
               {members.map((member) => (
                 <li key={member.id} class="user-detai flex mb-2 mr-5">
                   <div class="team-members-l">
-                    <Link
-                      class="no-underline flex text-gray-900"
-                      to="teamMember"
+                    <button
+                      class="no-underline flex bg-white text-gray-900"
+                      onClick={() => navigateToTeamMember(member.id)}
                     >
                       <img
                         class="team-members-list-item mr-3"
@@ -213,7 +223,7 @@ const Settings = () => {
                         <div class="john-fred1">{member.fullName}</div>
                         <div class="johnfredgmailcom1">{member.email}</div>
                       </div>
-                    </Link>
+                    </button>
                   </div>
                   <button class="group-button mx-8">
                     <div class="frame-child7"></div>
@@ -236,7 +246,7 @@ const Settings = () => {
                         type="switch"
                         id={`custom-switch-${member.id}`}
                         className="custom-switch content-center"
-                        label={member.isActive ? 'Active' : 'Inactive'}
+                        label={member.isActive ? "Active" : "Inactive"}
                         checked={member.isActive}
                         onChange={handleSwitchChange}
                       />

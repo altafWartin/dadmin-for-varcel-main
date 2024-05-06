@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import Sidebar from "../../components/Sidebar/Sidebar";
-import Navbar from "../../components/Navbar/Navbar";
-import Dropdown from "react-bootstrap/Dropdown";
+import React, { useEffect, useState } from "react";
+
 import Form from "react-bootstrap/Form";
+import { useParams, useHistory } from "react-router-dom";
 
 import calendar from "../../assets/Icon/calendar.svg";
 import arrowdown from "../../assets/Icon/arrowdown.svg";
@@ -13,14 +12,10 @@ import setting from "../../assets/Icon/setting.svg";
 import threedots from "../../assets/Icon/threedots.svg";
 import profile from "../../assets/Icon/profile-user 1.svg";
 import p2 from "../../assets/Images/p2.svg";
-import icon4 from "../../assets/Icon/icon-4.svg";
+
 import p3 from "../../assets/Images/p3.svg";
 import p4 from "../../assets/Images/p4.svg";
-import plusicon from "../../assets/Icon/plusicon.svg";
-import send from "../../assets/Icon/send.svg";
-import icon1 from "../../assets/Icon/icon-1.svg";
-import icon2 from "../../assets/Icon/icon-2.svg";
-import icon3 from "../../assets/Icon/icon-3.svg";
+
 import "./AddMember/AddMember.css";
 
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
@@ -31,7 +26,6 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Checkbox from "@mui/material/Checkbox";
-import Avatar from "@mui/material/Avatar";
 
 const users = [
   {
@@ -84,15 +78,211 @@ const users = [
   // Add more objects as needed
 ];
 
+const formatDate = (dateString) => {
+  const dateObject = new Date(dateString);
+  const year = dateObject.getFullYear();
+  const month = (dateObject.getMonth() + 1).toString().padStart(2, "0"); // Adding 1 to get the correct month (0-indexed)
+  const date = dateObject.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${date}`;
+};
+
 const TeamMember = () => {
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [selectedButton, setSelectedButton] = useState("project");
   const [isAssignPopupOpen, setAssignPopupOpen] = useState(false);
+  const [hoveredProjectIndex, setHoveredProjectIndex] = useState(null);
+
+  const [projects, setProjects] = useState([]);
+  const [workspace, setWorkspace] = useState([]);
+  const [workflow, setWorkflow] = useState([]);
+  const [container, setContainer] = useState([]);
+
+  const [assignProjects, setAssignProjects] = useState([]);
+  const [assignWorkspaces, setAssignWorkspaces] = useState([]);
+  const [assignWorkflows, setAssignWorkflows] = useState([]);
+  const [assignContainers, setAssignContainers] = useState([]);
+
+  const { memberId } = useParams();
+
+  // Now you can use `memberId` in your component logic
+  console.log(memberId, "memberId"); // This will log the memberId from the URL
+
+  useEffect(() => {
+    const fetchProjects = async (memberId) => {
+      const token = localStorage.getItem("token");
+
+      try {
+        const response = await fetch(
+          `https://d-admin-backend.onrender.com/api/setting/get-user-projects`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ id: memberId }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+
+        const data = await response.json();
+
+        setProjects(data.data.projects); // Assuming the response has a 'projects' field
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchProjects(memberId);
+  }, [memberId]);
+
+  useEffect(() => {
+    const fetchWorkspace = async (memberId) => {
+      const token = localStorage.getItem("token");
+
+      try {
+        const response = await fetch(
+          `https://d-admin-backend.onrender.com/api/setting/get-user-workspaces`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ id: memberId }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+
+        const data = await response.json();
+        console.log(data, "dataaaaaaaaaa");
+
+        setWorkspace(data.data.workspace); // Assuming the response has a 'projects' field
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchWorkspace(memberId);
+  }, [memberId]);
+
+  useEffect(() => {
+    const fetchWorkflows = async (memberId) => {
+      const token = localStorage.getItem("token");
+
+      try {
+        const response = await fetch(
+          `https://d-admin-backend.onrender.com/api/setting/get-user-workflow`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ id: memberId }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+
+        const data = await response.json();
+
+        setWorkflow(data.data.workflow); // Assuming the response has a 'projects' field
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchWorkflows(memberId);
+  }, [memberId]);
+
+  useEffect(() => {
+    const fetchContainers = async (memberId) => {
+      const token = localStorage.getItem("token");
+
+      try {
+        const response = await fetch(
+          `https://d-admin-backend.onrender.com/api/setting/get-user-containers`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ id: memberId }),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch projects");
+        }
+
+        const data = await response.json();
+        console.log("dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", data.data);
+
+        setContainer(data.data); // Assuming the response has a 'projects' field
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchContainers(memberId);
+  }, [memberId]);
+
+  const fetchAssignProjects = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/setting/get-assign-user-projects/${memberId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log(data.data, "assign user projects");
+      setAssignProjects(data.data);
+
+      // Assuming data.data is an array of projects with isAssign property
+
+      // Filter projects where isProjectAssign is true and extract their IDs
+      const checkedIds = data.data
+        .filter((project) => project.isProjectAssign)
+        .map((project) => project.id);
+
+      setAssignProjects(data.data);
+      setProjectChecked(checkedIds); // Set checked state with IDs of assigned projects
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAssignProjects();
+  }, [memberId]); // Fetch data when memberId changes
+
+  console.log(assignProjects, "assign projects");
 
   const handleButtonClick = (button) => {
     setSelectedButton(button);
   };
 
+  console.log(projects, "projects");
   const openPopup = () => {
     setPopupOpen(true);
   };
@@ -102,6 +292,7 @@ const TeamMember = () => {
   };
 
   const openAssignPopup = () => {
+    fetchAssignProjects();
     console.log("open assign popup");
     setAssignPopupOpen(true);
   };
@@ -111,19 +302,61 @@ const TeamMember = () => {
     setPopupOpen(false);
   };
 
-  const [checked, setChecked] = React.useState([1]);
+  const [checked, setChecked] = React.useState([]);
 
-  const handleToggle = (value) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
+  const [projectChecked, setProjectChecked] = React.useState([]);
+  console.log("projectChecked", projectChecked);
 
-    if (currentIndex === -1) {
-      newChecked.push(value);
+  const handleToggle = (id, isProjectAssign) => () => {
+    const updatedProjects = assignProjects.map((project) =>
+      project.id === id
+        ? { ...project, isProjectAssign: !isProjectAssign }
+        : project
+    );
+    setAssignProjects(updatedProjects);
+    console.log(updatedProjects, "updated projects");
+
+    const isChecked = projectChecked.includes(id);
+    if (isChecked) {
+      const newChecked = projectChecked.filter((checkedId) => checkedId !== id);
+      setProjectChecked(newChecked);
     } else {
-      newChecked.splice(currentIndex, 1);
+      setProjectChecked([...projectChecked, id]);
     }
+  };
 
-    setChecked(newChecked);
+  const handleAssignProjects = async () => {
+    const token = localStorage.getItem("token");
+
+    const requestBody = {
+      userId: memberId,
+      assignIds: projectChecked,
+    };
+
+    try {
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/setting/assign-projects-to-user",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log("Assign projects response:", data);
+      // Handle success or further actions here
+    } catch (error) {
+      console.error("Error assigning projects:", error);
+      // Handle error cases here
+    }
   };
 
   return (
@@ -293,26 +526,26 @@ const TeamMember = () => {
                       bgcolor: "background.paper",
                     }}
                   >
-                    {users.map((user) => {
-                      const { index, userName, profilePicture } = user;
-                      const labelId = `checkbox-list-secondary-label-${index}`;
+                    {assignProjects.map((project) => {
+                      const { id, name, isProjectAssign } = project;
+                      const labelId = `checkbox-list-secondary-label-${id}`;
 
                       return (
                         <ListItem
-                          key={index}
+                          key={project.id}
                           secondaryAction={
                             <Checkbox
                               edge="end"
-                              onChange={handleToggle(index)}
-                              checked={checked.indexOf(index) !== -1}
+                              onChange={handleToggle(id, isProjectAssign)}
+                              checked={projectChecked.includes(id)}
                               inputProps={{ "aria-labelledby": labelId }}
                             />
                           }
                           disablePadding
                         >
                           <ListItemButton>
-                            <p>{`projects id ${index}`}</p>
-                            <p class="ml-8">avala project</p>
+                            <p className="ml-5">{project.id}</p>
+                            <p class="ml-12">{project.name}</p>
                           </ListItemButton>
                         </ListItem>
                       );
@@ -321,7 +554,7 @@ const TeamMember = () => {
                 </div>
                 <div className="d-flex justify-content-end">
                   <button
-                    onClick={closeAssignPopup}
+                    onClick={handleAssignProjects}
                     className="mb-2 w-full right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
                   >
                     Assign
@@ -358,494 +591,135 @@ const TeamMember = () => {
             </div>
 
             <tbody className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
+              {projects.map((project) => (
+                <div
+                  key={project.id}
+                  class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap"
+                >
+                  <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
+                  <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
+                    <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
+                      {project.id}
+                    </div>
                   </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
+                  <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
+                    <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
+                      <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
+                        <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
+                          {project.name}
+                        </div>
+                      </div>
+                      <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
+                        <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
+                          {formatDate(project.created_at)}
+                        </div>
+                      </div>
+                      <div class="w-[7.38rem] flex flex-col items-start justify-start">
+                        <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
+                          <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
+                          <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
+                            {project.status}
+                          </div>
+                        </button>
+                      </div>
+
+                      <div className="pr-4">
+                        <Form className="content-center">
+                          <Form.Check
+                            type="switch"
+                            id={`custom-switch-${project.id}`}
+                            className="custom-switch content-center"
+                            label={project.isActive ? "Active" : "Inactive"}
+                            checked={project.isActive}
+                            // onChange={handleSwitchChange}
+                          />
+                        </Form>
                       </div>
                     </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
+                  </div>
+                  <div
+                    className="hover-div"
+                    // onMouseEnter={() => handleMouseEnter(project.index)}
+                    // onMouseLeave={handleMouseLeave}
+                  >
+                    <img
+                      className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p3}
+                    />
+                    <img
+                      className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p2}
+                    />
+                    <img
+                      className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p4}
+                    />
+
+                    {hoveredProjectIndex === project.index && (
+                      <div className="user-list absolute h-[12rem] overflow-y-auto bg-gray-100 bg-opacity-70 z-10">
+                        <List>
+                          {users.map((user) => (
+                            <ListItem
+                              // onClick={handleListItemClick}
+                              key={user.index}
+                              disablePadding
+                            >
+                              <ListItemButton>
+                                <ListItemAvatar>
+                                  <img src={user.profilePicture} alt="" />
+                                  <img
+                                    className="self-stretch ml-[-10px] h-[3.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                                    loading="lazy"
+                                    alt=""
+                                    src={p4}
+                                  />
+                                </ListItemAvatar>
+                                <div className="">
+                                  <ListItemText primary={user.userName} />
+                                  <p className="text-sm"> Software Developer</p>
+                                </div>
+                              </ListItemButton>
+                            </ListItem>
+                          ))}
+                        </List>
                       </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
+                    )}
+                  </div>
+                  <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
+                    <div class="flex flex-row items-center justify-start gap-[1rem]">
+                      <button
+                        // onClick={() => handleEditProject(project.id)}
+                        className="no-underline  bg-white"
+                      >
+                        <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
+                          <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
+                          <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
+                            
+                          </div>
                         </div>
                       </button>
                     </div>
 
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
+                    {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
+                    <button
+                      className="bg-white"
+                      onClick={() => openPopup(project.id)}
+                    >
+                      <img
+                        class="h-[1.25rem] w-[1.28rem] relative z-[1]"
+                        alt=""
+                        src={threedots}
+                      />
+                    </button>
                   </div>
                 </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
+              ))}
             </tbody>
           </div>
         </div>
@@ -947,494 +821,139 @@ const TeamMember = () => {
             </div>
 
             <tbody className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
+              {workspace.map((workspace) => (
+                <div
+                  key={workspace.index}
+                  class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap"
+                >
+                  <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
+                  <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
+                    <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
+                      {workspace.id}
+                    </div>
                   </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
+                  <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
+                    <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
+                      <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
+                        <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
+                          {workspace.name}
+                        </div>
+                      </div>
+                      <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
+                        <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
+                          {formatDate(workspace.created_at)}
+                        </div>
+                      </div>
+                      <div class="w-[7.38rem] flex flex-col items-start justify-start">
+                        <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
+                          <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
+                          <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
+                            {workspace.status}
+                          </div>
+                        </button>
+                      </div>
+
+                      <div className="pr-4">
+                        <Form className="content-center">
+                          <Form.Check
+                            type="switch"
+                            id={`custom-switch-${workspace.id}`}
+                            className="custom-switch content-center"
+                            label={workspace.isActive ? "Active" : "Inactive"}
+                            checked={workspace.isActive}
+                            // onChange={handleSwitchChange}
+                          />
+                        </Form>
                       </div>
                     </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
+                  </div>
+                  <div
+                    className="hover-div"
+                    // onMouseEnter={() => handleMouseEnter(workspace.index)}
+                    // onMouseLeave={handleMouseLeave}
+                  >
+                    <img
+                      className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p3}
+                    />
+                    <img
+                      className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p2}
+                    />
+                    <img
+                      className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p4}
+                    />
+
+                    {hoveredProjectIndex === workspace.index && (
+                      <div className="user-list absolute h-[12rem] overflow-y-auto bg-gray-100 bg-opacity-70 z-10">
+                        <List>
+                          {users.map((user) => (
+                            <ListItem
+                              // onClick={handleListItemClick}
+                              // key={user.index}
+                              disablePadding
+                            >
+                              <ListItemButton>
+                                <ListItemAvatar>
+                                  {/* <Avatar
+                                    src={user.profilePicture}
+                                    alt={user.userName}
+                                  />
+                                  <img src={user.profilePicture} alt="" /> */}
+                                  <img
+                                    className="self-stretch ml-[-10px] h-[3.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                                    loading="lazy"
+                                    alt=""
+                                    src={p4}
+                                  />
+                                </ListItemAvatar>
+                                <div className="">
+                                  <ListItemText primary={user.userName} />
+                                  <p className="text-sm"> Software Developer</p>
+                                </div>
+                              </ListItemButton>
+                            </ListItem>
+                          ))}
+                        </List>
                       </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
+                    )}
+                  </div>
+                  <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
+                    <div class="flex flex-row items-center justify-start gap-[1rem]">
+                      <button
+                        // onClick={() => handleEditWorkspace(workspace.id)}
+                        className="no-underline  bg-white"
+                      >
+                        <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
+                          <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
+                          <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
+                            
+                          </div>
                         </div>
                       </button>
                     </div>
 
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
+                    {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
+                    <button
+                      className="bg-white"
+                      onClick={() => openPopup(workspace.id)}
+                    >
+                      <img
+                        class="h-[1.25rem] w-[1.28rem] relative z-[1]"
+                        alt=""
+                        src={threedots}
+                      />
+                    </button>
                   </div>
                 </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
+              ))}
             </tbody>
           </div>
         </div>
@@ -1536,494 +1055,139 @@ const TeamMember = () => {
             </div>
 
             <tbody className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
+              {workflow.map((workflow) => (
+                <div
+                  key={workflow.index}
+                  class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap"
+                >
+                  <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
+                  <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
+                    <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
+                      {workflow.id}
+                    </div>
                   </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
+                  <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
+                    <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
+                      <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
+                        <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
+                          {workflow.name}
+                        </div>
+                      </div>
+                      <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
+                        <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
+                          {formatDate(workflow.created_at)}
+                        </div>
+                      </div>
+                      <div class="w-[7.38rem] flex flex-col items-start justify-start">
+                        <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
+                          <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
+                          <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
+                            {workflow.status}
+                          </div>
+                        </button>
+                      </div>
+
+                      <div className="pr-4">
+                        <Form className="content-center">
+                          <Form.Check
+                            type="switch"
+                            id={`custom-switch-${workflow.id}`}
+                            className="custom-switch content-center"
+                            label={workflow.isActive ? "Active" : "Inactive"}
+                            checked={workflow.isActive}
+                            // onChange={handleSwitchChange}
+                          />
+                        </Form>
                       </div>
                     </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
+                  </div>
+                  <div
+                    className="hover-div"
+                    // onMouseEnter={() => handleMouseEnter(workspace.index)}
+                    // onMouseLeave={handleMouseLeave}
+                  >
+                    <img
+                      className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p3}
+                    />
+                    <img
+                      className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p2}
+                    />
+                    <img
+                      className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p4}
+                    />
+
+                    {hoveredProjectIndex === workflow.index && (
+                      <div className="user-list absolute h-[12rem] overflow-y-auto bg-gray-100 bg-opacity-70 z-10">
+                        <List>
+                          {users.map((user) => (
+                            <ListItem
+                              // onClick={handleListItemClick}
+                              // key={user.index}
+                              disablePadding
+                            >
+                              <ListItemButton>
+                                <ListItemAvatar>
+                                  {/* <Avatar
+                                    src={user.profilePicture}
+                                    alt={user.userName}
+                                  />
+                                  <img src={user.profilePicture} alt="" /> */}
+                                  <img
+                                    className="self-stretch ml-[-10px] h-[3.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                                    loading="lazy"
+                                    alt=""
+                                    src={p4}
+                                  />
+                                </ListItemAvatar>
+                                <div className="">
+                                  <ListItemText primary={user.userName} />
+                                  <p className="text-sm"> Software Developer</p>
+                                </div>
+                              </ListItemButton>
+                            </ListItem>
+                          ))}
+                        </List>
                       </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
+                    )}
+                  </div>
+                  <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
+                    <div class="flex flex-row items-center justify-start gap-[1rem]">
+                      <button
+                        // onClick={() => handleEditWorkspace(workspace.id)}
+                        className="no-underline  bg-white"
+                      >
+                        <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
+                          <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
+                          <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
+                            
+                          </div>
                         </div>
                       </button>
                     </div>
 
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
+                    {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
+                    <button
+                      className="bg-white"
+                      onClick={() => openPopup(workflow.id)}
+                    >
+                      <img
+                        class="h-[1.25rem] w-[1.28rem] relative z-[1]"
+                        alt=""
+                        src={threedots}
+                      />
+                    </button>
                   </div>
                 </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
+              ))}
             </tbody>
           </div>
         </div>
@@ -2122,496 +1286,140 @@ const TeamMember = () => {
                 <p className="pr-10">action</p>
               </thead>
             </div>
-
             <tbody className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
+              {container.map((container) => (
+                <div
+                  key={container.index}
+                  class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap"
+                >
+                  <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
+                  <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
+                    <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
+                      {container.id}
+                    </div>
                   </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
+                  <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
+                    <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
+                      <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
+                        <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
+                          {container.name}
+                        </div>
+                      </div>
+                      <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
+                        <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
+                          {formatDate(container.created_at)}
+                        </div>
+                      </div>
+                      <div class="w-[7.38rem] flex flex-col items-start justify-start">
+                        <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
+                          <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
+                          <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
+                            {container.status}
+                          </div>
+                        </button>
+                      </div>
+
+                      <div className="pr-4">
+                        <Form className="content-center">
+                          <Form.Check
+                            type="switch"
+                            id={`custom-switch-${container.id}`}
+                            className="custom-switch content-center"
+                            label={container.isActive ? "Active" : "Inactive"}
+                            checked={container.isActive}
+                            // onChange={handleSwitchChange}
+                          />
+                        </Form>
                       </div>
                     </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
+                  </div>
+                  <div
+                    className="hover-div"
+                    // onMouseEnter={() => handleMouseEnter(workspace.index)}
+                    // onMouseLeave={handleMouseLeave}
+                  >
+                    <img
+                      className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p3}
+                    />
+                    <img
+                      className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p2}
+                    />
+                    <img
+                      className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                      loading="lazy"
+                      alt=""
+                      src={p4}
+                    />
+
+                    {hoveredProjectIndex === container.index && (
+                      <div className="user-list absolute h-[12rem] overflow-y-auto bg-gray-100 bg-opacity-70 z-10">
+                        <List>
+                          {users.map((user) => (
+                            <ListItem
+                              // onClick={handleListItemClick}
+                              // key={user.index}
+                              disablePadding
+                            >
+                              <ListItemButton>
+                                <ListItemAvatar>
+                                  {/* <Avatar
+                                    src={user.profilePicture}
+                                    alt={user.userName}
+                                  />
+                                  <img src={user.profilePicture} alt="" /> */}
+                                  <img
+                                    className="self-stretch ml-[-10px] h-[3.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                                    loading="lazy"
+                                    alt=""
+                                    src={p4}
+                                  />
+                                </ListItemAvatar>
+                                <div className="">
+                                  <ListItemText primary={user.userName} />
+                                  <p className="text-sm"> Software Developer</p>
+                                </div>
+                              </ListItemButton>
+                            </ListItem>
+                          ))}
+                        </List>
                       </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
+                    )}
+                  </div>
+                  <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
+                    <div class="flex flex-row items-center justify-start gap-[1rem]">
+                      <button
+                        // onClick={() => handleEditWorkspace(workspace.id)}
+                        className="no-underline  bg-white"
+                      >
+                        <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
+                          <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
+                          <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
+                            
+                          </div>
                         </div>
                       </button>
                     </div>
 
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
+                    {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
+                    <button
+                      className="bg-white"
+                      onClick={() => openPopup(container.id)}
+                    >
+                      <img
+                        class="h-[1.25rem] w-[1.28rem] relative z-[1]"
+                        alt=""
+                        src={threedots}
+                      />
+                    </button>
                   </div>
                 </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
-              <div class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap">
-                <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                  <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                    Avala Project
-                  </div>
-                </div>
-                <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                  <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                    <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                      <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Carter Mango
-                      </div>
-                    </div>
-                    <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                      <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                        Sun, 10 May 2022
-                      </div>
-                    </div>
-                    <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                      <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                        <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                        <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                          New
-                        </div>
-                      </button>
-                    </div>
-
-                    <div className="">
-                      <Form>
-                        <Form.Check // prettier-ignore
-                          type="switch"
-                          id="custom-switch"
-                          className="custom-switch"
-                        />
-                      </Form>
-                    </div>
-                  </div>
-                </div>
-                <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                  <div class="flex flex-row items-center justify-start gap-[1rem]">
-                    <Link to="/editWorkspace" className="no-underline">
-                      <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                        <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                        <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                          
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-
-                  {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                  <button className="bg-white" onClick={openPopup}>
-                    <img
-                      class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                      alt=""
-                      src={threedots}
-                    />
-                  </button>
-                </div>
-              </div>
+              ))}
             </tbody>
           </div>
         </div>

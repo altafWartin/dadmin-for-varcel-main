@@ -44,7 +44,7 @@ function App() {
           <Route path="/signUp" element={<SignUp />} />
           <Route path="/" element={<Dashboard />} />
           <Route path="/workspace" element={<Workspace />} />
-          <Route path="/editWorkspace" element={<EditWorkspace />} />
+          <Route path="/workspace/editWorkspace/:workspaceId" element={<EditWorkspace />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/addNewProject" element={<AddProject />} />
           <Route path="/projects/editProject/:projectId" element={<EditProject />} />
@@ -60,7 +60,7 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/addMember" element={<AddMember />} />
           <Route path="/settings/editMemberInfo/:memberId" element={<EditMemberInfo />} />
-          <Route path="/settings/teamMember" element={<TeamMember />} />
+          <Route path="/settings/teamMember/:memberId" element={<TeamMember />} />
           <Route path="/changePassword" element={<ChangePassword />} />
         </Routes>
         {!isLoginPage && !issignUpPage && <Footer />}
