@@ -36,12 +36,10 @@ const Projects = () => {
 
   const [hoveredProjectIndex, setHoveredProjectIndex] = useState(null);
 
-  
   const [isAssignPopupOpen, setAssignPopupOpen] = useState(false);
 
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
-
 
   const notifyDelete = () => toast.success("Project deleted successfully");
 
@@ -49,28 +47,26 @@ const Projects = () => {
 
   console.log("users", users);
 
-const getAssignUsers = async (selectedProjectId) => {
-  const token = localStorage.getItem("token");
-  try {
-    const response = await fetch(
-      `https://d-admin-backend.onrender.com/api/project/get-assign-project/${selectedProjectId}`, // corrected URL interpolation
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const data = await response.json();
-    const userData = data.data;
-    console.log("API Response:", data); // Log the response
-    setUsers(userData); // Assuming setUsers is a state update function
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  }
-};
-
-
-
+  const getAssignUsers = async (selectedProjectId) => {
+    console.log("selectedProjectId", selectedProjectId);
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/project/get-assign-project/${selectedProjectId}`, // corrected URL interpolation
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      const userData = data.data;
+      console.log("API Response user Data :", data); // Log the response
+      setUsers(userData); // Assuming setUsers is a state update function
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,32 +102,34 @@ const getAssignUsers = async (selectedProjectId) => {
 
   const handleEditProject = async (projectId) => {
     navigate(`/projects/editProject/${projectId}`);
-
   };
 
   const handleMouseEnter = (index) => {
     setHoveredProjectIndex(index);
+    console.log("MouseEnter");
   };
 
   const handleMouseLeave = () => {
     setHoveredProjectIndex(null);
+    console.log("MouseLeave");
   };
 
-  const [checked, setChecked] = useState(
-    users.filter((user) => user.isProjectAssign).map((user) => user.id)
-  );
+  // const [checked, setChecked] = useState(
+  //   users.filter((user) => user.isProjectAssign).map((user) => user.id)
+  // );
 
   const handleToggle = (id) => () => {
-    const isChecked = checked.includes(id);
-    const newChecked = isChecked
-      ? checked.filter((checkId) => checkId !== id)
-      : [...checked, id];
+  //   const isChecked = checked.includes(id);
+  //   const newChecked = isChecked
+  //     ? checked.filter((checkId) => checkId !== id)
+  //     : [...checked, id];
 
-    setChecked(newChecked);
+  //   setChecked(newChecked);
   };
 
   const openPopup = (projectId) => {
     setPopupOpen(true);
+    console.log('openPopup', projectId);
     setSelectedProjectId(projectId); // Assuming you have a state to store the selected project ID
   };
 
@@ -218,7 +216,7 @@ const getAssignUsers = async (selectedProjectId) => {
                   bgcolor: "background.paper",
                 }}
               >
-                {users.map((user, index) => {
+                {/* {users.map((user, index) => {
                   const { id, name, isProjectAssign } = user;
                   const labelId = `checkbox-list-label-${id}`;
 
@@ -247,7 +245,7 @@ const getAssignUsers = async (selectedProjectId) => {
                       </ListItemButton>
                     </ListItem>
                   );
-                })}
+                })} */}
               </List>
             </div>
             <div className="d-flex justify-content-end">
@@ -281,7 +279,8 @@ const getAssignUsers = async (selectedProjectId) => {
                 </button>
 
                 <button
-                  onClick={openAssignPopup}
+                onClick={()=> openAssignPopup(selectedProjectId)}
+    
                   class=" mb-2 w-full  right-[0rem] left-[0rem]  hover:bg-coral-100  rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
                 >
                   Assign
@@ -433,33 +432,33 @@ const getAssignUsers = async (selectedProjectId) => {
                     {hoveredProjectIndex === project.index && (
                       <div className="user-list absolute h-[12rem] overflow-y-auto bg-gray-100 bg-opacity-70 z-10">
                         <List>
-                          {users.map((user) => (
-                            <ListItem
-                              onClick={handleListItemClick}
-                              key={user.index}
-                              disablePadding
-                            >
-                              <ListItemButton>
-                                <ListItemAvatar>
-                                  {/* <Avatar
-                                    src={user.profilePicture}
-                                    alt={user.userName}
-                                  />
-                                  <img src={user.profilePicture} alt="" /> */}
-                                  <img
-                                    className="self-stretch ml-[-10px] h-[3.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                                    loading="lazy"
-                                    alt=""
-                                    src={p4}
-                                  />
-                                </ListItemAvatar>
-                                <div className="">
-                                  <ListItemText primary={user.userName} />
-                                  <p className="text-sm"> Software Developer</p>
-                                </div>
-                              </ListItemButton>
-                            </ListItem>
-                          ))}
+                          {/* {users.map((user) => ( */}
+                            {/* <ListItem */}
+                              {/* onClick={handleListItemClick} */}
+                              {/* key={user.index} */}
+                              {/* disablePadding */}
+                            {/* > */}
+                              {/* <ListItemButton> */}
+                                {/* <ListItemAvatar> */}
+                                  {/* <!~~ <Avatar */}
+                                    {/* src={user.profilePicture} */}
+                                    {/* alt={user.userName} */}
+                                  {/* /> */}
+                                  {/* <img src={user.profilePicture} alt="" /> ~~> */}
+                                  {/* <img */}
+                                    {/* className="self-stretch ml-[-10px] h-[3.5rem] absolute relative max-w-full overflow-hidden shrink-0" */}
+                                    {/* loading="lazy" */}
+                                    {/* alt="" */}
+                                    {/* src={p4} */}
+                                  {/* /> */}
+                                {/* </ListItemAvatar> */}
+                                {/* <div className=""> */}
+                                  {/* <ListItemText primary={user.userName} /> */}
+                                  {/* <p className="text-sm"> Software Developer</p> */}
+                                {/* </div> */}
+                              {/* </ListItemButton> */}
+                            {/* </ListItem> */}
+                          {/* ))} */}
                         </List>
                       </div>
                     )}

@@ -204,7 +204,7 @@ const Settings = () => {
 
           <div class="avatar-frame1">
             <h3 class="team-members2">Team members</h3>
-            <ul class="user-details-li">
+            <ul class="pl-0">
               {members.map((member) => (
                 <li key={member.id} class="user-detai flex mb-2 mr-5">
                   <div class="team-members-l">

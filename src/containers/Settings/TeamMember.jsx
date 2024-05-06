@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import { useParams, useHistory } from "react-router-dom";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import calendar from "../../assets/Icon/calendar.svg";
 import arrowdown from "../../assets/Icon/arrowdown.svg";
 import { Link } from "react-router-dom";
@@ -92,6 +95,10 @@ const TeamMember = () => {
   const [isAssignPopupOpen, setAssignPopupOpen] = useState(false);
   const [hoveredProjectIndex, setHoveredProjectIndex] = useState(null);
 
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('');
+  // const [profile, setProfile] = useState('');
+
   const [projects, setProjects] = useState([]);
   const [workspace, setWorkspace] = useState([]);
   const [workflow, setWorkflow] = useState([]);
@@ -102,10 +109,63 @@ const TeamMember = () => {
   const [assignWorkflows, setAssignWorkflows] = useState([]);
   const [assignContainers, setAssignContainers] = useState([]);
 
+  const [checked, setChecked] = React.useState([]);
+
+  const [projectChecked, setProjectChecked] = React.useState([]);
+  const [workspaceChecked, setWorkspaceChecked] = React.useState([]);
+  const [workflowChecked, setWorkflowChecked] = useState([]);
+  const [containerChecked, setContainerChecked] = useState([]);
+
   const { memberId } = useParams();
 
-  // Now you can use `memberId` in your component logic
-  console.log(memberId, "memberId"); // This will log the memberId from the URL
+  const [message, setMessage] = useState("");
+
+  const notifyAssign = (message) => {
+    toast.success(` ${message}`);
+  };
+
+  const [memberData, setMemberData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      const token = localStorage.getItem("token");
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      try {
+        const response = await fetch(
+          `https://d-admin-backend.onrender.com/api/user/get-member/${memberId}`,
+          { headers }
+        );
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        setName(data.data.fullName);
+        setRole(data.data.role);
+        // setProfile(data.data.profilePic);
+        setMemberData(data.data);
+      } catch (error) {
+        setError(
+          error.message || "An error occurred while fetching member data."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [memberId]);
+ 
+  console.log(memberData,"Member")
 
   useEffect(() => {
     const fetchProjects = async (memberId) => {
@@ -161,7 +221,6 @@ const TeamMember = () => {
         }
 
         const data = await response.json();
-        console.log(data, "dataaaaaaaaaa");
 
         setWorkspace(data.data.workspace); // Assuming the response has a 'projects' field
       } catch (error) {
@@ -226,7 +285,6 @@ const TeamMember = () => {
         }
 
         const data = await response.json();
-        console.log("dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", data.data);
 
         setContainer(data.data); // Assuming the response has a 'projects' field
       } catch (error) {
@@ -255,7 +313,7 @@ const TeamMember = () => {
       }
 
       const data = await response.json();
-      console.log(data.data, "assign user projects");
+
       setAssignProjects(data.data);
 
       // Assuming data.data is an array of projects with isAssign property
@@ -272,17 +330,118 @@ const TeamMember = () => {
     }
   };
 
+  const fetchAssignWorkspaces = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/setting/get-assign-user-workspaces/${memberId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+
+      setAssignWorkspaces(data.data);
+
+      // Assuming data.data is an array of projects with isAssign property
+
+      // Filter projects where isProjectAssign is true and extract their IDs
+      const checkedIds = data.data
+        .filter((workspace) => workspace.isWorkspaceAssign)
+        .map((workspace) => workspace.id);
+
+      setAssignWorkspaces(data.data);
+      setWorkspaceChecked(checkedIds); // Set checked state with IDs of assigned projects
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchAssignWorkflows = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/setting/get-assign-user-workflows/${memberId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+
+      setAssignWorkflows(data.data);
+
+      // Filter workflows where isWorkflowAssign is true and extract their IDs
+      const checkedIds = data.data
+        .filter((workflow) => workflow.isWorkflowAssign)
+        .map((workflow) => workflow.id);
+
+      setAssignWorkflows(data.data);
+      setWorkflowChecked(checkedIds); // Set checked state with IDs of assigned workflows
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const fetchAssignContainers = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/setting/get-assign-user-containers/${memberId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+
+      setAssignContainers(data.data);
+
+      // Filter containers where isContainerAssign is true and extract their IDs
+      const checkedIds = data.data
+        .filter((container) => container.isContainerAssign)
+        .map((container) => container.id);
+
+      setAssignContainers(data.data);
+      setContainerChecked(checkedIds); // Set checked state with IDs of assigned containers
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   useEffect(() => {
     fetchAssignProjects();
+    fetchAssignWorkspaces();
+    fetchAssignWorkflows();
+    fetchAssignContainers();
   }, [memberId]); // Fetch data when memberId changes
-
-  console.log(assignProjects, "assign projects");
 
   const handleButtonClick = (button) => {
     setSelectedButton(button);
   };
 
-  console.log(projects, "projects");
   const openPopup = () => {
     setPopupOpen(true);
   };
@@ -293,7 +452,8 @@ const TeamMember = () => {
 
   const openAssignPopup = () => {
     fetchAssignProjects();
-    console.log("open assign popup");
+    fetchAssignWorkspaces();
+
     setAssignPopupOpen(true);
   };
 
@@ -302,11 +462,6 @@ const TeamMember = () => {
     setPopupOpen(false);
   };
 
-  const [checked, setChecked] = React.useState([]);
-
-  const [projectChecked, setProjectChecked] = React.useState([]);
-  console.log("projectChecked", projectChecked);
-
   const handleToggle = (id, isProjectAssign) => () => {
     const updatedProjects = assignProjects.map((project) =>
       project.id === id
@@ -314,7 +469,6 @@ const TeamMember = () => {
         : project
     );
     setAssignProjects(updatedProjects);
-    console.log(updatedProjects, "updated projects");
 
     const isChecked = projectChecked.includes(id);
     if (isChecked) {
@@ -351,7 +505,11 @@ const TeamMember = () => {
       }
 
       const data = await response.json();
-      console.log("Assign projects response:", data);
+
+      setMessage(data.message);
+      notifyAssign(data.message);
+      setAssignPopupOpen(false);
+
       // Handle success or further actions here
     } catch (error) {
       console.error("Error assigning projects:", error);
@@ -359,9 +517,181 @@ const TeamMember = () => {
     }
   };
 
+  const handleWorkspaceToggle = (id, isWorkspaceAssign) => () => {
+    const updatedWorkspaces = assignWorkspaces.map((workspace) =>
+      workspace.id === id
+        ? { ...workspace, isWorkspaceAssign: !isWorkspaceAssign }
+        : workspace
+    );
+    setAssignWorkspaces(updatedWorkspaces);
+
+    const isChecked = workspaceChecked.includes(id);
+    if (isChecked) {
+      const newChecked = workspaceChecked.filter(
+        (checkedId) => checkedId !== id
+      );
+      setWorkspaceChecked(newChecked);
+    } else {
+      setWorkspaceChecked([...workspaceChecked, id]);
+    }
+  };
+
+  const handleAssignWorkspaces = async () => {
+    const token = localStorage.getItem("token");
+
+    const requestBody = {
+      userId: memberId,
+      assignIds: workspaceChecked,
+    };
+
+    try {
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/setting/assign-workspaces-to-user",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+
+      setMessage(data.message);
+      notifyAssign(data.message);
+      setAssignPopupOpen(false);
+
+      // Handle success or further actions here
+    } catch (error) {
+      console.error("Error assigning workspaces:", error);
+      // Handle error cases here
+    }
+  };
+
+  const handleWorkflowToggle = (id, isWorkflowAssign) => () => {
+    const updatedWorkflows = assignWorkflows.map((workflow) =>
+      workflow.id === id
+        ? { ...workflow, isWorkflowAssign: !isWorkflowAssign }
+        : workflow
+    );
+    setAssignWorkflows(updatedWorkflows);
+
+    const isChecked = workflowChecked.includes(id);
+    if (isChecked) {
+      const newChecked = workflowChecked.filter(
+        (checkedId) => checkedId !== id
+      );
+      setWorkflowChecked(newChecked);
+    } else {
+      setWorkflowChecked([...workflowChecked, id]);
+    }
+  };
+
+  const handleAssignWorkflows = async () => {
+    const token = localStorage.getItem("token");
+
+    const requestBody = {
+      userId: memberId,
+      assignIds: workflowChecked,
+    };
+
+    try {
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/setting/assign-workflows-to-user",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+
+      setMessage(data.message);
+      notifyAssign(data.message);
+      setAssignPopupOpen(false);
+
+      // Handle success or further actions here
+    } catch (error) {
+      console.error("Error assigning workflows:", error);
+      // Handle error cases here
+    }
+  };
+
+  const handleContainerToggle = (id, isContainerAssign) => () => {
+    const updatedContainers = assignContainers.map((container) =>
+      container.id === id
+        ? { ...container, isContainerAssign: !isContainerAssign }
+        : container
+    );
+    setAssignContainers(updatedContainers);
+
+    const isChecked = containerChecked.includes(id);
+    if (isChecked) {
+      const newChecked = containerChecked.filter(
+        (checkedId) => checkedId !== id
+      );
+      setContainerChecked(newChecked);
+    } else {
+      setContainerChecked([...containerChecked, id]);
+    }
+  };
+
+  const handleAssignContainers = async () => {
+    const token = localStorage.getItem("token");
+
+    const requestBody = {
+      userId: memberId,
+      assignIds: containerChecked,
+    };
+
+    try {
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/setting/assign-containers-to-user",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+
+      setMessage(data.message);
+      notifyAssign(data.message);
+      setAssignPopupOpen(false);
+
+      // Handle success or further actions here
+    } catch (error) {
+      console.error("Error assigning containers:", error);
+      // Handle error cases here
+    }
+  };
+
   return (
     <div className="containerBody">
       {" "}
+      <ToastContainer />{" "}
       {isPopupOpen && (
         <div class="fixed top-1/2 left-1/2 transform bg-blend-difference -translate-x-1/2 -translate-y-1/2 z-[9999] w-full max-w-[25.88rem] p-8 bg-white rounded-3xl shadow-lg backdrop-blur-[8px]">
           <button
@@ -429,10 +759,16 @@ const TeamMember = () => {
               />
 
               <div class="flex flex-col items-center justify-start py-[0rem] px-[0.25rem]">
-                <div class="relative font-medium z-[1]">Team members</div>
-                <div class="relative text-[0.875rem] capitalize text-darkslategray-100 z-[2]">
-                  developer
-                </div>
+    
+                  <>
+                    <div class="relative font-medium z-[1]">
+                      {name}
+                    </div>
+                    <div class="relative text-[0.875rem] capitalize text-darkslategray-100 z-[2]">
+                {role}
+                    </div>
+                  </>
+               
               </div>
             </div>
             <div class="flex-1 rounded-xl bg-white flex flex-col items-start justify-start pt-[2.625rem] pb-[3.688rem] pr-[3.125rem] pl-[2.25rem] box-border gap-[0.75rem] min-w-[35.313rem] max-w-full text-[1.25rem] text-midnightblue mq750:min-w-full mq1050:pr-[1.563rem] mq1050:box-border">
@@ -756,26 +1092,29 @@ const TeamMember = () => {
                       bgcolor: "background.paper",
                     }}
                   >
-                    {users.map((user) => {
-                      const { index, userName, profilePicture } = user;
-                      const labelId = `checkbox-list-secondary-label-${index}`;
+                    {assignWorkspaces.map((workspace) => {
+                      const { id, name, isWorkspaceAssign } = workspace;
+                      const labelId = `checkbox-list-secondary-label-${id}`;
 
                       return (
                         <ListItem
-                          key={index}
+                          key={workspace.id}
                           secondaryAction={
                             <Checkbox
                               edge="end"
-                              onChange={handleToggle(index)}
-                              checked={checked.indexOf(index) !== -1}
+                              onChange={handleWorkspaceToggle(
+                                id,
+                                isWorkspaceAssign
+                              )}
+                              checked={workspaceChecked.includes(id)}
                               inputProps={{ "aria-labelledby": labelId }}
                             />
                           }
                           disablePadding
                         >
                           <ListItemButton>
-                            <p>{`Workspace id ${index}`}</p>
-                            <p class="ml-8">avala project</p>
+                            <p className="ml-5">{workspace.id}</p>
+                            <p class="ml-12">{workspace.name}</p>
                           </ListItemButton>
                         </ListItem>
                       );
@@ -784,7 +1123,7 @@ const TeamMember = () => {
                 </div>
                 <div className="d-flex justify-content-end">
                   <button
-                    onClick={closeAssignPopup}
+                    onClick={handleAssignWorkspaces}
                     className="mb-2 w-full right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
                   >
                     Assign
@@ -990,26 +1329,29 @@ const TeamMember = () => {
                       bgcolor: "background.paper",
                     }}
                   >
-                    {users.map((user) => {
-                      const { index, userName, profilePicture } = user;
-                      const labelId = `checkbox-list-secondary-label-${index}`;
+                    {assignWorkflows.map((workflow) => {
+                      const { id, name, isWorkflowAssign } = workflow;
+                      const labelId = `checkbox-list-secondary-label-${id}`;
 
                       return (
                         <ListItem
-                          key={index}
+                          key={workflow.id}
                           secondaryAction={
                             <Checkbox
                               edge="end"
-                              onChange={handleToggle(index)}
-                              checked={checked.indexOf(index) !== -1}
+                              onChange={handleWorkflowToggle(
+                                id,
+                                isWorkflowAssign
+                              )}
+                              checked={workflowChecked.includes(id)}
                               inputProps={{ "aria-labelledby": labelId }}
                             />
                           }
                           disablePadding
                         >
                           <ListItemButton>
-                            <p>{`Workflows id ${index}`}</p>
-                            <p class="ml-8">avala project</p>
+                            <p className="ml-5">{workflow.id}</p>
+                            <p className="ml-12">{workflow.name}</p>
                           </ListItemButton>
                         </ListItem>
                       );
@@ -1018,7 +1360,7 @@ const TeamMember = () => {
                 </div>
                 <div className="d-flex justify-content-end">
                   <button
-                    onClick={closeAssignPopup}
+                    onClick={handleAssignWorkflows}
                     className="mb-2 w-full right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
                   >
                     Assign
@@ -1223,26 +1565,29 @@ const TeamMember = () => {
                       bgcolor: "background.paper",
                     }}
                   >
-                    {users.map((user) => {
-                      const { index, userName, profilePicture } = user;
-                      const labelId = `checkbox-list-secondary-label-${index}`;
+                    {assignContainers.map((container) => {
+                      const { id, name, isContainerAssign } = container;
+                      const labelId = `checkbox-list-secondary-label-${id}`;
 
                       return (
                         <ListItem
-                          key={index}
+                          key={id}
                           secondaryAction={
                             <Checkbox
                               edge="end"
-                              onChange={handleToggle(index)}
-                              checked={checked.indexOf(index) !== -1}
+                              onChange={handleContainerToggle(
+                                id,
+                                isContainerAssign
+                              )}
+                              checked={containerChecked.includes(id)}
                               inputProps={{ "aria-labelledby": labelId }}
                             />
                           }
                           disablePadding
                         >
                           <ListItemButton>
-                            <p>{`Container id ${index}`}</p>
-                            <p class="ml-8">avala project</p>
+                            <p className="ml-5">{id}</p>
+                            <p className="ml-12">{name}</p>
                           </ListItemButton>
                         </ListItem>
                       );
@@ -1251,7 +1596,7 @@ const TeamMember = () => {
                 </div>
                 <div className="d-flex justify-content-end">
                   <button
-                    onClick={closeAssignPopup}
+                    onClick={handleAssignContainers}
                     className="mb-2 w-full right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
                   >
                     Assign

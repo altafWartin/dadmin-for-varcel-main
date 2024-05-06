@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // import styles from "./Navbar.module.css";
 import { Link } from "react-router-dom";
 import search from "../../assets/Icon/search.svg";
@@ -21,26 +21,42 @@ initTE({ Dropdown, Ripple });
 const Navbar = () => {
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState("");
+  const [loginUser, setLoginUser] = useState(null);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  console.log(loginUser, "setLoginUser");
 
-  // Function to handle form submission
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem("user");
+
+    // Parse the JSON data if it exists
+    if (userData) {
+      const parsedUserData = JSON.parse(userData);
+      setFullName(parsedUserData.fullName)
+      setEmail(parsedUserData.email)
+      setLoginUser(parsedUserData);
+    }
+  }, []);
+
   // Function to handle form submission
   const handleFileUpload = async (event) => {
     event.preventDefault();
-  
+
     try {
       console.log("Starting file upload...");
-  
+
       const formData = new FormData();
       formData.append("file", file);
-  
+
       console.log("FormData created:", formData);
-  
+
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No token found");
       }
       console.log("Token found:", token);
-  
+
       const response = await fetch(
         "https://d-admin-backend.onrender.com/api/user/update-profile-pic",
         {
@@ -51,27 +67,27 @@ const Navbar = () => {
           body: formData,
         }
       );
-  
+
       console.log("Response received:", response);
-  
+
       if (!response.ok) {
         throw new Error("Failed to upload image");
       }
-  
+
       const responseData = await response.json();
       console.log("Response data:", responseData);
-  
+
       // Check if the response has the expected structure
       if (responseData.success && responseData.data) {
         const updatedUser = responseData.data;
         console.log("Updated User Data:", updatedUser);
-  
+
         // Update user data in local storage
         localStorage.setItem("user", JSON.stringify(updatedUser));
       } else {
         throw new Error("Invalid response structure");
       }
-  
+
       setUploadStatus("Image uploaded successfully");
       console.log("Image uploaded:", responseData);
     } catch (error) {
@@ -79,7 +95,7 @@ const Navbar = () => {
       console.error("Error uploading image:", error);
     }
   };
-  
+
   return (
     <div>
       <header class="self-stretch z-2000  bg-white flex flex-row items-center justify-between py-[1rem] pr-[3rem] pl-[17.75rem] gap-[1.25rem] top-[0] z-[0] sticky text-left text-[0.88rem] text-text-100 font-poppins lg:pl-[1.38rem] lg:pr-[1.5rem] lg:box-border">
@@ -107,39 +123,35 @@ const Navbar = () => {
             />
           </div>
           <div className="flex flex-row items-center justify-start gap-[0.94rem]">
-          <div className="flex flex-col items-end justify-start">
-            <div className="flex items-center font-semibold">
-              Gracetrans
+            <div className="flex flex-col items-end justify-start">
+              <div className="flex items-center font-semibold">{fullName}</div>
+              <div className="text-[0.69rem] text-bodytext-50">{email}</div>
             </div>
-            <div className="text-[0.69rem] text-bodytext-50">
-              @gracetrans
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+                style={{ zIndex: 1 }} // Overlay the input on top of the profile image
+              />
+              <img
+                className="h-[2.75rem] w-[2.75rem] relative rounded-3xl object-cover cursor-pointer"
+                alt="Profile Picture"
+                src={Profile}
+                onClick={() =>
+                  document.querySelector('input[type="file"]').click()
+                } // Open file input on profile image click
+              />
             </div>
+            <Link to="/login">
+              <img
+                className="h-[1.25rem] w-[1.25rem] relative cursor-pointer"
+                alt="Logout"
+                src={logout}
+              />
+            </Link>
           </div>
-          <div className="relative">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileUpload}
-              className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
-              style={{ zIndex: 1 }} // Overlay the input on top of the profile image
-            />
-            <img
-              className="h-[2.75rem] w-[2.75rem] relative rounded-3xl object-cover cursor-pointer"
-              alt="Profile Picture"
-              src={Profile}
-              onClick={() =>
-                document.querySelector('input[type="file"]').click()
-              } // Open file input on profile image click
-            />
-          </div>
-          <Link to="/login">
-            <img
-              className="h-[1.25rem] w-[1.25rem] relative cursor-pointer"
-              alt="Logout"
-              src={logout}
-            />
-          </Link>
-        </div>
         </div>
       </header>
     </div>
