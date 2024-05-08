@@ -23,8 +23,6 @@ import icon2 from "../../assets/Icon/icon-2.svg";
 import icon3 from "../../assets/Icon/icon-3.svg";
 import icon4 from "../../assets/Icon/icon-4.svg";
 
-
-
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -39,7 +37,7 @@ const users = [
   {
     index: 0,
     userName: "User 1",
-    profilePicture:  "../../assets/Images/p3.svg",
+    profilePicture: "../../assets/Images/p3.svg",
   },
   {
     index: 1,
@@ -49,7 +47,8 @@ const users = [
   {
     index: 2,
     userName: "User 2",
-    profilePicture: "https://en.wikipedia.org/wiki/Katrina_Kaif#/media/File:Katrina_Kaif_promoting_Bharat_in_2019.jpg",
+    profilePicture:
+      "https://en.wikipedia.org/wiki/Katrina_Kaif#/media/File:Katrina_Kaif_promoting_Bharat_in_2019.jpg",
   },
   {
     index: 3,
@@ -83,7 +82,6 @@ const users = [
   },
   // Add more objects as needed
 ];
-
 
 const Container = () => {
   const [checked, setChecked] = React.useState([1]);
@@ -119,7 +117,6 @@ const Container = () => {
   const closeAssignPopup = () => {
     setAssignPopupOpen(false);
     setPopupOpen(false);
-
   };
 
   return (
@@ -181,8 +178,7 @@ const Container = () => {
             </div>
             <div className="d-flex justify-content-end">
               <button
-                  onClick={closeAssignPopup}
-
+                onClick={closeAssignPopup}
                 className="mb-2 w-full right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
               >
                 Assign
@@ -236,8 +232,8 @@ const Container = () => {
           </div>
         </div>
       )}
-    
-    <div className=" bg-slate-100 pt-10 pl-[260px] h-[108vh]  z-[20]">
+
+      <div className=" bg-slate-100 pt-10 pl-[260px] h-[108vh]  z-[20]">
         <section class=" w-[71.25rem] px-[var(--padding-xl)] box-border text-left text-5xl text-bodytext-100 font-poppins flex justify-start flex flex-col items-start max-w-full">
           <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full text-[1.5rem] text-bodytext-100 mq750:flex-wrap">
             <h2 class="m-0 h-[2.25rem] relative text-inherit tracking-[0.02em] font-semibold font-inherit flex items-center mq450:text-[1.19rem]">
@@ -425,16 +421,15 @@ const Container = () => {
                   Images
                 </h2>
                 <div class="flex flex-row items-start justify-start gap-[1.38rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
-              
-                <Link
-                  to="/addImage"
-                  class="cursor-pointer no-underline [border:none] py-[0.38rem] pr-[1.38rem] pl-[1.81rem] bg-coral-100 rounded-3xs flex flex-row items-center justify-end whitespace-nowrap hover:bg-chocolate-100"
-                >
-                  <div class="h-[2rem] w-[7.63rem] relative rounded-3xs bg-coral-100 hidden"></div>
-                  <div class="relative text-[0.94rem] leading-[1.25rem] font-semibold font-poppins text-white text-left z-[1]">
-                    Add New
-                  </div>
-                </Link>
+                  <Link
+                    to="/addImage"
+                    class="cursor-pointer no-underline [border:none] py-[0.38rem] pr-[1.38rem] pl-[1.81rem] bg-coral-100 rounded-3xs flex flex-row items-center justify-end whitespace-nowrap hover:bg-chocolate-100"
+                  >
+                    <div class="h-[2rem] w-[7.63rem] relative rounded-3xs bg-coral-100 hidden"></div>
+                    <div class="relative text-[0.94rem] leading-[1.25rem] font-semibold font-poppins text-white text-left z-[1]">
+                      Add New
+                    </div>
+                  </Link>
 
                   <div class="flex flex-row items-start justify-start gap-[0.25rem]">
                     <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.56rem] pl-[0.5rem] gap-[0.38rem]">
@@ -1019,16 +1014,10 @@ const Container = () => {
                     src="/public/vector-11.svg"
                   />
                 </div>
-          
-
-                
               </div>
-            
             </div>
           </div>
-          
         </section>
-
       </div>
     </div>
   );
