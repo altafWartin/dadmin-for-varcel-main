@@ -2,7 +2,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import "./App.css";
 import Dashboard from "./containers/Dashboard/Dashboard.jsx";
 import Workspace from "./containers/Workspace/Workspace.jsx";
-import Container from "./containers/Container/Resources.jsx";
+import Container from "./containers/Container/Container.jsx";
 import Settings from "./containers/Settings/Settings.jsx";
 import Workflows from "./containers/Workflows/Workflows.jsx";
 import Sidebar from "./components/Sidebar/Sidebar.jsx";
@@ -25,6 +25,7 @@ import AddImage from "./containers/Container/AddImage.jsx";
 import EditImage from "./containers/Container/EditImage.jsx";
 import EditMemberInfo from "./containers/Settings/EditMemberInfo.jsx";
 import TeamMember from "./containers/Settings/TeamMember.jsx";
+import Resource from "./containers/Container/Resource.jsx";
 
 function App() {
   const location = useLocation();
@@ -52,9 +53,10 @@ function App() {
           <Route path="/workflow" element={<Workflows />} />
           <Route path="/editWorkflow" element={<EditWorkflow />} />
           <Route path="/addNewWorkflow" element={<AddNewWorkflow />} />
-          <Route path="/container" element={<Container />} />
+          {/* <Route path="/container" element={<Container />} /> */}
+          <Route path="/container" element={<Resource/>} />
           <Route path="/addNewContainer" element={<AddNewContainer />} />
-          <Route path="/editContainer" element={<EditContainer />} />
+          <Route path="/container/editContainer/:containerId" element={<EditContainer />} />
           <Route path="/addImage" element={<AddImage />} />
           <Route path="/editImage" element={<EditImage />} />
           <Route path="/settings" element={<Settings />} />

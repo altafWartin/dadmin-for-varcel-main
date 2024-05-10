@@ -16,7 +16,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const EditProject = () => {
-  const [id, setId] = useState("")
+  const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -25,6 +25,8 @@ const EditProject = () => {
   const [status, setStatus] = useState("");
 
   const { projectId } = useParams();
+
+
   const navigate = useNavigate();
   const [token, setToken] = useState("");
 
@@ -54,7 +56,7 @@ const EditProject = () => {
         console.log("Project data:", projectData);
 
         // Populate input fields with project data
-        setId(projectData.data.id ||"")
+        setId(projectData.data.id || "");
         setName(projectData.data.name || "");
         setDescription(projectData.data.description || "");
         setStatus(projectData.data.status || "");
@@ -68,7 +70,6 @@ const EditProject = () => {
 
     fetchProjectData();
   }, [projectId, token]);
-
 
   const notifyAddProject = () => toast.success("Project add successfully");
   const notifyerror = () =>
