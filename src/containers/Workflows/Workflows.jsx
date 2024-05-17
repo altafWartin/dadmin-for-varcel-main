@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+
 import Form from "react-bootstrap/Form";
 import calendar from "../../assets/Icon/calendar.svg";
 import arrowdown from "../../assets/Icon/arrowdown.svg";
@@ -6,26 +11,9 @@ import setting from "../../assets/Icon/setting.svg";
 import close from "../../assets/Icon/close.png";
 import logo from "../../assets/logo.svg";
 import threedots from "../../assets/Icon/threedots.svg";
-import { Link } from "react-router-dom";
-import Sidebar from "../../components/Sidebar/Sidebar";
-import Navbar from "../../components/Navbar/Navbar";
-import Dropdown from "react-bootstrap/Dropdown";
-import "./Workflows.css";
 import p2 from "../../assets/Images/p2.svg";
 import p3 from "../../assets/Images/p3.svg";
 import p4 from "../../assets/Images/p4.svg";
-import plusicon from "../../assets/Icon/plusicon.svg";
-import send from "../../assets/Icon/send.svg";
-import icon1 from "../../assets/Icon/icon-1.svg";
-import icon2 from "../../assets/Icon/icon-2.svg";
-import icon3 from "../../assets/Icon/icon-3.svg";
-import icon4 from "../../assets/Icon/icon-4.svg";
-
-import { useNavigate } from "react-router-dom";
-
-
-
-
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -34,119 +22,172 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Checkbox from "@mui/material/Checkbox";
 import Avatar from "@mui/material/Avatar";
 
-const projects = [
-  {
-    index: 0,
-    projectName: "Avala Project",
-  },
-  {
-    index: 1,
-    projectName: "Avala Project",
-  },
-  {
-    index: 2,
-    projectName: "Avala Project",
-  },
-  {
-    index: 3,
-    projectName: "Avala Project",
-  },
-  {
-    index: 4,
-    projectName: "Avala Project",
-  },
-];
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const users = [
-  {
-    index: 0,
-    userName: "User 1",
-    profilePicture: "../../assets/Images/p2.svg",
-  },
-  {
-    index: 1,
-    userName: "User 2",
-    profilePicture: "../../assets/Images/Profile.jpeg",
-  },
-  {
-    index: 2,
-    userName: "User 2",
-    profilePicture:
-      "https://en.wikipedia.org/wiki/Katrina_Kaif#/media/File:Katrina_Kaif_promoting_Bharat_in_2019.jpg",
-  },
-  {
-    index: 3,
-    userName: "User 3",
-    profilePicture:
-      "https://unsplash.com/photos/shallow-focus-photography-of-woman-outdoor-during-day-rDEOVtE7vOs",
-  },
-  {
-    index: 4,
-    userName: "User 2",
-    profilePicture: "/static/images/avatar/2.jpg",
-  },
-  {
-    index: 5,
-    userName: "User 2",
-    profilePicture: "/static/images/avatar/2.jpg",
-  },
-  {
-    index: 6,
-    userName: "User 4",
-    profilePicture: "/static/images/avatar/2.jpg",
-  },
-  {
-    index: 7,
-    userName: "User 2",
-    profilePicture: "/static/images/avatar/2.jpg",
-  },
-  {
-    index: 8,
-    userName: "User 2",
-    profilePicture: "/static/images/avatar/2.jpg",
-  },
-  // Add more objects as needed
-];
+const formatDate = (dateString) => {
+  const dateObject = new Date(dateString);
+  const year = dateObject.getFullYear();
+  const month = (dateObject.getMonth() + 1).toString().padStart(2, "0"); // Adding 1 to get the correct month (0-indexed)
+  const date = dateObject.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${date}`;
+};
 
-const Workflows = () => {
-  const [hoveredProjectIndex, setHoveredProjectIndex] = useState(null);
+const Workflow = () => {
+  const [containers, setContainers] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [shouldFetchData, setShouldFetchData] = useState(true);
+  const [workspaces, setWorkspaces] = useState();
 
-  const handleMouseEnter = (index) => {
-    setHoveredProjectIndex(index);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredProjectIndex(null);
-  };
-
-  const [checked, setChecked] = React.useState([1]);
-
-  const handleToggle = (value) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
-
-    if (currentIndex === -1) {
-      newChecked.push(value);
-    } else {
-      newChecked.splice(currentIndex, 1);
-    }
-
-    setChecked(newChecked);
-  };
-  const [isPopupOpen, setPopupOpen] = useState(false);
   const [isAssignPopupOpen, setAssignPopupOpen] = useState(false);
 
-  const openPopup = () => {
+  const [isPopupOpen, setPopupOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [userChecked, setUserChecked] = useState([]);
+
+  const [message, setMessage] = useState("");
+
+  const apiUrl = "https://d-admin-backend.onrender.com";
+
+  const notifyAssign = (message) => {
+    toast.success(` ${message}`);
+  };
+
+  const notifyDelete = () => toast.success("Workflow deleted successfully");
+  const notifyStatus = () =>
+    toast.success("Container status updated successfully");
+
+  const [users, setUsers] = useState([]);
+
+  console.log("users", users);
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const getAssignUsers = async (projectId) => {
+    console.log("this data is from selected projectid ", projectId);
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(
+        `${apiUrl}/api/workflow/get-assign-workflow/${projectId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await response.json();
+      const userData = data.data;
+      console.log("API Response user Data :", data.data); // Log the response
+      setUsers(userData); // Assuming setUsers is a state update function
+      // Filter userData to get users with isWorkflowAssign true and extract their IDs
+      const userIDsContainerAssignTrue = userData
+        .filter((user) => user.isWorkflowAssign)
+        .map((user) => user.id);
+
+      console.log(
+        "User IDs with isWorkflowAssign true:",
+        userIDsContainerAssignTrue
+      );
+      setUserChecked(userIDsContainerAssignTrue);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (shouldFetchData) {
+        const token = localStorage.getItem("token");
+        try {
+          const response = await fetch(
+            `${apiUrl}/api/workflow/all-workflows?limit=500`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          const data = await response.json();
+          console.log("API Responseeeeeeee:", data); // Log the response
+          if (data.success) {
+            const sortedWorkspaces = data.data.rows.sort((a, b) => a.id - b.id);
+            setWorkspaces(sortedWorkspaces);
+            setContainers(sortedWorkspaces);
+            setProjects(sortedWorkspaces);
+            setShouldFetchData(false); // Set shouldFetchData to true after successful deletion
+          } else {
+            console.error("Failed to fetch projects:", data.message);
+          }
+        } catch (error) {
+          console.error("Error fetching projects:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [shouldFetchData, projects]);
+
+  console.log(projects);
+
+  const handleEditProject = async (workflowId) => {
+    navigate(`/workflow/editWorkflow/${workflowId}`);
+  };
+
+  const openPopup = (projectId) => {
     setPopupOpen(true);
+    getAssignUsers(projectId);
+    console.log("openPopup", projectId);
+    setSelectedProjectId(projectId); // Assuming you have a state to store the selected project ID
+    console.log("popupOpen", selectedProjectId);
+  };
+
+  const handleDeleteProject = async (selectedProjectId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/workflow/delete-workflow/${selectedProjectId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // Add any other headers if required, such as authorization headers
+          },
+          // Add body data if your API requires it for deletion
+          // body: JSON.stringify({}),
+        }
+      );
+
+      if (response.ok) {
+        // Handle successful deletion, e.g., update UI or show a success message
+        console.log("Project deleted successfully");
+        setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+        notifyDelete();
+        closePopup();
+      } else {
+        // Handle unsuccessful deletion, e.g., show an error message
+        console.error("Failed to delete project");
+      }
+    } catch (error) {
+      // Handle any network errors or exceptions
+      console.error("An error occurred:", error);
+    }
   };
 
   const closePopup = () => {
+    getAssignUsers(selectedProjectId);
     setPopupOpen(false);
   };
 
-  const openAssignPopup = () => {
+  const openAssignPopup = (selectedProjectId) => {
     console.log("open assign popup");
+    getAssignUsers(selectedProjectId);
+
+    // console.log("openPopup", projectId);
+    console.log("popupOpen", selectedProjectId);
     setAssignPopupOpen(true);
+    getAssignUsers(selectedProjectId);
   };
 
   const closeAssignPopup = () => {
@@ -157,16 +198,195 @@ const Workflows = () => {
   // Inside your component
   const navigate = useNavigate();
 
+  console.log("userChecked", userChecked);
 
-  const handleListItemClick = () => {
-    console.log("handleListItem")
-    navigate("/settings/teamMember");
+  const handleToggle = (id, isWorkflowAssign) => () => {
+    console.log("Toggling user with ID:", id);
+    console.log("Current isWorkflowAssign value:", isWorkflowAssign);
 
+    const updatedUsers = users.map((user) =>
+      user.id === id ? { ...user, isWorkflowAssign: !isWorkflowAssign } : user
+    );
 
-};
+    console.log("Updated users:", updatedUsers);
+
+    // Filter users with isWorkflowAssign equal to true and save their IDs in an array
+    const userIDsContainerAssignTrue = updatedUsers
+      .filter((user) => user.isWorkflowAssign)
+      .map((user) => user.id);
+
+    console.log(
+      "User IDs with isWorkflowAssign true:",
+      userIDsContainerAssignTrue
+    );
+
+    // Now you can do something with the user IDs that have isWorkflowAssign true
+
+    // const updatedUsers = users.map((user) =>
+    //   user.id === id ? { ...user, isWorkflowAssign: !isWorkflowAssign } : user
+    // );
+
+    console.log("Updated usersssssssssss:", updatedUsers);
+
+    setUsers(updatedUsers);
+
+    const isChecked = userChecked.includes(id);
+    if (isChecked) {
+      const newChecked = userChecked.filter((checkedId) => checkedId !== id);
+      setUserChecked(newChecked);
+    } else {
+      setUserChecked([...userChecked, id]);
+    }
+  };
+  console.log(userChecked);
+
+  const handleAssignProjects = async () => {
+    const token = localStorage.getItem("token");
+
+    const requestBody = {
+      assignUsers: userChecked,
+      workflowId: selectedProjectId,
+    };
+    console.log("requestBody", requestBody);
+
+    try {
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/workflow/assign-workflow",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log("API Responseeeeeeee:", data); // Log the response
+
+      setMessage(data.message);
+      notifyAssign(data.message);
+      getAssignUsers(selectedProjectId);
+      setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+      setUserChecked([]);
+
+      setAssignPopupOpen(false);
+      closePopup();
+
+      // Handle success or further actions here
+    } catch (error) {
+      console.error("Error assigning projects:", error);
+      // Handle error cases here
+    }
+  };
+
+  const handleSwitchChange = (containerId, currentIsActive) => {
+    // Do something with projectId and currentIsActive
+    console.log(
+      `Project ID: ${containerId}, Current IsActive: ${currentIsActive}`
+    );
+
+    const token = localStorage.getItem("token");
+    const newIsActive = !currentIsActive; // Flip the currentIsActive value
+
+    const requestBody = JSON.stringify({
+      id: containerId,
+      isActive: newIsActive,
+    });
+    console.log("requestBody", requestBody);
+
+    fetch(`${apiUrl}/api/workflow/change-active-inactive`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: requestBody,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Response from API:", data);
+        setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+
+        // Handle response or update local state as needed
+      })
+      .catch((error) => {
+        console.error("Error updating project:", error);
+        // Handle error if needed
+      });
+  };
+
+  const [showUserList, setShowUserList] = useState(false);
+  const [hoveredProject, setHoveredProject] = useState(null);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const open = Boolean(anchorEl);
+
+  const handleClickListItem = (event, projectId) => {
+    console.log("handleClickListItem", projectId);
+    setSelectedProjectId(projectId);
+    getAssignUsers(projectId);
+    setAnchorEl(event.currentTarget);
+  };
+
+  console.log("handleClickListItem", selectedProjectId);
+
+  const handleMenuItemClick = (event, index) => {
+    setSelectedIndex(index);
+    setAnchorEl(null);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  // update status
+
+  console.log(apiUrl, "apiUrl=");
+
+  const updateContainerStatus = async (projectId, status) => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const requestBody = {
+        id: projectId,
+        status: status,
+      };
+
+      const response = await fetch(`${apiUrl}/api/workflow/update-status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update container status");
+      }
+
+      setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+      notifyStatus();
+
+      setPopupOpen(false);
+      const data = await response.json();
+      console.log("Container status updated:", data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   return (
     <div>
+      {" "}
+      <ToastContainer />
       <div>
         {isAssignPopupOpen && (
           <div class="fixed top-1/2 left-1/2 h-[28.31rem] transform bg-blend-difference -translate-x-1/2 -translate-y-1/2 z-[9999] w-full max-w-[25.88rem] p-8 bg-white rounded-3xl shadow-lg backdrop-blur-[8px]">
@@ -180,6 +400,13 @@ const Workflows = () => {
             <div class=" text-[1.25rem] leading-[2.5rem] capitalize font-medium text-darkslategray-100">
               Assign Workflow to Users
             </div>
+            <thead className=" flex justify-between px-3 ">
+              <p>User ID</p>
+              <p className="">User Profile</p>
+              <p className="">User Name</p>
+              <p className="">Assign</p>
+            </thead>
+
             <div className="h-[18rem] overflow-y-auto">
               <List
                 dense
@@ -190,45 +417,44 @@ const Workflows = () => {
                   bgcolor: "background.paper",
                 }}
               >
-                {users.map((user) => {
-                  const { index, userName, profilePicture } = user;
-                  const labelId = `checkbox-list-secondary-label-${index}`;
+                {users &&
+                  users.map((user) => {
+                    const { id, name, isWorkflowAssign, profilePic } = user;
+                    const labelId = `checkbox-list-secondary-label-${id}`;
 
-                  return (
-
+                    return (
                       <ListItem
-                        key={index}
-                        onClick={handleListItemClick}
-
+                        key={id}
                         secondaryAction={
                           <Checkbox
                             edge="end"
-                            onChange={handleToggle(index)}
-                            checked={checked.indexOf(index) !== -1}
+                            onChange={handleToggle(id, isWorkflowAssign)}
+                            checked={userChecked.includes(id)}
                             inputProps={{ "aria-labelledby": labelId }}
                           />
                         }
                         disablePadding
                       >
                         <ListItemButton>
+                          <p className="mx-3">{id}</p>
                           <ListItemAvatar>
                             <Avatar
                               src={require("../../assets/Images/Profile.jpeg")}
                               // src={profilePicture}
-                              alt={userName}
+                              alt={name}
+                              className="ml-11"
                             />
                           </ListItemAvatar>
-                          <ListItemText id={labelId} primary={userName} />
+                          <p className="ml-12">{name}</p>
                         </ListItemButton>
                       </ListItem>
-
-                  );
-                })}
+                    );
+                  })}
               </List>
             </div>
             <div className="d-flex justify-content-end">
               <button
-                onClick={closeAssignPopup}
+                onClick={handleAssignProjects}
                 className="mb-2 w-full right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
               >
                 Assign
@@ -249,19 +475,38 @@ const Workflows = () => {
           <div class="relative h-[28.31rem] text-[0.88rem] text-dimgray font-poppins">
             <div class="w-full relative h-[24.31rem]  text-[0.88rem] text-dimgray font-poppins">
               <div class="absolute w-full top-[9.19rem] right-[0rem] left-[0rem] h-[12.13rem]">
-                <button class="mb-3 w-full top-[0rem] right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200">
+                <button
+                  onClick={() =>
+                    updateContainerStatus(selectedProjectId, "Start")
+                  }
+                  class="mb-3 w-full top-[0rem] right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
+                >
                   Start
                 </button>
-                <button class=" mb-3 w-full  right-[0rem] left-[0rem]  hover:bg-coral-100  rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200">
+                <button
+                  onClick={() =>
+                    updateContainerStatus(selectedProjectId, "Stop")
+                  }
+                  class="mb-3 w-full right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
+                >
                   Stop
                 </button>
-                <button class=" mb-3 w-full  right-[0rem] left-[0rem]  hover:bg-coral-100  rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200">
+                <button
+                  onClick={() =>
+                    updateContainerStatus(selectedProjectId, "Recreate")
+                  }
+                  class="mb-3 w-full right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
+                >
                   Recreate
-                </button>    <button class=" mb-3 w-full  right-[0rem] left-[0rem]  hover:bg-coral-100  rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200">
+                </button>{" "}
+                <button
+                  onClick={() => handleDeleteProject(selectedProjectId)}
+                  class=" mb-3 w-full  right-[0rem] left-[0rem]  hover:bg-coral-100  rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
+                >
                   Delete
                 </button>
                 <button
-                  onClick={openAssignPopup}
+                  onClick={() => openAssignPopup(selectedProjectId)}
                   class=" mb-2 w-full  right-[0rem] left-[0rem]  hover:bg-coral-100  rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
                 >
                   Assign
@@ -284,11 +529,11 @@ const Workflows = () => {
           </div>
         </div>
       )}
-      <div className=" bg-slate-100 pt-10 pl-[260px] h-[108vh]  z-[20]">
+      <div className=" bg-slate-100 pt-10 pl-[260px] h-[208vh]  z-[20]">
         <section class=" w-[71.25rem] px-[var(--padding-xl)] box-border text-left text-5xl text-bodytext-100 font-poppins flex justify-start flex flex-col items-start max-w-full">
           <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full text-[1.5rem] text-bodytext-100 mq750:flex-wrap">
             <h2 class="m-0 h-[2.25rem] relative text-inherit tracking-[0.02em] font-semibold font-inherit flex items-center mq450:text-[1.19rem]">
-              Workflows
+              Workflow
             </h2>
             <div class="flex flex-row items-start justify-start gap-[1.38rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
               <Link
@@ -328,7 +573,7 @@ const Workflows = () => {
           <div class="self-stretch flex flex-col mt-10 items-end justify-start gap-[1.44rem] max-w-full">
             <div class="w-[68.31rem] relative text-[1.13rem] pb-0 tracking-[-0.02em] capitalize font-medium font-poppins text-black whitespace-pre-wrap text-left inline-block max-w-full">
               <thead className=" flex justify-between pr-4 ">
-                <p>Workflows ID</p>
+                <p>Workflow ID</p>
                 <p className="">Name</p>
                 <p className="ml-10">Created</p>
                 <p className="pl-8">Status</p>
@@ -340,117 +585,177 @@ const Workflows = () => {
             </div>
 
             <tbody className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
-              {projects.map((project) => (
+              {projects.map((workspace) => (
                 <div
-                  key={project.index}
+                  key={workspace.id}
                   class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap"
                 >
                   <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
                   <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
                     <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
-                      Avala Project
+                      {workspace.id}
                     </div>
                   </div>
                   <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
                     <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
                       <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
                         <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          Carter Mango
+                          {workspace.name}
                         </div>
                       </div>
                       <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
                         <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          Sun, 10 May 2022
+                          {formatDate(workspace.created_at)}
                         </div>
                       </div>
                       <div class="w-[7.38rem] flex flex-col items-start justify-start">
                         <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
                           <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
                           <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                            New
+                            {workspace.status}
                           </div>
                         </button>
                       </div>
 
                       <div className="pr-4">
-                        <Form>
-                          <Form.Check // prettier-ignore
+                        <Form className="content-center">
+                          <Form.Check
                             type="switch"
-                            id="custom-switch"
-                            className="custom-switch"
+                            id={`custom-switch-${workspace.id}`}
+                            className="custom-switch content-center"
+                            // label={project.isActive ? "Active" : "Inactive"}
+                            checked={workspace.isActive}
+                            onChange={() =>
+                              handleSwitchChange(
+                                workspace.id,
+                                workspace.isActive
+                              )
+                            }
                           />
                         </Form>
                       </div>
                     </div>
                   </div>
-                  <div
-                    className="hover-div"
-                    onMouseEnter={() => handleMouseEnter(project.index)}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    <img
-                      className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                      loading="lazy"
-                      alt=""
-                      src={p3}
-                    />
-                    <img
-                      className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                      loading="lazy"
-                      alt=""
-                      src={p2}
-                    />
-                    <img
-                      className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                      loading="lazy"
-                      alt=""
-                      src={p4}
-                    />
-
-                    {hoveredProjectIndex === project.index && (
-                      <div className="user-list absolute h-[12rem] overflow-y-auto bg-gray-100 bg-opacity-70 z-10">
-                        <List>
-                          {users.map((user) => (
-                            <ListItem key={user.index} disablePadding>
-                              <ListItemButton>
-                                <ListItemAvatar>
-                                  {/* <Avatar
-                                    src={user.profilePicture}
-                                    alt={user.userName}
-                                  />
-                                  <img src={user.profilePicture} alt="" /> */}
+                  <div>
+                    <List
+                      component="nav"
+                      aria-label="Device settings"
+                      sx={{ bgcolor: "background.paper" }}
+                    >
+                      <ListItemButton
+                        id="lock-button"
+                        aria-haspopup="listbox"
+                        aria-controls="lock-menu"
+                        aria-label="when device is locked"
+                        aria-expanded={open ? "true" : undefined}
+                        onClick={(event) =>
+                          handleClickListItem(event, workspace.id)
+                        } // Pass event and projectId
+                      >
+                        <img
+                          className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                          loading="lazy"
+                          alt=""
+                          src={p3}
+                        />
+                        <img
+                          className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                          loading="lazy"
+                          alt=""
+                          src={p2}
+                        />
+                        <img
+                          className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                          loading="lazy"
+                          alt=""
+                          src={p4}
+                        />
+                      </ListItemButton>
+                    </List>
+                    <Menu
+                      id="lock-menu"
+                      anchorEl={anchorEl}
+                      open={open}
+                      onClose={handleClose}
+                      MenuListProps={{
+                        "aria-labelledby": "lock-button",
+                        role: "listbox",
+                        className:
+                          "bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto",
+                      }}
+                    >
+                      {!users ||
+                      users.length == 0 ||
+                      users.every((user) => !user.isWorkflowAssign) ? (
+                        <MenuItem disabled>No users found</MenuItem>
+                      ) : (
+                        users.map((user, index) =>
+                          // Assuming the condition for not showing isWorkflowAssign is false
+                          !user.isWorkflowAssign ? null : (
+                            <MenuItem
+                              key={index}
+                              disabled={index === 0}
+                              selected={index === selectedIndex}
+                              onClick={(event) =>
+                                handleMenuItemClick(event, index)
+                              }
+                              className="px-4 py-3 flex items-center"
+                            >
+                              <div className="mr-4">
+                                {user.profilePic ? (
                                   <img
-                                    className="self-stretch ml-[-10px] h-[3.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                                    loading="lazy"
+                                    className="h-12 w-12 rounded-full"
+                                    src={user.profilePic}
                                     alt=""
-                                    src={p4}
                                   />
-                                </ListItemAvatar>
-                                <div className="">
-                                  <ListItemText primary={user.userName} />
-                                  <p className="text-sm"> Software Developer</p>
-                                </div>
-                              </ListItemButton>
-                            </ListItem>
-                          ))}
-                        </List>
-                      </div>
-                    )}
+                                ) : (
+                                  <span className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                    <img
+                                      className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center"
+                                      loading="lazy"
+                                      alt=""
+                                      src={p2}
+                                    />
+                                  </span>
+                                )}
+                              </div>
+                              <div>
+                                <ListItemText
+                                  primary={`User ID: ${user.id}`}
+                                  className="text-gray-800 mb-1"
+                                />
+                                <ListItemText
+                                  primary={`Name: ${user.name}`}
+                                  className="text-gray-600 text-sm"
+                                />
+                              </div>
+                            </MenuItem>
+                          )
+                        )
+                      )}
+                    </Menu>
                   </div>
+
                   <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
                     <div class="flex flex-row items-center justify-start gap-[1rem]">
-                      <Link to="/editWorkflow" className="no-underline">
+                      <button
+                        onClick={() => handleEditProject(workspace.id)}
+                        className="no-underline  bg-white"
+                      >
                         <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
                           <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
                           <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
                             
                           </div>
                         </div>
-                      </Link>
+                      </button>
                     </div>
 
                     {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                    <button className="bg-white" onClick={openPopup}>
+                    <button
+                      className="bg-white"
+                      onClick={() => openPopup(workspace.id)}
+                    >
                       <img
                         class="h-[1.25rem] w-[1.28rem] relative z-[1]"
                         alt=""
@@ -468,4 +773,4 @@ const Workflows = () => {
   );
 };
 
-export default Workflows;
+export default Workflow;

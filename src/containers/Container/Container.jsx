@@ -43,14 +43,20 @@ const Container = () => {
 
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [userChecked, setUserChecked] = useState([]);
+
 
   const [message, setMessage] = useState("");
+
+  const apiUrl = "https://d-admin-backend.onrender.com";
 
   const notifyAssign = (message) => {
     toast.success(` ${message}`);
   };
 
   const notifyDelete = () => toast.success("Container deleted successfully");
+  const notifyStatus = () =>
+    toast.success("Container status updated successfully");
 
   const [users, setUsers] = useState([]);
 
@@ -98,12 +104,12 @@ const Container = () => {
 
   // images
 
-  const getAssignUsers = async (selectedProjectId) => {
-    console.log("this data is from selected projectid ", selectedProjectId);
+  const getAssignUsers = async (projectId) => {
+    console.log("this data is from selected projectid ", projectId);
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/container/get-assign-container/${selectedProjectId}`, // corrected URL interpolation
+        `https://d-admin-backend.onrender.com/api/container/get-assign-container/${projectId}`, // corrected URL interpolation
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -114,6 +120,16 @@ const Container = () => {
       const userData = data.data;
       console.log("API Response user Data :", data.data); // Log the response
       setUsers(userData); // Assuming setUsers is a state update function
+      // Filter userData to get users with isContainerAssign true and extract their IDs
+      const userIDsContainerAssignTrue = userData
+        .filter((user) => user.isContainerAssign)
+        .map((user) => user.id);
+
+      console.log(
+        "User IDs with isContainerAssign true:",
+        userIDsContainerAssignTrue
+      );
+      setUserChecked(userIDsContainerAssignTrue)
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -160,7 +176,7 @@ const Container = () => {
 
   const openPopup = (projectId) => {
     setPopupOpen(true);
-    getAssignUsers();
+    getAssignUsers(projectId);
     console.log("openPopup", projectId);
     setSelectedProjectId(projectId); // Assuming you have a state to store the selected project ID
     console.log("popupOpen", selectedProjectId);
@@ -222,12 +238,37 @@ const Container = () => {
   // Inside your component
   const navigate = useNavigate();
 
-  const [userChecked, setUserChecked] = useState([]);
 
-  const handleToggle = (id, isProjectAssign) => () => {
+  console.log("userChecked", userChecked);
+
+  const handleToggle = (id, isContainerAssign) => () => {
+    console.log("Toggling user with ID:", id);
+    console.log("Current isContainerAssign value:", isContainerAssign);
+
     const updatedUsers = users.map((user) =>
-      user.id === id ? { ...user, isProjectAssign: !isProjectAssign } : user
+      user.id === id ? { ...user, isContainerAssign: !isContainerAssign } : user
     );
+
+    console.log("Updated users:", updatedUsers);
+
+    // Filter users with isContainerAssign equal to true and save their IDs in an array
+    const userIDsContainerAssignTrue = updatedUsers
+      .filter((user) => user.isContainerAssign)
+      .map((user) => user.id);
+
+    console.log(
+      "User IDs with isContainerAssign true:",
+      userIDsContainerAssignTrue
+    );
+
+    // Now you can do something with the user IDs that have isContainerAssign true
+
+    // const updatedUsers = users.map((user) =>
+    //   user.id === id ? { ...user, isContainerAssign: !isContainerAssign } : user
+    // );
+
+    console.log("Updated usersssssssssss:", updatedUsers);
+
     setUsers(updatedUsers);
 
     const isChecked = userChecked.includes(id);
@@ -272,6 +313,7 @@ const Container = () => {
       notifyAssign(data.message);
       getAssignUsers(selectedProjectId);
       setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+      setUserChecked([]);
 
       setAssignPopupOpen(false);
       closePopup();
@@ -344,6 +386,43 @@ const Container = () => {
     setAnchorEl(null);
   };
 
+  // update status
+
+  console.log(apiUrl, "apiUrl=");
+
+  const updateContainerStatus = async (projectId, status) => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const requestBody = {
+        id: projectId,
+        status: status,
+      };
+
+      const response = await fetch(`${apiUrl}/api/container/update-status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update container status");
+      }
+
+      setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+      notifyStatus();
+
+      setPopupOpen(false);
+      const data = await response.json();
+      console.log("Container status updated:", data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div>
       {" "}
@@ -359,7 +438,7 @@ const Container = () => {
               <img src={close} class="h-6 w-6 flex text-gray-500" alt="" />
             </button>
             <div class=" text-[1.25rem] leading-[2.5rem] capitalize font-medium text-darkslategray-100">
-              Assign Projects to Users
+              Assign Container to Users
             </div>
             <thead className=" flex justify-between px-3 ">
               <p>User ID</p>
@@ -380,7 +459,7 @@ const Container = () => {
               >
                 {users &&
                   users.map((user) => {
-                    const { id, name, isProjectAssign, profilePic } = user;
+                    const { id, name, isContainerAssign, profilePic } = user;
                     const labelId = `checkbox-list-secondary-label-${id}`;
 
                     return (
@@ -389,7 +468,7 @@ const Container = () => {
                         secondaryAction={
                           <Checkbox
                             edge="end"
-                            onChange={handleToggle(id, isProjectAssign)}
+                            onChange={handleToggle(id, isContainerAssign)}
                             checked={userChecked.includes(id)}
                             inputProps={{ "aria-labelledby": labelId }}
                           />
@@ -433,12 +512,36 @@ const Container = () => {
             {/* Add your cut icon SVG here */}
             <img src={close} class="h-6 w-6 text-gray-500" alt="" />
           </button>
-          <div class="relative h-[17.31rem] text-[0.88rem] text-dimgray font-poppins">
+          <div class="relative h-[28.31rem] text-[0.88rem] text-dimgray font-poppins">
             <div class="w-full relative h-[24.31rem]  text-[0.88rem] text-dimgray font-poppins">
               <div class="absolute w-full top-[9.19rem] right-[0rem] left-[0rem] h-[12.13rem]">
                 <button
-                  onClick={() => handleDeleteProject(selectedProjectId)}
+                  onClick={() =>
+                    updateContainerStatus(selectedProjectId, "Start")
+                  }
                   class="mb-3 w-full top-[0rem] right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
+                >
+                  Start
+                </button>
+                <button
+                  onClick={() =>
+                    updateContainerStatus(selectedProjectId, "Stop")
+                  }
+                  class="mb-3 w-full right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
+                >
+                  Stop
+                </button>
+                <button
+                  onClick={() =>
+                    updateContainerStatus(selectedProjectId, "Recreate")
+                  }
+                  class="mb-3 w-full right-[0rem] left-[0rem] hover:bg-coral-100 rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
+                >
+                  Recreate
+                </button>{" "}
+                <button
+                  onClick={() => handleDeleteProject(selectedProjectId)}
+                  class=" mb-3 w-full  right-[0rem] left-[0rem]  hover:bg-coral-100  rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-200"
                 >
                   Delete
                 </button>
@@ -456,7 +559,7 @@ const Container = () => {
                 src={logo}
               />
               <div class=" text-[1.25rem] leading-[2.5rem] capitalize font-medium text-darkslategray-100">
-                Projects Actions
+                Container Actions
               </div>
 
               <div class="absolute top-[4.44rem] justify-center left-[2.06rem] tracking-[-0.02em] whitespace-pre-wrap text-center inline-block w-[18.31rem]">
@@ -622,12 +725,12 @@ const Container = () => {
                       }}
                     >
                       {!users ||
-                      users.length === 0 ||
-                      users.every((user) => !user.isProjectAssign) ? (
+                      users.length == 0 ||
+                      users.every((user) => !user.isContainerAssign) ? (
                         <MenuItem disabled>No users found</MenuItem>
                       ) : (
                         users.map((user, index) =>
-                          // Assuming the condition for not showing isProjectAssign is false
+                          // Assuming the condition for not showing isContainerAssign is false
                           !user.isContainerAssign ? null : (
                             <MenuItem
                               key={index}
@@ -746,18 +849,6 @@ const Container = () => {
             </div>
           </div>
           <div class="self-stretch flex flex-col mt-10 items-end justify-start gap-[1.44rem] max-w-full">
-            {/* <div class="w-[68.31rem] relative text-[1.13rem] pb-0 tracking-[-0.02em] capitalize font-medium font-poppins text-black whitespace-pre-wrap text-left inline-block max-w-full"> */}
-            {/* <thead className=" flex justify-between pr-4 "> */}
-            {/* <p>Container ID</p> */}
-            {/* <p className="">Name</p> */}
-            {/* <p className="ml-10">Created</p> */}
-            {/* <p className="pl-8">Status</p> */}
-            {/* <p className="">IsActive</p> */}
-            {/* <p className="pl-5">Users</p> */}
-            {/* <p className="pr-3">Edit</p> */}
-            {/* <p className="d-flex justify-end pr-5">Action</p> */}
-            {/* </thead> */}
-            {/* </div> */}
             <div className="container mx-auto p-4">
               <h1 className="text-2xl font-bold mb-4">Image Gallery</h1>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-start">
@@ -796,188 +887,6 @@ const Container = () => {
                 </div>
               )}
             </div>
-            {/* <tbody className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]"> */}
-            {/* {containers.map((container) => ( */}
-            {/* <div */}
-            {/* key={container.id} */}
-            {/* class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap" */}
-            {/* > */}
-            {/* <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div> */}
-            {/* <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]"> */}
-            {/* <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]"> */}
-            {/* {container.id} */}
-            {/* </div> */}
-            {/* </div> */}
-            {/* <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full"> */}
-            {/* <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap"> */}
-            {/* <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border"> */}
-            {/* <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]"> */}
-            {/* {container.name} */}
-            {/* </div> */}
-            {/* </div> */}
-            {/* <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]"> */}
-            {/* <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]"> */}
-            {/* {formatDate(container.created_at)} */}
-            {/* </div> */}
-            {/* </div> */}
-            {/* <div class="w-[7.38rem] flex flex-col items-start justify-start"> */}
-            {/* <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100"> */}
-            {/* <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div> */}
-            {/* <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]"> */}
-            {/* {container.status} */}
-            {/* </div> */}
-            {/* </button> */}
-            {/* </div> */}
-            {/*  */}
-            {/* <div className="pr-4"> */}
-            {/* <Form className="content-center"> */}
-            {/* <Form.Check */}
-            {/* type="switch" */}
-            {/* id={`custom-switch-${container.id}`} */}
-            {/* className="custom-switch content-center" */}
-            {/* // label={project.isActive ? "Active" : "Inactive"} */}
-            {/* checked={container.isActive} */}
-            {/* onChange={() => */}
-            {/* handleSwitchChange( */}
-            {/* container.id, */}
-            {/* container.isActive */}
-            {/* ) */}
-            {/* } */}
-            {/* /> */}
-            {/* </Form> */}
-            {/* </div> */}
-            {/* </div> */}
-            {/* </div> */}
-            {/* <div> */}
-            {/* <List */}
-            {/* component="nav" */}
-            {/* aria-label="Device settings" */}
-            {/* sx={{ bgcolor: "background.paper" }} */}
-            {/* > */}
-            {/* <ListItemButton */}
-            {/* id="lock-button" */}
-            {/* aria-haspopup="listbox" */}
-            {/* aria-controls="lock-menu" */}
-            {/* aria-label="when device is locked" */}
-            {/* aria-expanded={open ? "true" : undefined} */}
-            {/* onClick={(event) => */}
-            {/* handleClickListItem(event, container.id) */}
-            {/* } // Pass event and projectId */}
-            {/* > */}
-            {/* <img */}
-            {/* className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0" */}
-            {/* loading="lazy" */}
-            {/* alt="" */}
-            {/* src={p3} */}
-            {/* /> */}
-            {/* <img */}
-            {/* className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0" */}
-            {/* loading="lazy" */}
-            {/* alt="" */}
-            {/* src={p2} */}
-            {/* /> */}
-            {/* <img */}
-            {/* className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0" */}
-            {/* loading="lazy" */}
-            {/* alt="" */}
-            {/* src={p4} */}
-            {/* /> */}
-            {/* </ListItemButton> */}
-            {/* </List> */}
-            {/* <Menu */}
-            {/* id="lock-menu" */}
-            {/* anchorEl={anchorEl} */}
-            {/* open={open} */}
-            {/* onClose={handleClose} */}
-            {/* MenuListProps={{ */}
-            {/* "aria-labelledby": "lock-button", */}
-            {/* role: "listbox", */}
-            {/* className: */}
-            {/* "bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto", */}
-            {/* }} */}
-            {/* > */}
-            {/* {!users || */}
-            {/* users.length === 0 || */}
-            {/* users.every((user) => !user.isProjectAssign) ? ( */}
-            {/* <MenuItem disabled>No users found</MenuItem> */}
-            {/* ) : ( */}
-            {/* users.map((user, index) => */}
-            {/* // Assuming the condition for not showing isProjectAssign is false */}
-            {/* !user.isContainerAssign ? null : ( */}
-            {/* <MenuItem */}
-            {/* key={index} */}
-            {/* disabled={index === 0} */}
-            {/* selected={index === selectedIndex} */}
-            {/* onClick={(event) => */}
-            {/* handleMenuItemClick(event, index) */}
-            {/* } */}
-            {/* className="px-4 py-3 flex items-center" */}
-            {/* > */}
-            {/* <div className="mr-4"> */}
-            {/* {user.profilePic ? ( */}
-            {/* <img */}
-            {/* className="h-12 w-12 rounded-full" */}
-            {/* src={user.profilePic} */}
-            {/* alt="" */}
-            {/* /> */}
-            {/* ) : ( */}
-            {/* <span className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center"> */}
-            {/* <img */}
-            {/* className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center" */}
-            {/* loading="lazy" */}
-            {/* alt="" */}
-            {/* src={p2} */}
-            {/* /> */}
-            {/* </span> */}
-            {/* )} */}
-            {/* </div> */}
-            {/* <div> */}
-            {/* <ListItemText */}
-            {/* primary={`User ID: ${user.id}`} */}
-            {/* className="text-gray-800 mb-1" */}
-            {/* /> */}
-            {/* <ListItemText */}
-            {/* primary={`Name: ${user.name}`} */}
-            {/* className="text-gray-600 text-sm" */}
-            {/* /> */}
-            {/* </div> */}
-            {/* </MenuItem> */}
-            {/* ) */}
-            {/* ) */}
-            {/* )} */}
-            {/* </Menu> */}
-            {/* </div> */}
-            {/*  */}
-            {/* <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]"> */}
-            {/* <div class="flex flex-row items-center justify-start gap-[1rem]"> */}
-            {/* <button */}
-            {/* onClick={() => handleEditProject(container.id)} */}
-            {/* className="no-underline  bg-white" */}
-            {/* > */}
-            {/* <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]"> */}
-            {/* <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div> */}
-            {/* <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"> */}
-            {/*  */}
-            {/* </div> */}
-            {/* </div> */}
-            {/* </button> */}
-            {/* </div> */}
-            {/*  */}
-            {/* <!~~ <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> ~~> */}
-            {/* <button */}
-            {/* className="bg-white" */}
-            {/* onClick={() => openPopup(container.id)} */}
-            {/* > */}
-            {/* <img */}
-            {/* class="h-[1.25rem] w-[1.28rem] relative z-[1]" */}
-            {/* alt="" */}
-            {/* src={threedots} */}
-            {/* /> */}
-            {/* </button> */}
-            {/* </div> */}
-            {/* </div> */}
-            {/* ))} */}
-            {/* </tbody> */}
           </div>
         </section>
       </div>

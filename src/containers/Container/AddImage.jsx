@@ -162,12 +162,15 @@ const AddImage = () => {
                 />
               </div>{" "}
               <div className="flex-1 flex flex-col items-start justify-start pt-[0.25rem] px-[0.5rem] pb-[1.13rem] box-border relative gap-[0.5rem] min-w-[15.88rem] max-w-full z-[3]">
-            <label htmlFor="fileInput" className="block ml-2 text-sm uppercase font-medium text-bodytext-50 dark:text-white">
-                File Upload
-            </label>
+                <label
+                  htmlFor="fileInput"
+                  className="block ml-2 text-sm uppercase font-medium text-bodytext-50 dark:text-white"
+                >
+                  File Upload
+                </label>
 
-            <div className="relative w-full">
-                <input
+                <div className="relative w-full">
+                  <input
                     type="file"
                     id="fileInput"
                     className="opacity-0 cursor-pointer absolute inset-0 w-full h-full"
@@ -175,41 +178,46 @@ const AddImage = () => {
                     onChange={(e) => handleFileChange(e.target.files)}
                     accept="image/*" // Limit file selection to images
                     required
-                />
-                <div className="bg-gray-50 border w-full h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 relative">
+                  />
+                  <div className="bg-gray-50 border w-full h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 relative">
                     <span className="text-gray-500 mt-1">File Upload</span>
                     <img
-                        className="w-[1.25rem] h-[1.25rem] absolute right-[1.563rem] bottom-[1rem] align-center cursor-pointer"
-                        src={FileUpload}
-                        alt="Upload Icon"
-                        onClick={() => openFileInput()}
+                      className="w-[1.25rem] h-[1.25rem] absolute right-[1.563rem] bottom-[1rem] align-center cursor-pointer"
+                      src={FileUpload}
+                      alt="Upload Icon"
+                      onClick={() => openFileInput()}
                     />
-                </div>
-                {previewImage && (
+                  </div>
+                  {previewImage && (
                     <div className="mt-2 relative">
-                        <img
-                            className="max-w-full h-auto rounded-lg"
-                            src={previewImage}
-                            alt="Preview"
-                        />
-                        <button
-                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 cursor-pointer"
-                            onClick={removePreview}
+                      <img
+                        className="max-w-full h-auto rounded-lg"
+                        src={previewImage}
+                        alt="Preview"
+                      />
+                      <button
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 cursor-pointer"
+                        onClick={removePreview}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
                     </div>
-                )}
-            </div>
-        </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
 

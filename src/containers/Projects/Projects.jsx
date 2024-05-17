@@ -37,6 +37,7 @@ const Projects = () => {
   const [shouldFetchData, setShouldFetchData] = useState(true);
 
   const [isAssignPopupOpen, setAssignPopupOpen] = useState(false);
+  const [userChecked, setUserChecked] = useState([]);
 
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
@@ -72,6 +73,12 @@ const Projects = () => {
       const userData = data.data;
       console.log("API Response user Data :", data.data); // Log the response
       setUsers(userData); // Assuming setUsers is a state update function
+      const userIDsProjectAssignTrue = userData
+      .filter((user) => user.isProjectAssign)
+      .map((user) => user.id);
+
+    console.log("User IDs with isProjectAssign true:", userIDsProjectAssignTrue);
+    setUserChecked(userIDsProjectAssignTrue)
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -182,7 +189,6 @@ const Projects = () => {
     navigate("/settings/teamMember");
   };
 
-  const [userChecked, setUserChecked] = useState([]);
 
   const handleToggle = (id, isProjectAssign) => () => {
     const updatedUsers = users.map((user) =>
@@ -529,7 +535,7 @@ const Projects = () => {
                             type="switch"
                             id={`custom-switch-${project.id}`}
                             className="custom-switch content-center"
-                            // label={project.isActive ? "Active" : "Inactive"}
+                            label={project.isActive ? "Active" : "Inactive"}
                             checked={project.isActive}
                             onChange={() =>
                               handleSwitchChange(project.id, project.isActive)

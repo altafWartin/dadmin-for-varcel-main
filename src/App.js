@@ -51,7 +51,7 @@ function App() {
           <Route path="/projects/editProject/:projectId" element={<EditProject />} />
           <Route path="/addNewWorkspace" element={<AddNewWorkspace />} />
           <Route path="/workflow" element={<Workflows />} />
-          <Route path="/editWorkflow" element={<EditWorkflow />} />
+          <Route path="/workflow/editWorkflow/:workflowId" element={<EditWorkflow />} />
           <Route path="/addNewWorkflow" element={<AddNewWorkflow />} />
           {/* <Route path="/container" element={<Container />} /> */}
           <Route path="/container" element={<Resource/>} />

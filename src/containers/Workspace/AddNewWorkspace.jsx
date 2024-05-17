@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../components/Navbar/Navbar";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import calendar from "../../assets/Icon/calendar.svg";
@@ -9,11 +11,20 @@ import close from "../../assets/Icon/close.png";
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 import logo from "../../assets/logo.svg";
 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const AddNewWorkspace = () => {
   const [paramCount, setParamCount] = useState(0);
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [labelName, setLabelName] = useState("");
   const [labelNames, setLabelNames] = useState([]);
+
+  const navigate = useNavigate();
+
+  const notifyAddWorkspace = () => toast.success("Workspace add successfully");
+  const notifyerror = (message) =>
+    toast.error({message});
 
   // Function to open popup
   const openPopup = () => {
@@ -108,7 +119,12 @@ const AddNewWorkspace = () => {
   
       // Parse the response JSON
       const data = await response.json();
+      notifyAddWorkspace()
+      notifyerror(data.message)
       console.log("Response data:", data); // Handle response data here
+      navigate("/workspace");
+
+
     } catch (error) {
       console.error("Error:", error.message);
     }

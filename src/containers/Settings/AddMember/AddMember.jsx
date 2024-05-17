@@ -2,6 +2,21 @@ import React, { useEffect, useState } from "react";
 import { Formik, Field, ErrorMessage } from "formik";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Checkbox from "@mui/material/Checkbox";
+import Avatar from "@mui/material/Avatar";
+
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from '@mui/material'; // Importing components from Material-UI
+
 
 import "./AddMember.css";
 import logo from "../../../assets/logo.svg";
@@ -13,9 +28,13 @@ import setting from "../../../assets/Icon/setting.svg";
 import ArrowRight from "../../../assets/Icon/ArrowRight.svg";
 
 const AddMember = () => {
-
   const [token, setToken] = useState("");
-
+  const [selectedRole, setSelectedRole] = useState("");
+  const roles = ["Project Manager", "Developer"];
+  // const handleMenuItemClick = (event, index) => {
+  //   setSelectedRole(roles[index]);
+  //   handleClose(event);
+  // };
 
   const notify = () => toast.ok("Member add successfully");
 
@@ -26,7 +45,6 @@ const AddMember = () => {
       setToken(storedToken);
     }
   }, []);
-
 
   return (
     <div className="containerBody">
@@ -191,22 +209,39 @@ const AddMember = () => {
                       className="error-message"
                     />
                   </div>
+          
+
                   <div className="input12">
                     <div className="title-frame1">
                       <div className="title8">Role</div>
                     </div>
-                    <Field
-                      className="input13 px-3"
-                      placeholder="Role"
-                      id="role"
-                      name="role"
-                      type="text"
-                    />
-                    <ErrorMessage
-                      name="role"
-                      component="div"
-                      className="error-message"
-                    />
+                    <FormControl fullWidth>
+  {/* <InputLabel id="role-select-label">Select Role</InputLabel> */}
+  <Select
+    labelId="role-select-label"
+    id="role-select"
+    value={selectedRole}
+    onChange={(event) => setSelectedRole(event.target.value)}
+  >
+    {roles.map((role) => (
+      <MenuItem key={role} value={role}>
+        {role}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+                    {/* <Field */}
+                      {/* className="input13 px-3" */}
+                      {/* placeholder="Role" */}
+                      {/* id="role" */}
+                      {/* name="role" */}
+                      {/* type="text" */}
+                    {/* /> */}
+                    {/* <ErrorMessage */}
+                      {/* name="role" */}
+                      {/* component="div" */}
+                      {/* className="error-message" */}
+                    {/* /> */}
                   </div>
                   <div className="input-instance">
                     <button
