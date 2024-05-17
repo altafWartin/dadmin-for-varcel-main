@@ -5,7 +5,7 @@ import Workspace from "./containers/Workspace/Workspace.jsx";
 import Container from "./containers/Container/Container.jsx";
 import Settings from "./containers/Settings/Settings.jsx";
 import Workflows from "./containers/Workflows/Workflows.jsx";
-import Sidebar from "./components/Sidebar/Sidebar.jsx";
+import Sidebar from "./components/Sidebar/Sidebar.jsx";    
 import Navbar from "./components/Navbar/Navbar.jsx";
 import Login from "./containers/Login/Login.jsx";
 import AddMember from "./containers/Settings/AddMember/AddMember.jsx";
