@@ -10,13 +10,7 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Checkbox from "@mui/material/Checkbox";
 import Avatar from "@mui/material/Avatar";
 
-import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from '@mui/material'; // Importing components from Material-UI
-
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material"; // Importing components from Material-UI
 
 import "./AddMember.css";
 import logo from "../../../assets/logo.svg";
@@ -30,11 +24,7 @@ import ArrowRight from "../../../assets/Icon/ArrowRight.svg";
 const AddMember = () => {
   const [token, setToken] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
-  const roles = ["Project Manager", "Developer"];
-  // const handleMenuItemClick = (event, index) => {
-  //   setSelectedRole(roles[index]);
-  //   handleClose(event);
-  // };
+  const roles = ["Admin", "Project Manager", "Developer"];
 
   const notify = () => toast.ok("Member add successfully");
 
@@ -156,7 +146,7 @@ const AddMember = () => {
                 }
               }}
             >
-              {({ handleSubmit, isSubmitting }) => (
+              {({ handleSubmit, isSubmitting, setFieldValue, values }) => (
                 <form onSubmit={handleSubmit} className="w-full">
                   <div className="input12">
                     <div className="title-frame1">
@@ -209,39 +199,30 @@ const AddMember = () => {
                       className="error-message"
                     />
                   </div>
-          
 
                   <div className="input12">
                     <div className="title-frame1">
                       <div className="title8">Role</div>
                     </div>
                     <FormControl fullWidth>
-  {/* <InputLabel id="role-select-label">Select Role</InputLabel> */}
-  <Select
-    labelId="role-select-label"
-    id="role-select"
-    value={selectedRole}
-    onChange={(event) => setSelectedRole(event.target.value)}
-  >
-    {roles.map((role) => (
-      <MenuItem key={role} value={role}>
-        {role}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
-                    {/* <Field */}
-                      {/* className="input13 px-3" */}
-                      {/* placeholder="Role" */}
-                      {/* id="role" */}
-                      {/* name="role" */}
-                      {/* type="text" */}
-                    {/* /> */}
-                    {/* <ErrorMessage */}
-                      {/* name="role" */}
-                      {/* component="div" */}
-                      {/* className="error-message" */}
-                    {/* /> */}
+                      {/* <InputLabel id="role-select-label">Select Role</InputLabel> */}
+                      <Field
+                        name="role"
+                        as={Select}
+                        labelId="role-select-label"
+                        id="role-select"
+                        value={values.role}
+                        onChange={(event) =>
+                          setFieldValue("role", event.target.value)
+                        }
+                      >
+                        {roles.map((role) => (
+                          <MenuItem key={role} value={role}>
+                            {role}
+                          </MenuItem>
+                        ))}
+                      </Field>
+                    </FormControl>
                   </div>
                   <div className="input-instance">
                     <button

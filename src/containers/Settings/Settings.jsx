@@ -17,6 +17,16 @@ import clock from "../../assets/Icon/clock.svg";
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 import file2 from "../../assets/Images/File 2.png";
 
+
+
+const formatDate = (dateString) => {
+  const dateObject = new Date(dateString);
+  const year = dateObject.getFullYear();
+  const month = (dateObject.getMonth() + 1).toString().padStart(2, "0"); // Adding 1 to get the correct month (0-indexed)
+  const date = dateObject.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${date}`;
+};
+
 const Settings = () => {
   const [members, setMembers] = useState([]);
   const [token, setToken] = useState("");
@@ -204,7 +214,7 @@ const Settings = () => {
 
           <div class="avatar-frame1">
             <h3 class="team-members2">Team members</h3>
-            <ul class="pl-0">
+            <ul class="pl-0 space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
               {members.map((member) => (
                 <li key={member.id} class="user-detai flex mb-2 mr-5">
                   <div class="team-members-l">

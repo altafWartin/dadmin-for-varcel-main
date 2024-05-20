@@ -1652,7 +1652,9 @@ const TeamMember = () => {
                       </div>
                       <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
                         <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          {formatDate(container.created_at)}
+           
+                          {formatDate(workspace.created_at)}
+
                         </div>
                       </div>
                       <div class="w-[7.38rem] flex flex-col items-start justify-start">

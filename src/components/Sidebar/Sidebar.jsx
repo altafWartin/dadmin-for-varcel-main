@@ -12,6 +12,7 @@ import Projecticon from "../../assets/Icon/workflow.svg";
 const Sidebar = () => {
   const location = useLocation();
   const [activeLink, setActiveLink] = useState(location.pathname);
+  const user = JSON.parse(localStorage.getItem("user")); // Retrieve user from localStorage
 
   const handleLinkClick = (path) => {
     setActiveLink(path);
@@ -29,13 +30,13 @@ const Sidebar = () => {
           <div className={styles.menuSidebar}>
             <div className={styles.frameParent}>
               <Link
-                to="/"
+                to="/dashboard"
                 className={styles.linkText}
-                onClick={() => handleLinkClick("/")}
+                onClick={() => handleLinkClick("/dashboard")}
               >
                 <div
                   className={`${styles.iconcalendarParent} ${
-                    isLinkActive("/") && styles.active
+                    isLinkActive("/dashboard") && styles.active
                   }`}
                 >
                   <img
@@ -56,7 +57,11 @@ const Sidebar = () => {
                     isLinkActive("/projects") && styles.active
                   }`}
                 >
-                  <img className={styles.vuesaxboldelement3Icon} alt="" src={Projecticon} />
+                  <img
+                    className={styles.vuesaxboldelement3Icon}
+                    alt=""
+                    src={Projecticon}
+                  />
                   <div className={styles.workspace}>Projects</div>
                 </div>
               </Link>
@@ -114,25 +119,28 @@ const Sidebar = () => {
                   <div className={styles.workspace}>Workflows</div>
                 </div>
               </Link>
-            
-              <Link
-                to="/settings"
-                className={styles.linkText}
-                onClick={() => handleLinkClick("/settings")}
-              >
-                <div
-                  className={`${styles.iconcalendarParent} ${
-                    isLinkActive("/settings") && styles.active
-                  }`}
-                >
-                  <img
-                    className={styles.vuesaxboldelement3Icon}
-                    alt=""
-                    src={setting}
-                  />
-                  <div className={styles.workspace}>Settings</div>
-                </div>
-              </Link>
+
+              {!user ||
+                (user.role !== "developer" && (
+                  <Link
+                    to="/settings"
+                    className={styles.linkText}
+                    onClick={() => handleLinkClick("/settings")}
+                  >
+                    <div
+                      className={`${styles.iconcalendarParent} ${
+                        isLinkActive("/settings") && styles.active
+                      }`}
+                    >
+                      <img
+                        className={styles.vuesaxboldelement3Icon}
+                        alt=""
+                        src={setting}
+                      />
+                      <div className={styles.workspace}>Settings</div>
+                    </div>
+                  </Link>
+                ))}
               <div className={styles.frameChild} />
               <div className={styles.frameChild} />
             </div>

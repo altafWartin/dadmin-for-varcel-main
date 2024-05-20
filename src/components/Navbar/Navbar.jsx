@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState,  useEffect } from "react";
 // import styles from "./Navbar.module.css";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import search from "../../assets/Icon/search.svg";
-import Message from "../../assets/Icon/Message.svg";
+
 import Notification from "../../assets/Icon/Notification.svg";
-import arrowdown from "../../assets/Icon/arrowdown.svg";
+
 import logout from "../../assets/Icon/logout.svg";
 import Profile from "../../assets/Images/Profile.jpeg";
-import DropdownButton from "react-bootstrap/DropdownButton";
-import SplitButton from "react-bootstrap/SplitButton";
-import help from "../../assets/Icon/help.svg";
-// import Dropdown from "react-bootstrap/Dropdown";
 
-// TW Elements is free under AGPL, with commercial license required for specific uses. See more details: https://tw-elements.com/license/ and contact us for queries at tailwind@mdbootstrap.com
-// Initialization for ES Users
 import { Dropdown, Ripple, initTE } from "tw-elements";
 
 initTE({ Dropdown, Ripple });
@@ -25,6 +19,7 @@ const Navbar = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   console.log(loginUser, "setLoginUser");
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Get user data from localStorage
@@ -33,8 +28,8 @@ const Navbar = () => {
     // Parse the JSON data if it exists
     if (userData) {
       const parsedUserData = JSON.parse(userData);
-      setFullName(parsedUserData.fullName)
-      setEmail(parsedUserData.email)
+      setFullName(parsedUserData.fullName);
+      setEmail(parsedUserData.email);
       setLoginUser(parsedUserData);
     }
   }, []);
@@ -96,6 +91,14 @@ const Navbar = () => {
     }
   };
 
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    // Navigate to the login page
+    navigate("/login");
+  };
+
   return (
     <div>
       <header class="self-stretch z-2000  bg-white flex flex-row items-center justify-between py-[1rem] pr-[3rem] pl-[17.75rem] gap-[1.25rem] top-[0] z-[0] sticky text-left text-[0.88rem] text-text-100 font-poppins lg:pl-[1.38rem] lg:pr-[1.5rem] lg:box-border">
@@ -144,13 +147,13 @@ const Navbar = () => {
                 } // Open file input on profile image click
               />
             </div>
-            <Link to="/login">
+            <button className="bg-white"  onClick={handleLogout}>
               <img
                 className="h-[1.25rem] w-[1.25rem] relative cursor-pointer"
                 alt="Logout"
                 src={logout}
               />
-            </Link>
+            </button>
           </div>
         </div>
       </header>

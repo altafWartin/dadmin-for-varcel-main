@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { FormControl, InputLabel, Select, MenuItem } from "@mui/material"; // Importing components from Material-UI
+
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./AddMember/AddMember.css";
@@ -16,6 +18,8 @@ const EditMemberInfo = () => {
   const [role, setRole] = useState("");
   const [memberData, setMemberData] = useState("");
   const [fullName, setFullName] = useState("");
+  const [selectedRole, setSelectedRole] = useState("");
+  const roles = ["Admin", "Project Manager", "Developer"];
   const { memberId } = useParams();
   const id = memberId;
   const navigate = useNavigate();
@@ -55,11 +59,21 @@ const EditMemberInfo = () => {
     fetchMemberData();
   }, [memberId, token]);
 
-
-  console.log("pass",password);
+  console.log("pass", password);
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const requestBody = {
+        id,
+        fullName,
+        email,
+        role,
+      };
+
+      if (password !== "") {
+        requestBody.password = password;
+      }
+
       const response = await fetch(
         `https://d-admin-backend.onrender.com/api/user/update-member`,
         {
@@ -68,11 +82,11 @@ const EditMemberInfo = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ id, fullName, email, password, role }),
+          body: JSON.stringify(requestBody),
         }
       );
-      console.log(JSON.stringify({ id, fullName, email, password, role }))
 
+      console.log("Request body:", requestBody);
       console.log("Response status:", response.status);
 
       if (!response.ok) {
@@ -80,11 +94,11 @@ const EditMemberInfo = () => {
       }
 
       const data = await response.json();
-      console.log("API response data:", JSON.stringify(data));
+      console.log("API response data:", data);
 
       // Navigate to the home page
       // Assuming navigate("/") is your navigation function
-      navigate("/settings"); // Use navigate to navigate to a different route
+      // navigate("/settings"); // Use navigate to navigate to a different route
     } catch (error) {
       console.error("Error adding member:", error.message);
     }
@@ -179,7 +193,22 @@ const EditMemberInfo = () => {
                 <div className="title-frame1">
                   <div className="title8">Role</div>
                 </div>
-                <input
+                <FormControl fullWidth>
+                  <Select
+                    labelId="role-select-label"
+                    id="role-select"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                  >
+                    {roles.map((role) => (
+                      <MenuItem key={role} value={role}>
+                        {role}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                {/* <input
                   className="input13 px-3"
                   placeholder="Role"
                   id="role"
@@ -187,7 +216,7 @@ const EditMemberInfo = () => {
                   type="text"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                />
+                /> */}
               </div>
               <div className="input-instance">
                 <button
@@ -202,7 +231,7 @@ const EditMemberInfo = () => {
                     <div className="placeholder10"></div>
                     <div className="title12">Country</div>
                   </div>
-                  <b className="add-new-member">Add New Member</b>
+                  <b className="add-new-member">Save</b>
                 </button>
               </div>
             </form>

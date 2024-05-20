@@ -1,11 +1,18 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
 import "./App.css";
 import Dashboard from "./containers/Dashboard/Dashboard.jsx";
 import Workspace from "./containers/Workspace/Workspace.jsx";
 import Container from "./containers/Container/Container.jsx";
 import Settings from "./containers/Settings/Settings.jsx";
 import Workflows from "./containers/Workflows/Workflows.jsx";
-import Sidebar from "./components/Sidebar/Sidebar.jsx";    
+import Sidebar from "./components/Sidebar/Sidebar.jsx";
 import Navbar from "./components/Navbar/Navbar.jsx";
 import Login from "./containers/Login/Login.jsx";
 import AddMember from "./containers/Settings/AddMember/AddMember.jsx";
@@ -14,7 +21,6 @@ import AddNewWorkspace from "./containers/Workspace/AddNewWorkspace.jsx";
 import AddNewWorkflow from "./containers/Workflows/AddNewWorkflow.jsx";
 import AddNewContainer from "./containers/Container/AddNewContainer.jsx";
 import Footer from "./components/Footer/Footer.jsx";
-import SignUp from "./containers/SignUp/SignUp.jsx";
 import Projects from "./containers/Projects/Projects.jsx";
 import EditWorkspace from "./containers/Workspace/EditWorkspace.jsx";
 import EditWorkflow from "./containers/Workflows/EditWorkflows.jsx";
@@ -28,46 +34,61 @@ import TeamMember from "./containers/Settings/TeamMember.jsx";
 import Resource from "./containers/Container/Resource.jsx";
 
 function App() {
+  const [token, setToken] = useState("");
+  const navigate = useNavigate();
   const location = useLocation();
 
+  useEffect(() => {
+    const accessToken = localStorage.getItem("token");
+    if (accessToken) {
+      setToken(accessToken);
+    } else if (location.pathname !== "/login") {
+      navigate("/login");
+    }
+  }, [navigate, location.pathname]);
+
   const isLoginPage = location.pathname === "/login";
-  const issignUpPage = location.pathname === "/signUp";
-  const isDash = location.pathname === "/";
+
+  if (!token && !isLoginPage) {
+    return <Navigate to="/login" />;
+  } else if (token && isLoginPage) {
+    // return <Navigate to="/dashboard" />;
+  }
+
 
   return (
-    <>
-      <div className="App">
-        {!isLoginPage && !issignUpPage && <Sidebar />}
-        {!isLoginPage && !issignUpPage && <Navbar />}
+    <div className="App">
+      {!isLoginPage && <Sidebar />}
+      {!isLoginPage && <Navbar />}
 
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signUp" element={<SignUp />} />
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/workspace" element={<Workspace />} />
-          <Route path="/workspace/editWorkspace/:workspaceId" element={<EditWorkspace />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/addNewProject" element={<AddProject />} />
-          <Route path="/projects/editProject/:projectId" element={<EditProject />} />
-          <Route path="/addNewWorkspace" element={<AddNewWorkspace />} />
-          <Route path="/workflow" element={<Workflows />} />
-          <Route path="/workflow/editWorkflow/:workflowId" element={<EditWorkflow />} />
-          <Route path="/addNewWorkflow" element={<AddNewWorkflow />} />
-          {/* <Route path="/container" element={<Container />} /> */}
-          <Route path="/container" element={<Resource/>} />
-          <Route path="/addNewContainer" element={<AddNewContainer />} />
-          <Route path="/container/editContainer/:containerId" element={<EditContainer />} />
-          <Route path="/addImage" element={<AddImage />} />
-          <Route path="/editImage" element={<EditImage />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/addMember" element={<AddMember />} />
-          <Route path="/settings/editMemberInfo/:memberId" element={<EditMemberInfo />} />
-          <Route path="/settings/teamMember/:memberId" element={<TeamMember />} />
-          <Route path="/changePassword" element={<ChangePassword />} />
-        </Routes>
-        {!isLoginPage && !issignUpPage && <Footer />}
-      </div>
-    </>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={token ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/workspace" element={<Workspace />} />
+        <Route path="/workspace/editWorkspace/:workspaceId" element={<EditWorkspace />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/addNewProject" element={<AddProject />} />
+        <Route path="/projects/editProject/:projectId" element={<EditProject />} />
+        <Route path="/addNewWorkspace" element={<AddNewWorkspace />} />
+        <Route path="/workflow" element={<Workflows />} />
+        <Route path="/workflow/editWorkflow/:workflowId" element={<EditWorkflow />} />
+        <Route path="/addNewWorkflow" element={<AddNewWorkflow />} />
+        <Route path="/container" element={<Resource />} />
+        <Route path="/addNewContainer" element={<AddNewContainer />} />
+        <Route path="/container/editContainer/:containerId" element={<EditContainer />} />
+        <Route path="/addImage" element={<AddImage />} />
+        <Route path="/editImage" element={<EditImage />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/addMember" element={<AddMember />} />
+        <Route path="/settings/editMemberInfo/:memberId" element={<EditMemberInfo />} />
+        <Route path="/settings/teamMember/:memberId" element={<TeamMember />} />
+        <Route path="/changePassword" element={<ChangePassword />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+
+      {!isLoginPage && <Footer />}
+    </div>
   );
 }
 

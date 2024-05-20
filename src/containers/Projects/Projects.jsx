@@ -487,10 +487,10 @@ const Projects = () => {
               <thead className=" flex justify-between pr-4 ">
                 <p>Projects ID</p>
                 <p className="">Name</p>
-                <p className="ml-10">Created</p>
-                <p className="pl-8">Status</p>
-                <p className="">IsActive</p>
+                <p className="">Created</p>
+                {/* <p className="pl-8">Status</p> */}
                 <p className="pl-5">Users</p>
+                <p className="">IsActive</p>
                 <p className="pr-3">Edit</p>
                 <p className="d-flex justify-end pr-5">Action</p>
               </thead>
@@ -520,32 +520,15 @@ const Projects = () => {
                           {formatDate(project.created_at)}
                         </div>
                       </div>
-                      <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                        <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                          <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                          <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                            {project.status}
-                          </div>
-                        </button>
-                      </div>
-
-                      <div className="pr-4">
-                        <Form className="content-center">
-                          <Form.Check
-                            type="switch"
-                            id={`custom-switch-${project.id}`}
-                            className="custom-switch content-center"
-                            label={project.isActive ? "Active" : "Inactive"}
-                            checked={project.isActive}
-                            onChange={() =>
-                              handleSwitchChange(project.id, project.isActive)
-                            }
-                          />
-                        </Form>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
+                      {/* <div class="w-[7.38rem] flex flex-col items-start justify-start"> */}
+                        {/* <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100"> */}
+                          {/* <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div> */}
+                          {/* <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]"> */}
+                            {/* {project.status} */}
+                          {/* </div> */}
+                        {/* </button> */}
+                      {/* </div> */}
+                      <div>
                     <List
                       component="nav"
                       aria-label="Device settings"
@@ -643,6 +626,23 @@ const Projects = () => {
                       )}
                     </Menu>
                   </div>
+                  
+                    </div>
+                  </div>
+                  <div className="pr-4">
+                        <Form className="content-center">
+                          <Form.Check
+                            type="switch"
+                            id={`custom-switch-${project.id}`}
+                            className="custom-switch content-center"
+                            label={project.isActive ? "Active" : "Inactive"}
+                            checked={project.isActive}
+                            onChange={() =>
+                              handleSwitchChange(project.id, project.isActive)
+                            }
+                          />
+                        </Form>
+                      </div>
 
                   <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
                     <div class="flex flex-row items-center justify-start gap-[1rem]">
