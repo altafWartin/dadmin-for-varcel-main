@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
@@ -44,6 +44,8 @@ const Workflow = () => {
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [userChecked, setUserChecked] = useState([]);
+
+  const user = JSON.parse(localStorage.getItem("user")); // Retrieve user from localStorage
 
   const [message, setMessage] = useState("");
 
@@ -570,202 +572,197 @@ const Workflow = () => {
               </div>
             </div>
           </div>
-          <div class="self-stretch flex flex-col mt-10 items-end justify-start gap-[1.44rem] max-w-full">
-            <div class="w-[68.31rem] relative text-[1.13rem] pb-0 tracking-[-0.02em] capitalize font-medium font-poppins text-black whitespace-pre-wrap text-left inline-block max-w-full">
-              <thead className=" flex justify-between pr-4 ">
+          <div className="self-stretch flex flex-col mt-10 items-end justify-start gap-[1.44rem] max-w-full">
+            <div className="w-[68.31rem] relative text-[1.13rem] pb-0 tracking-[-0.02em] capitalize font-medium font-poppins text-black whitespace-pre-wrap text-left inline-block max-w-full">
+              <div className="flex justify-between pr-4">
                 <p>Workflow ID</p>
-                <p className="">Name</p>
-                <p className="ml-10">Created</p>
-                <p className="pl-8">Status</p>
-                <p className="">IsActive</p>
-                <p className="pl-5">Users</p>
-                <p className="pr-3">Edit</p>
-                <p className="d-flex justify-end pr-5">Action</p>
-              </thead>
+                <p>Name</p>
+                <p className="ml-2">Created</p>
+                <p className="pl-2">Status</p>
+                <p className="pl-5 pr-3">Users</p>
+                {!user ||
+                  (user.role !== "developer" && (
+                    <>
+                      <p>IsActive</p>
+                      <p className="pr-1">Edit</p>
+                      <p className="d-flex justify-end pr-5">Action</p>
+                    </>
+                  ))}
+              </div>
             </div>
 
-            <tbody className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
+            <div className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
               {projects.map((workspace) => (
                 <div
                   key={workspace.id}
-                  class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap"
+                  className="self-stretch rounded-2xl bg-white box-border flex items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] max-w-full border-[1px] border-solid border-whitesmoke"
                 >
-                  <div class="h-[4.75rem] w-[69.94rem] relative rounded-2xl bg-white box-border hidden max-w-full border-[1px] border-solid border-whitesmoke"></div>
-                  <div class="flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem]">
-                    <div class="relative text-[1rem] tracking-[-0.02em] font-medium font-plus-jakarta-sans text-bodytext-100 text-left z-[1]">
+                  <div className="flex items-center justify-between w-full">
+                    <div className="text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
                       {workspace.id}
                     </div>
-                  </div>
-                  <div class="w-[34rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                    <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                      <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                        <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          {workspace.name}
-                        </div>
-                      </div>
-                      <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                        <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          {formatDate(workspace.created_at)}
-                        </div>
-                      </div>
-                      <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                        <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                          <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                          <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                            {workspace.status}
-                          </div>
-                        </button>
-                      </div>
-
-                      <div className="pr-4">
-                        <Form className="content-center">
-                          <Form.Check
-                            type="switch"
-                            id={`custom-switch-${workspace.id}`}
-                            className="custom-switch content-center"
-                            // label={project.isActive ? "Active" : "Inactive"}
-                            checked={workspace.isActive}
-                            onChange={() =>
-                              handleSwitchChange(
-                                workspace.id,
-                                workspace.isActive
-                              )
-                            }
-                          />
-                        </Form>
-                      </div>
+                    <div className="text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
+                      {workspace.name.length > 10
+                        ? `${workspace.name.slice(0, 10)}...`
+                        : workspace.name}
                     </div>
-                  </div>
-                  <div>
-                    <List
-                      component="nav"
-                      aria-label="Device settings"
-                      sx={{ bgcolor: "background.paper" }}
-                    >
-                      <ListItemButton
-                        id="lock-button"
-                        aria-haspopup="listbox"
-                        aria-controls="lock-menu"
-                        aria-label="when device is locked"
-                        aria-expanded={open ? "true" : undefined}
-                        onClick={(event) =>
-                          handleClickListItem(event, workspace.id)
-                        } // Pass event and projectId
-                      >
-                        <img
-                          className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                          loading="lazy"
-                          alt=""
-                          src={p3}
-                        />
-                        <img
-                          className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                          loading="lazy"
-                          alt=""
-                          src={p2}
-                        />
-                        <img
-                          className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                          loading="lazy"
-                          alt=""
-                          src={p4}
-                        />
-                      </ListItemButton>
-                    </List>
-                    <Menu
-                      id="lock-menu"
-                      anchorEl={anchorEl}
-                      open={open}
-                      onClose={handleClose}
-                      MenuListProps={{
-                        "aria-labelledby": "lock-button",
-                        role: "listbox",
-                        className:
-                          "bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto",
-                      }}
-                    >
-                      {!users ||
-                      users.length == 0 ||
-                      users.every((user) => !user.isWorkflowAssign) ? (
-                        <MenuItem disabled>No users found</MenuItem>
-                      ) : (
-                        users.map((user, index) =>
-                          // Assuming the condition for not showing isWorkflowAssign is false
-                          !user.isWorkflowAssign ? null : (
-                            <MenuItem
-                              key={index}
-                              disabled={index === 0}
-                              selected={index === selectedIndex}
-                              onClick={(event) =>
-                                handleMenuItemClick(event, index)
-                              }
-                              className="px-4 py-3 flex items-center"
-                            >
-                              <div className="mr-4">
-                                {user.profilePic ? (
-                                  <img
-                                    className="h-12 w-12 rounded-full"
-                                    src={user.profilePic}
-                                    alt=""
-                                  />
-                                ) : (
-                                  <span className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
-                                    <img
-                                      className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center"
-                                      loading="lazy"
-                                      alt=""
-                                      src={p2}
-                                    />
-                                  </span>
-                                )}
-                              </div>
-                              <div>
-                                <ListItemText
-                                  primary={`User ID: ${user.id}`}
-                                  className="text-gray-800 mb-1"
-                                />
-                                <ListItemText
-                                  primary={`Name: ${user.name}`}
-                                  className="text-gray-600 text-sm"
-                                />
-                              </div>
-                            </MenuItem>
-                          )
-                        )
-                      )}
-                    </Menu>
-                  </div>
-
-                  <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                    <div class="flex flex-row items-center justify-start gap-[1rem]">
-                      <button
-                        onClick={() => handleEditProject(workspace.id)}
-                        className="no-underline  bg-white"
-                      >
-                        <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                          <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                          <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                            
-                          </div>
+                    <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                      {formatDate(workspace.created_at)}
+                    </div>
+                    <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                      <button className="cursor-pointer py-[0.31rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex items-center justify-center border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:border-chocolate-100">
+                        <div className="text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100">
+                          {workspace.status}
                         </div>
                       </button>
                     </div>
-
-                    {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                    <button
-                      className="bg-white"
-                      onClick={() => openPopup(workspace.id)}
-                    >
-                      <img
-                        class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                        alt=""
-                        src={threedots}
-                      />
-                    </button>
+                    <div className="flex items-center">
+                      <List
+                        component="nav"
+                        aria-label="Device settings"
+                        sx={{ bgcolor: "background.paper" }}
+                      >
+                        <ListItemButton
+                          id="lock-button"
+                          aria-haspopup="listbox"
+                          aria-controls="lock-menu"
+                          aria-label="when device is locked"
+                          aria-expanded={open ? "true" : undefined}
+                          onClick={(event) =>
+                            handleClickListItem(event, workspace.id)
+                          }
+                        >
+                          <img
+                            className="h-[1.5rem]"
+                            loading="lazy"
+                            alt=""
+                            src={p3}
+                          />
+                          <img
+                            className="ml-[-10px] h-[1.5rem]"
+                            loading="lazy"
+                            alt=""
+                            src={p2}
+                          />
+                          <img
+                            className="ml-[-10px] h-[1.5rem]"
+                            loading="lazy"
+                            alt=""
+                            src={p4}
+                          />
+                        </ListItemButton>
+                      </List>
+                      <Menu
+                        id="lock-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        MenuListProps={{
+                          "aria-labelledby": "lock-button",
+                          role: "listbox",
+                          className:
+                            "bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto",
+                        }}
+                      >
+                        {!users ||
+                        users.length === 0 ||
+                        users.every((user) => !user.isWorkflowAssign) ? (
+                          <MenuItem disabled>No users found</MenuItem>
+                        ) : (
+                          users.map((user, index) =>
+                            !user.isWorkflowAssign ? null : (
+                              <MenuItem
+                                key={index}
+                                disabled={index === 0}
+                                selected={index === selectedIndex}
+                                onClick={(event) =>
+                                  handleMenuItemClick(event, index)
+                                }
+                                className="px-4 py-3 flex items-center"
+                              >
+                                <div className="mr-4">
+                                  {user.profilePic ? (
+                                    <img
+                                      className="h-12 w-12 rounded-full"
+                                      src={user.profilePic}
+                                      alt=""
+                                    />
+                                  ) : (
+                                    <span className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                      <img
+                                        className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center"
+                                        loading="lazy"
+                                        alt=""
+                                        src={p2}
+                                      />
+                                    </span>
+                                  )}
+                                </div>
+                                <div>
+                                  <ListItemText
+                                    primary={`User ID: ${user.id}`}
+                                    className="text-gray-800 mb-1"
+                                  />
+                                  <ListItemText
+                                    primary={`Name: ${user.name}`}
+                                    className="text-gray-600 text-sm"
+                                  />
+                                </div>
+                              </MenuItem>
+                            )
+                          )
+                        )}
+                      </Menu>
+                    </div>
+                    {!user ||
+                      (user.role !== "developer" && (
+                        <>
+                          <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
+                            <Form>
+                              <Form.Check
+                                type="switch"
+                                id={`custom-switch-${workspace.id}`}
+                                checked={workspace.isActive}
+                                onChange={() =>
+                                  handleSwitchChange(
+                                    workspace.id,
+                                    workspace.isActive
+                                  )
+                                }
+                              />
+                            </Form>
+                          </div>
+                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                            <button
+                              onClick={() => handleEditProject(workspace.id)}
+                              className="no-underline bg-white"
+                            >
+                              <div className="flex items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative">
+                                <div className="absolute inset-0 rounded-xl bg-coral-200"></div>
+                                <div className="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100">
+                                  
+                                </div>
+                              </div>
+                            </button>
+                          </div>
+                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                            <button
+                              onClick={() => openPopup(workspace.id)}
+                              className="bg-white justify-end"
+                            >
+                              <img
+                                className="h-[1.25rem] w-[1.28rem] relative"
+                                alt=""
+                                src={threedots}
+                              />
+                            </button>
+                          </div>
+                        </>
+                      ))}
                   </div>
                 </div>
               ))}
-            </tbody>
+            </div>
           </div>
         </section>
       </div>

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 
@@ -46,6 +48,10 @@ const Projects = () => {
   const [projectChecked, setProjectChecked] = React.useState([]);
   const [message, setMessage] = useState("");
 
+  const location = useLocation();
+  const [activeLink, setActiveLink] = useState(location.pathname);
+  const user = JSON.parse(localStorage.getItem("user")); // Retrieve user from localStorage
+
   const notifyAssign = (message) => {
     toast.success(` ${message}`);
   };
@@ -74,11 +80,14 @@ const Projects = () => {
       console.log("API Response user Data :", data.data); // Log the response
       setUsers(userData); // Assuming setUsers is a state update function
       const userIDsProjectAssignTrue = userData
-      .filter((user) => user.isProjectAssign)
-      .map((user) => user.id);
+        .filter((user) => user.isProjectAssign)
+        .map((user) => user.id);
 
-    console.log("User IDs with isProjectAssign true:", userIDsProjectAssignTrue);
-    setUserChecked(userIDsProjectAssignTrue)
+      console.log(
+        "User IDs with isProjectAssign true:",
+        userIDsProjectAssignTrue
+      );
+      setUserChecked(userIDsProjectAssignTrue);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -188,7 +197,6 @@ const Projects = () => {
     console.log("handleListItem");
     navigate("/settings/teamMember");
   };
-
 
   const handleToggle = (id, isProjectAssign) => () => {
     const updatedUsers = users.map((user) =>
@@ -490,9 +498,15 @@ const Projects = () => {
                 <p className="">Created</p>
                 {/* <p className="pl-8">Status</p> */}
                 <p className="pl-5">Users</p>
-                <p className="">IsActive</p>
-                <p className="pr-3">Edit</p>
-                <p className="d-flex justify-end pr-5">Action</p>
+
+                {!user ||
+                  (user.role !== "developer" && (
+                    <>
+                      <p className="">IsActive</p>
+                      <p className="pr-3">Edit</p>
+                      <p className="d-flex justify-end pr-5">Action</p>
+                    </>
+                  ))}
               </thead>
             </div>
 
@@ -521,156 +535,160 @@ const Projects = () => {
                         </div>
                       </div>
                       {/* <div class="w-[7.38rem] flex flex-col items-start justify-start"> */}
-                        {/* <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100"> */}
-                          {/* <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div> */}
-                          {/* <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]"> */}
-                            {/* {project.status} */}
-                          {/* </div> */}
-                        {/* </button> */}
+                      {/* <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100"> */}
+                      {/* <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div> */}
+                      {/* <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]"> */}
+                      {/* {project.status} */}
+                      {/* </div> */}
+                      {/* </button> */}
                       {/* </div> */}
                       <div>
-                    <List
-                      component="nav"
-                      aria-label="Device settings"
-                      sx={{ bgcolor: "background.paper" }}
-                    >
-                      <ListItemButton
-                        id="lock-button"
-                        aria-haspopup="listbox"
-                        aria-controls="lock-menu"
-                        aria-label="when device is locked"
-                        aria-expanded={open ? "true" : undefined}
-                        onClick={(event) =>
-                          handleClickListItem(event, project.id)
-                        } // Pass event and projectId
-                      >
-                        <img
-                          className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                          loading="lazy"
-                          alt=""
-                          src={p3}
-                        />
-                        <img
-                          className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                          loading="lazy"
-                          alt=""
-                          src={p2}
-                        />
-                        <img
-                          className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                          loading="lazy"
-                          alt=""
-                          src={p4}
-                        />
-                      </ListItemButton>
-                    </List>
-                    <Menu
-                      id="lock-menu"
-                      anchorEl={anchorEl}
-                      open={open}
-                      onClose={handleClose}
-                      MenuListProps={{
-                        "aria-labelledby": "lock-button",
-                        role: "listbox",
-                        className:
-                          "bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto",
-                      }}
-                    >
-                      {users.length === 0 ||
-                      users.every((user) => !user.isProjectAssign) ? (
-                        <MenuItem disabled>No users found</MenuItem>
-                      ) : (
-                        users.map((user, index) =>
-                          // Assuming the condition for not showing isProjectAssign is false
-                          !user.isProjectAssign ? null : (
-                            <MenuItem
-                              key={index}
-                              disabled={index === 0}
-                              selected={index === selectedIndex}
-                              onClick={(event) =>
-                                handleMenuItemClick(event, index)
-                              }
-                              className="px-4 py-3 flex items-center"
-                            >
-                              <div className="mr-4">
-                                {user.profilePic ? (
-                                  <img
-                                    className="h-8 w-8 rounded-full"
-                                    src={user.profilePic}
-                                    alt=""
-                                  />
-                                ) : (
-                                  <span className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                                    <img
-                                      className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center"
-                                      loading="lazy"
-                                      alt=""
-                                      src={p2}
+                        <List
+                          component="nav"
+                          aria-label="Device settings"
+                          sx={{ bgcolor: "background.paper" }}
+                        >
+                          <ListItemButton
+                            id="lock-button"
+                            aria-haspopup="listbox"
+                            aria-controls="lock-menu"
+                            aria-label="when device is locked"
+                            aria-expanded={open ? "true" : undefined}
+                            onClick={(event) =>
+                              handleClickListItem(event, project.id)
+                            } // Pass event and projectId
+                          >
+                            <img
+                              className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                              loading="lazy"
+                              alt=""
+                              src={p3}
+                            />
+                            <img
+                              className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                              loading="lazy"
+                              alt=""
+                              src={p2}
+                            />
+                            <img
+                              className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                              loading="lazy"
+                              alt=""
+                              src={p4}
+                            />
+                          </ListItemButton>
+                        </List>
+                        <Menu
+                          id="lock-menu"
+                          anchorEl={anchorEl}
+                          open={open}
+                          onClose={handleClose}
+                          MenuListProps={{
+                            "aria-labelledby": "lock-button",
+                            role: "listbox",
+                            className:
+                              "bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto",
+                          }}
+                        >
+                          {users.length === 0 ||
+                          users.every((user) => !user.isProjectAssign) ? (
+                            <MenuItem disabled>No users found</MenuItem>
+                          ) : (
+                            users.map((user, index) =>
+                              // Assuming the condition for not showing isProjectAssign is false
+                              !user.isProjectAssign ? null : (
+                                <MenuItem
+                                  key={index}
+                                  disabled={index === 0}
+                                  selected={index === selectedIndex}
+                                  onClick={(event) =>
+                                    handleMenuItemClick(event, index)
+                                  }
+                                  className="px-4 py-3 flex items-center"
+                                >
+                                  <div className="mr-4">
+                                    {user.profilePic ? (
+                                      <img
+                                        className="h-8 w-8 rounded-full"
+                                        src={user.profilePic}
+                                        alt=""
+                                      />
+                                    ) : (
+                                      <span className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                                        <img
+                                          className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center"
+                                          loading="lazy"
+                                          alt=""
+                                          src={p2}
+                                        />
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div>
+                                    <ListItemText
+                                      primary={`User ID: ${user.id}`}
+                                      className="text-gray-800 mb-1"
                                     />
-                                  </span>
-                                )}
-                              </div>
-                              <div>
-                                <ListItemText
-                                  primary={`User ID: ${user.id}`}
-                                  className="text-gray-800 mb-1"
-                                />
-                                <ListItemText
-                                  primary={`Name: ${user.name}`}
-                                  className="text-gray-600 text-sm"
-                                />
-                              </div>
-                            </MenuItem>
-                          )
-                        )
-                      )}
-                    </Menu>
-                  </div>
-                  
-                    </div>
-                  </div>
-                  <div className="pr-4">
-                        <Form className="content-center">
-                          <Form.Check
-                            type="switch"
-                            id={`custom-switch-${project.id}`}
-                            className="custom-switch content-center"
-                            label={project.isActive ? "Active" : "Inactive"}
-                            checked={project.isActive}
-                            onChange={() =>
-                              handleSwitchChange(project.id, project.isActive)
-                            }
-                          />
-                        </Form>
+                                    <ListItemText
+                                      primary={`Name: ${user.name}`}
+                                      className="text-gray-600 text-sm"
+                                    />
+                                  </div>
+                                </MenuItem>
+                              )
+                            )
+                          )}
+                        </Menu>
                       </div>
-
-                  <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
-                    <div class="flex flex-row items-center justify-start gap-[1rem]">
-                      <button
-                        onClick={() => handleEditProject(project.id)}
-                        className="no-underline  bg-white"
-                      >
-                        <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                          <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                          <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                            
-                          </div>
-                        </div>
-                      </button>
                     </div>
-
-                    {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
-                    <button
-                      className="bg-white"
-                      onClick={() => openPopup(project.id)}
-                    >
-                      <img
-                        class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                        alt=""
-                        src={threedots}
-                      />
-                    </button>
                   </div>
+                  {!user ||
+                    (user.role !== "developer" && (
+                      <>
+                        <div className="pr-4">
+                          <Form className="content-center">
+                            <Form.Check
+                              type="switch"
+                              id={`custom-switch-${project.id}`}
+                              className="custom-switch content-center"
+                              label={project.isActive ? "Active" : "Inactive"}
+                              checked={project.isActive}
+                              onChange={() =>
+                                handleSwitchChange(project.id, project.isActive)
+                              }
+                            />
+                          </Form>
+                        </div>
+
+                        <div class="w-[10.75rem] flex flex-row items-center justify-start gap-[4.38rem]">
+                          <div class="flex flex-row items-center justify-start gap-[1rem]">
+                            <button
+                              onClick={() => handleEditProject(project.id)}
+                              className="no-underline  bg-white"
+                            >
+                              <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
+                                <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
+                                <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
+                                  
+                                </div>
+                              </div>
+                            </button>
+                          </div>
+
+                          {/* <i class="bi bi-pencil-square relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]"></i> */}
+                          <button
+                            className="bg-white"
+                            onClick={() => openPopup(project.id)}
+                          >
+                            <img
+                              class="h-[1.25rem] w-[1.28rem] relative z-[1]"
+                              alt=""
+                              src={threedots}
+                            />
+                          </button>
+                        </div>
+                      </>
+                    ))}
                 </div>
               ))}
             </tbody>

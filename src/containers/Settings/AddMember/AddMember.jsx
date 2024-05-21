@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Formik, Field, ErrorMessage } from "formik";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,7 +26,7 @@ const AddMember = () => {
   const [token, setToken] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const roles = ["Admin", "Project Manager", "Developer"];
-
+  const navigate = useNavigate();
   const notify = () => toast.ok("Member add successfully");
 
   useEffect(() => {
@@ -139,6 +140,7 @@ const AddMember = () => {
 
                   // Navigate to the home page
                   // Assuming navigate("/") is your navigation function
+                  navigate("/settings"); // Use navigate to navigate to a different route
                 } catch (error) {
                   console.error("Error adding member:", error.message);
                 } finally {

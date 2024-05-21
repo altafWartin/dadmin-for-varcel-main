@@ -17,8 +17,6 @@ import clock from "../../assets/Icon/clock.svg";
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 import file2 from "../../assets/Images/File 2.png";
 
-
-
 const formatDate = (dateString) => {
   const dateObject = new Date(dateString);
   const year = dateObject.getFullYear();
@@ -217,62 +215,75 @@ const Settings = () => {
             <ul class="pl-0 space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
               {members.map((member) => (
                 <li key={member.id} class="user-detai flex mb-2 mr-5">
-                  <div class="team-members-l">
-                    <button
-                      class="no-underline flex bg-white text-gray-900"
-                      onClick={() => navigateToTeamMember(member.id)}
-                    >
-                      <img
-                        class="team-members-list-item mr-3"
-                        loading="eager"
-                        alt=""
-                        src={file2}
-                      />
+                  <div className=" w-full flex justify-between gap-2">
+                    <div className="w-full flex justify-start">
+                      <div class="team-members-l">
+                        <button
+                          class="no-underline flex bg-white text-gray-900"
+                          onClick={() => navigateToTeamMember(member.id)}
+                        >
+                          <img
+                            class="team-members-list-item mr-3"
+                            loading="eager"
+                            alt=""
+                            src={file2}
+                          />
 
-                      <div class="john-fred-group">
-                        <div class="john-fred1">{member.fullName}</div>
-                        <div class="johnfredgmailcom1">{member.email}</div>
+                          <div class="john-fred-group">
+                            <div class="john-fred1">{member.fullName}</div>
+                            <div class="johnfredgmailcom1">
+                              {member.email.length > 15
+                                ? `${member.email.slice(0, 12)}...`
+                                : member.email}
+                            </div>
+                          </div>
+                        </button>
                       </div>
-                    </button>
+                    </div>
+                    <div className="w-full  flex justify-end">
+                      <div className="w-full h-max  ">
+
+                      <button class="group-button ">
+                        <div class="frame-child7"></div>
+                        <div class="project-manager">{member.role}</div>
+                      </button>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteMember(member.id)}
+                        className=" h-[60px] w-[]60px] mx-3 mt-2 bg-white d-flex justify-content-center align-items-center"
+                      >
+                        <img
+                          class="delete-icon justify-content-center align-items-center"
+                          loading="eager"
+                          alt=""
+                          src={Deleteiconn}
+                        />
+                      </button>
+                      <div class="toggle-button mx-8 d-flex justify-content-center align-items-center">
+                        <Form className="content-center">
+                          <Form.Check
+                            type="switch"
+                            id={`custom-switch-${member.id}`}
+                            className="custom-switch content-center"
+                            label={member.isActive ? "Active" : "Inactive"}
+                            checked={member.isActive}
+                            onChange={handleSwitchChange}
+                          />
+                        </Form>
+                      </div>
+                      <button
+                        className=" h-[60px] w-[]60px] mx-3 mt-2 bg-white d-flex justify-content-center align-items-center"
+                        onClick={() => handleEditClick(member.id)}
+                      >
+                        <img
+                          className="delete-icon justify-content-end align-items-center "
+                          loading="eager"
+                          alt=""
+                          src={EditButton}
+                        />
+                      </button>
+                    </div>
                   </div>
-                  <button class="group-button mx-8">
-                    <div class="frame-child7"></div>
-                    <div class="project-manager">{member.role}</div>
-                  </button>
-                  <button
-                    onClick={() => handleDeleteMember(member.id)}
-                    className=" h-[60px] w-[]60px] mx-3 mt-2 bg-white d-flex justify-content-center align-items-center"
-                  >
-                    <img
-                      class="delete-icon justify-content-center align-items-center"
-                      loading="eager"
-                      alt=""
-                      src={Deleteiconn}
-                    />
-                  </button>
-                  <div class="toggle-button mx-8 d-flex justify-content-center align-items-center">
-                    <Form className="content-center">
-                      <Form.Check
-                        type="switch"
-                        id={`custom-switch-${member.id}`}
-                        className="custom-switch content-center"
-                        label={member.isActive ? "Active" : "Inactive"}
-                        checked={member.isActive}
-                        onChange={handleSwitchChange}
-                      />
-                    </Form>
-                  </div>
-                  <button
-                    className=" h-[60px] w-[]60px] mx-3 mt-2 bg-white d-flex justify-content-center align-items-center"
-                    onClick={() => handleEditClick(member.id)}
-                  >
-                    <img
-                      className="delete-icon justify-content-center align-items-center"
-                      loading="eager"
-                      alt=""
-                      src={EditButton}
-                    />
-                  </button>
                 </li>
               ))}
             </ul>

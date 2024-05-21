@@ -758,7 +758,7 @@
 }
 .frame-child7 {
   height: 70%;
-  width: 100%;
+  width: 150px;
   position: absolute;
   align-content: center;
   border-radius: var(--br-7xs);
@@ -770,7 +770,7 @@
   font-size: var(--font-size-sm);
   font-family: var(--font-poppins);
   color: var(--color-coral);
-  text-align: left;
+  text-align: center;
   z-index: 1;
 }
 .group-button {

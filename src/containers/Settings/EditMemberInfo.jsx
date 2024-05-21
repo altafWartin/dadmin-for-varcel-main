@@ -51,6 +51,7 @@ const EditMemberInfo = () => {
         setPassword(memberData.data.password || "");
         setRole(memberData.data.role || "");
         setMemberData(memberData.data);
+        
       } catch (error) {
         console.error("Error fetching member data:", error);
       }
@@ -98,7 +99,7 @@ const EditMemberInfo = () => {
 
       // Navigate to the home page
       // Assuming navigate("/") is your navigation function
-      // navigate("/settings"); // Use navigate to navigate to a different route
+      navigate("/settings"); // Use navigate to navigate to a different route
     } catch (error) {
       console.error("Error adding member:", error.message);
     }
