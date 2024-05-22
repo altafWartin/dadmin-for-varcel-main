@@ -769,6 +769,7 @@
   position: relative;
   font-size: var(--font-size-sm);
   font-family: var(--font-poppins);
+  justify-content: center;
   color: var(--color-coral);
   text-align: center;
   z-index: 1;

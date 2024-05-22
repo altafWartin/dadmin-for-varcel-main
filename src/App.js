@@ -46,7 +46,6 @@ function App() {
       navigate("/login");
     }
   }, []); // Empty dependency array ensures this effect runs only once during initial render
-  
 
   const isLoginPage = location.pathname === "/login";
 
@@ -56,7 +55,6 @@ function App() {
     // return <Navigate to="/dashboard" />;
   }
 
-
   return (
     <div className="App">
       {!isLoginPage && <Sidebar />}
@@ -64,25 +62,45 @@ function App() {
 
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={token ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
+        <Route
+          path="/"
+          element={
+            token ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+          }
+        />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/workspace" element={<Workspace />} />
-        <Route path="/workspace/editWorkspace/:workspaceId" element={<EditWorkspace />} />
+        <Route
+          path="/workspace/editWorkspace/:workspaceId"
+          element={<EditWorkspace />}
+        />
         <Route path="/projects" element={<Projects />} />
         <Route path="/addNewProject" element={<AddProject />} />
-        <Route path="/projects/editProject/:projectId" element={<EditProject />} />
+        <Route
+          path="/projects/editProject/:projectId"
+          element={<EditProject />}
+        />
         <Route path="/addNewWorkspace" element={<AddNewWorkspace />} />
         <Route path="/workflow" element={<Workflows />} />
-        <Route path="/workflow/editWorkflow/:workflowId" element={<EditWorkflow />} />
+        <Route
+          path="/workflow/editWorkflow/:workflowId"
+          element={<EditWorkflow />}
+        />
         <Route path="/addNewWorkflow" element={<AddNewWorkflow />} />
         <Route path="/container" element={<Resource />} />
         <Route path="/addNewContainer" element={<AddNewContainer />} />
-        <Route path="/container/editContainer/:containerId" element={<EditContainer />} />
+        <Route
+          path="/container/editContainer/:containerId"
+          element={<EditContainer />}
+        />
         <Route path="/addImage" element={<AddImage />} />
         <Route path="/editImage" element={<EditImage />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/addMember" element={<AddMember />} />
-        <Route path="/settings/editMemberInfo/:memberId" element={<EditMemberInfo />} />
+        <Route
+          path="/settings/editMemberInfo/:memberId"
+          element={<EditMemberInfo />}
+        />
         <Route path="/settings/teamMember/:memberId" element={<TeamMember />} />
         <Route path="/changePassword" element={<ChangePassword />} />
         <Route path="*" element={<Navigate to="/" />} />

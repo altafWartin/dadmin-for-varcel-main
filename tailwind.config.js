@@ -3,7 +3,11 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      height: {
+        '70p': '70%', // Define a custom height class
+      },
       colors: {
+        oraangelight: "#fff7ed",
         ghostwhite: "#f5f7fb",
         black: "#000",
         "bodytext-100": "#0c063a",

@@ -241,13 +241,12 @@ const Settings = () => {
                       </div>
                     </div>
                     <div className="w-full  flex justify-end">
-                      <div className="w-full h-max  ">
-
-                      <button class="group-button ">
-                        <div class="frame-child7"></div>
-                        <div class="project-manager">{member.role}</div>
-                      </button>
+                      <div className="w-[200px] bg-oraangelight h-[80%] flex items-center justify-center">
+                        <button className="flex items-center justify-center h-full w-full">
+                          <div className="project-manager">{member.role}</div>
+                        </button>
                       </div>
+
                       <button
                         onClick={() => handleDeleteMember(member.id)}
                         className=" h-[60px] w-[]60px] mx-3 mt-2 bg-white d-flex justify-content-center align-items-center"
@@ -259,7 +258,7 @@ const Settings = () => {
                           src={Deleteiconn}
                         />
                       </button>
-                      <div class="toggle-button mx-8 d-flex justify-content-center align-items-center">
+                      <div class=" w-[100px] toggle-button mx-8 d-flex justify-content-center align-items-center">
                         <Form className="content-center">
                           <Form.Check
                             type="switch"
