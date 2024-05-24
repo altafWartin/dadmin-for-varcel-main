@@ -601,7 +601,7 @@ const Workflow = () => {
                     <div className="text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
                       {workspace.id}
                     </div>
-                    <div className="text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
+                    <div className=" w-[100px] text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
                       {workspace.name.length > 10
                         ? `${workspace.name.slice(0, 10)}...`
                         : workspace.name}
@@ -609,9 +609,9 @@ const Workflow = () => {
                     <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
                       {formatDate(workspace.created_at)}
                     </div>
-                    <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                    <div className="text-[0.88rem] d-flex justify-content-center w-[100px]  tracking-[-0.02em] font-poppins text-bodytext-50">
                       <button className="cursor-pointer py-[0.31rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex items-center justify-center border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:border-chocolate-100">
-                        <div className="text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100">
+                        <div className="text-[0.88rem] flex items-center justify-center leading-[1.25rem] font-manrope text-coral-100">
                           {workspace.status}
                         </div>
                       </button>

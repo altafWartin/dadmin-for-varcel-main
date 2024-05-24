@@ -94,7 +94,7 @@ function App() {
           element={<EditContainer />}
         />
         <Route path="/addImage" element={<AddImage />} />
-        <Route path="/editImage" element={<EditImage />} />
+        <Route path="/container/editImage/:imageId" element={<EditImage />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/addMember" element={<AddMember />} />
         <Route

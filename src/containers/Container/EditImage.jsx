@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
 import logo from "../../assets/logo.svg";
 
 import calendar from "../../assets/Icon/calendar.svg";
@@ -9,6 +11,109 @@ import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 import FileUpload from "../../assets/Icon/FileUpload.svg";
 
 const EditImage = () => {
+  const [id, setId] = useState("");
+  const [imageName, setImageName] = useState("");
+  const [imageTag, setImageTag] = useState("");
+  const [repository, setRepository] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const navigate = useNavigate();
+
+  const { imageId } = useParams();
+  console.log("ImageId", imageId);
+
+  useEffect(() => {
+    // Get token from localStorage when the component mounts
+    const storedToken = localStorage.getItem("token");
+
+    const fetchImageData = async () => {
+      try {
+        const response = await fetch(
+          `https://d-admin-backend.onrender.com/api/images/get-image/${imageId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${storedToken}`,
+            },
+          }
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch project data");
+        }
+        const data = await response.json();
+        console.log("Image data:", data);
+
+        // Populate input fields with project data
+        setId(data.data.id || "");
+        setImageName(data.data.name || "");
+        setRepository(data.data.repository || "");
+        setImageTag(data.data.tag || "");
+        setSelectedFile(data.data.image || "");
+      } catch (error) {
+        console.error("Error fetching project data:", error);
+      }
+    };
+
+    fetchImageData();
+  }, []);
+
+  const openFileInput = () => {
+    const fileInput = document.getElementById("fileInput");
+    fileInput.click();
+  };
+
+  const handleFileChange = (files) => {
+    if (files.length > 0) {
+      const file = files[0];
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      setSelectedFile(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!imageName || !imageTag || !repository || !selectedFile) {
+      alert("Please fill in all fields and select a file.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("id", id);
+    formData.append("name", imageName);
+    formData.append("tag", imageTag);
+    formData.append("repository", repository);
+    formData.append("file", selectedFile);
+
+    try {
+      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      const headers = {
+        Authorization: `Bearer ${token}`, // Construct the Authorization header
+      };
+
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/images/update-images",
+        {
+          method: "PATCH",
+          headers: headers, // Add the headers to the request
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Image uploaded successfully:", data);
+        navigate("/container");
+        // Handle success (e.g., show a success message, clear the form, etc.)
+      } else {
+        const errorData = await response.json();
+        console.error("Error uploading image:", errorData);
+        // Handle error (e.g., show an error message)
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      // Handle error (e.g., show an error message)
+    }
+  };
+
   return (
     <div className=" bg-slate-100  pt-10 pl-[260px] h-[95vh]">
       <section class="w-[71.125rem] flex flex-col items-center justify-start py-[0rem] px-[1.25rem] box-border gap-[5rem_0rem] max-w-full text-left text-[1.5rem] text-midnightblue font-poppins lg:gap-[5rem_0rem] mq750:gap-[5rem_0rem]">
@@ -24,11 +129,10 @@ const EditImage = () => {
             />
 
             <div class="relative text-[1rem] tracking-[0.02em] capitalize">
-              Edit Image
+              Add Image
             </div>
           </div>
           <div class="flex flex-row items-start justify-start gap-[0rem_1.375rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
-         
             <div class="flex flex-row items-start justify-start gap-[0rem_0.25rem]">
               <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.625rem] pl-[0.5rem] gap-[0rem_0.375rem]">
                 <img
@@ -54,7 +158,10 @@ const EditImage = () => {
             </div>
           </div>
         </div>
-        <form class="m-0 w-[57.44rem] rounded-3xl bg-white flex flex-col items-center justify-start pt-[2.13rem] pb-[2.75rem] pr-[2.81rem] pl-[2.75rem] box-border relative gap-[1.56rem] max-w-full z-[2] mq1050:pl-[1.38rem] mq1050:pr-[1.38rem] mq1050:box-border mq750:pt-[1.38rem] mq750:pb-[1.81rem] mq750:box-border">
+        <form
+          onSubmit={handleSubmit}
+          class="m-0 w-[57.44rem] rounded-3xl bg-white flex flex-col items-center justify-start pt-[2.13rem] pb-[2.75rem] pr-[2.81rem] pl-[2.75rem] box-border relative gap-[1.56rem] max-w-full z-[2] mq1050:pl-[1.38rem] mq1050:pr-[1.38rem] mq1050:box-border mq750:pt-[1.38rem] mq750:pb-[1.81rem] mq750:box-border"
+        >
           <div class="w-[24.44rem] h-[5.13rem] relative hidden max-w-full z-[0]">
             <div class="absolute w-full top-[1.81rem] right-[0rem] left-[0rem] rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-300"></div>
             <div class="absolute top-[3.31rem] right-[1rem] w-[1rem] h-[0.63rem]">
@@ -81,7 +188,7 @@ const EditImage = () => {
               />
 
               <h3 class="m-0 relative text-[1.25rem] leading-[2.5rem] capitalize font-medium font-poppins text-darkslategray-200 text-left z-[3] mq450:text-[1rem] mq450:leading-[2rem]">
-                Edit Image
+                Add Image
               </h3>
               <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 whitespace-pre-wrap text-center z-[4]">
                 Improve business performance with Comvi dashboards
@@ -102,6 +209,8 @@ const EditImage = () => {
                   id="name"
                   class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                   placeholder="Image Name"
+                  value={imageName}
+                  onChange={(e) => setImageName(e.target.value)}
                   required
                 />
               </div>
@@ -115,6 +224,8 @@ const EditImage = () => {
                 <input
                   type="text"
                   id="name"
+                  value={imageTag}
+                  onChange={(e) => setImageTag(e.target.value)}
                   class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                   placeholder="Image Tag"
                   required
@@ -133,44 +244,52 @@ const EditImage = () => {
                 <input
                   type="text"
                   id="Repository"
+                  value={repository}
+                  onChange={(e) => setRepository(e.target.value)}
                   class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                   placeholder="Repository"
                   required
                 />
               </div>{" "}
-              <div class="flex-1  flex flex-col items-start justify-start pt-[0.25rem] px-[0.5rem] pb-[1.13rem] box-border relative gap-[0.5rem] min-w-[15.88rem] max-w-full z-[3]">
+              <div className="flex-1 flex flex-col items-start justify-start pt-[0.25rem] px-[0.5rem] pb-[1.13rem] box-border relative gap-[0.5rem] min-w-[15.88rem] max-w-full z-[3]">
                 <label
-                  for="first_name"
-                  class="block ml-2 text-sm uppercase font-medium text-bodytext-50 dark:text-white"
+                  htmlFor="fileInput"
+                  className="block ml-2 text-sm uppercase font-medium text-bodytext-50 dark:text-white"
                 >
                   File Upload
                 </label>
 
-                <div className="bg-gray-50 border w-full  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-                 <span className="text-gray-500 mt-1">File Upload </span>
+                <div className="relative w-full">
                   <input
                     type="file"
-                    id="name"
-                    class="bg-gray-50 border w-full opacity-0 cursor-pointer mb-2 pb-3 h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                    placeholder="File Upload"
+                    id="fileInput"
+                    className="opacity-0 cursor-pointer absolute inset-0 w-full h-full"
+                    onChange={(e) => handleFileChange(e.target.files)}
+                    accept=".zip,application/zip" // Limit file selection to zip files
                     required
-                  />{" "}
-                  <img
-                    class="w-[1.25rem] h-[1.25rem] absolute !m-[0] right-[1.563rem] bottom-[2rem] align-center z-[4]"
-                    loading="eager"
-                    alt=""
-                    src={FileUpload}
-                  />{" "}
+                  />
+                  <div className="bg-gray-50 border w-full h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 relative">
+                    <span className="text-gray-500 mt-1">File Upload</span>
+                    <img
+                      className="w-[1.25rem] h-[1.25rem] absolute right-[1.563rem] bottom-[1rem] align-center cursor-pointer"
+                      src={FileUpload}
+                      alt="Upload Icon"
+                      onClick={() => openFileInput()}
+                    />
+                  </div>
                 </div>
-              </div>{" "}
+              </div>
             </div>
           </div>
 
           <div class="w-[26.63rem] flex flex-row items-start justify-start py-[0rem] pr-[2.19rem] pl-[0rem] box-border max-w-full">
-            <button class="cursor-pointer [border:none] p-[0.94rem] bg-coral-100 flex-1 rounded-lg flex flex-row items-center justify-center box-border max-w-full whitespace-nowrap z-[4] hover:bg-chocolate-100">
+            <button
+              type="submit"
+              class="cursor-pointer [border:none] p-[0.94rem] bg-coral-100 flex-1 rounded-lg flex flex-row items-center justify-center box-border max-w-full whitespace-nowrap z-[4] hover:bg-chocolate-100"
+            >
               <div class="h-[3.13rem] w-[24.44rem] relative rounded-lg bg-coral-100 hidden max-w-full"></div>
               <b class="relative text-[0.88rem] leading-[1.25rem] capitalize font-poppins text-white text-left z-[1]">
-                Save
+                Add Image
               </b>
             </button>
           </div>

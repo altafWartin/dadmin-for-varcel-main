@@ -571,7 +571,7 @@ const Workspace = () => {
               </div>
             </div>
           </div>
-          <div class="self-stretch flex flex-col mt-10 items-end justify-start gap-[1.44rem] max-w-full">
+          <div className="self-stretch flex flex-col mt-10 items-end justify-start gap-[1.44rem] max-w-full">
             <div className="w-[68.31rem] relative text-[1.13rem] pb-0 tracking-[-0.02em] capitalize font-medium font-poppins text-black whitespace-pre-wrap text-left inline-block max-w-full">
               <div className="flex justify-between pr-4">
                 <p>Workspace ID</p>
@@ -590,38 +590,33 @@ const Workspace = () => {
               </div>
             </div>
 
-            <tbody className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
+            <div className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
               {projects.map((workspace) => (
                 <div
                   key={workspace.id}
-                  class="self-stretch rounded-2xl bg-white box-border flex flex-row items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] gap-[1.25rem] max-w-full border-[1px] border-solid border-whitesmoke mq1050:flex-wrap"
+                  className="self-stretch rounded-2xl bg-white box-border flex items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] max-w-full border-[1px] border-solid border-whitesmoke"
                 >
-                  <div class="w-full flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.19rem] box-border max-w-full">
-                    <div class="self-stretch flex flex-row items-end justify-between min-h-[2.06rem] gap-[1.25rem] mq750:flex-wrap">
-                      <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                        <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          {workspace.id}
+                  <div className="flex items-center justify-between w-full">
+                    <div className="text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
+                      {workspace.id}
+                    </div>
+                    <div className="w-[100px]  text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
+                      {workspace.name.length > 10
+                        ? `${workspace.name.slice(0, 10)}...`
+                        : workspace.name}
+                    </div>
+                    <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                      {formatDate(workspace.created_at)}
+                    </div>
+                    <div className="text-[0.88rem] d-flex justify-content-center w-[90px]  tracking-[-0.02em] font-poppins text-bodytext-50">
+                      <button className="cursor-pointer py-[0.31rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex items-center justify-center border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:border-chocolate-100">
+                        <div className="text-[0.88rem] flex items-center justify-center leading-[1.25rem] font-manrope text-coral-100">
+                          {workspace.status}
                         </div>
-                      </div>
-                      <div class="w-[7.31rem] flex flex-col items-start justify-start pt-[0rem] px-[0rem] pb-[0.25rem] box-border">
-                        <div class="self-stretch relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          {workspace.name}
-                        </div>
-                      </div>
-                      <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
-                        <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-                          {formatDate(workspace.created_at)}
-                        </div>
-                      </div>
-                      <div class="w-[7.38rem] flex flex-col items-start justify-start">
-                        <button class="cursor-pointer py-[0.31rem] pr-[0.75rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex flex-row items-center justify-center z-[1] border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:box-border hover:border-[1px] hover:border-solid hover:border-chocolate-100">
-                          <div class="h-[1.94rem] w-[3.19rem] relative rounded-3xs box-border hidden border-[1px] border-solid border-coral-100"></div>
-                          <div class="relative text-[0.88rem] leading-[1.25rem] font-manrope text-coral-100 text-left z-[1]">
-                            {workspace.status}
-                          </div>
-                        </button>
-                      </div>
-                      <div class="w-[7.38rem] flex flex-col items-start justify-start">
+                      </button>
+                    </div>
+
+                    <div className="flex items-center">
                       <List
                         component="nav"
                         aria-label="Device settings"
@@ -720,60 +715,58 @@ const Workspace = () => {
                         )}
                       </Menu>
                     </div>
-                    </div>
-                   
-                  </div>
 
-                  {!user ||
-                    (user.role !== "developer" && (
-                      <>
-                        <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
-                          <Form className="content-center">
-                            <Form.Check
-                              type="switch"
-                              id={`custom-switch-${workspace.id}`}
-                              className="custom-switch content-center"
-                              // label={project.isActive ? "Active" : "Inactive"}
-                              checked={workspace.isActive}
-                              onChange={() =>
-                                handleSwitchChange(
-                                  workspace.id,
-                                  workspace.isActive
-                                )
-                              }
-                            />
-                          </Form>
-                        </div>
-                        <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                          <button
-                            onClick={() => handleEditProject(workspace.id)}
-                            className="no-underline  bg-white"
-                          >
-                            <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                              <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                              <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                                
+                    {!user ||
+                      (user.role !== "developer" && (
+                        <>
+                          <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
+                            <Form className="content-center">
+                              <Form.Check
+                                type="switch"
+                                id={`custom-switch-${workspace.id}`}
+                                className="custom-switch content-center"
+                                // label={project.isActive ? "Active" : "Inactive"}
+                                checked={workspace.isActive}
+                                onChange={() =>
+                                  handleSwitchChange(
+                                    workspace.id,
+                                    workspace.isActive
+                                  )
+                                }
+                              />
+                            </Form>
+                          </div>
+                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                            <button
+                              onClick={() => handleEditProject(workspace.id)}
+                              className="no-underline  bg-white"
+                            >
+                              <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
+                                <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
+                                <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
+                                  
+                                </div>
                               </div>
-                            </div>
-                          </button>
-                        </div>
-                        <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                          <button
-                            className="bg-white"
-                            onClick={() => openPopup(workspace.id)}
-                          >
-                            <img
-                              class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                              alt=""
-                              src={threedots}
-                            />
-                          </button>
-                        </div>
-                      </>
-                    ))}
+                            </button>
+                          </div>
+                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                            <button
+                              className="bg-white"
+                              onClick={() => openPopup(workspace.id)}
+                            >
+                              <img
+                                class="h-[1.25rem] w-[1.28rem] relative z-[1]"
+                                alt=""
+                                src={threedots}
+                              />
+                            </button>
+                          </div>
+                        </>
+                      ))}
+                  </div>
                 </div>
               ))}
-            </tbody>
+            </div>
           </div>
         </section>
       </div>
