@@ -6,6 +6,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 
 import Form from "react-bootstrap/Form";
+import search from "../../assets/Icon/search.svg";
+
 import calendar from "../../assets/Icon/calendar.svg";
 import arrowdown from "../../assets/Icon/arrowdown.svg";
 import setting from "../../assets/Icon/setting.svg";
@@ -22,6 +24,11 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Checkbox from "@mui/material/Checkbox";
 import Avatar from "@mui/material/Avatar";
+
+import DateRangePicker from "rsuite/DateRangePicker";
+import format from "date-fns/format";
+import CustomDateRangePicker from "../../components/DateRangePickerComponent"; //
+import "rsuite/DateRangePicker/styles/index.css";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -47,6 +54,12 @@ const Projects = () => {
   const [assignProjects, setAssignProjects] = useState([]);
   const [projectChecked, setProjectChecked] = React.useState([]);
   const [message, setMessage] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredProjects, setFilteredProjects] = useState([]);
+
+  console.log("projects", projects);
 
   const location = useLocation();
   const [activeLink, setActiveLink] = useState(location.pathname);
@@ -62,6 +75,89 @@ const Projects = () => {
   const [users, setUsers] = useState([]);
 
   console.log("users", users);
+
+  const apiUrl = "https://d-admin-backend.onrender.com";
+
+  const handleDateRangeChange = (value) => {
+    console.log("Date range changed:", value);
+    if (Array.isArray(value) && value.length === 2) {
+      const startDate = new Date(value[0]).toISOString().split("T")[0];
+      const endDate = new Date(value[1]).toISOString().split("T")[0];
+
+      setStartDate(startDate);
+      setEndDate(endDate);
+      console.log("Start Date:", startDate);
+      console.log("End Date:", endDate);
+      setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+    } else {
+      setStartDate("2023-04-01");
+      const today = new Date().toISOString().split("T")[0];
+      setEndDate(today);
+      // Handle the case when value is not in the expected format
+      console.log("Invalid date range:", value);
+      setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (shouldFetchData) {
+        const token = localStorage.getItem("token");
+
+        // Initialize the base URL
+        let url = `${apiUrl}/api/project/all-projects`;
+
+        // Check if startDate and endDate are defined and not empty or null
+        if (startDate && endDate) {
+          url += `?startDate=${startDate}&endDate=${endDate}`;
+        }
+
+        console.log(url);
+        try {
+          const response = await fetch(url, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          const data = await response.json();
+          console.log("API Response:", data); // Log the response
+
+          if (data.success) {
+            const sortedProjects = data.data.rows.sort((a, b) => a.id - b.id);
+            setProjects(sortedProjects);
+            setFilteredProjects(sortedProjects); // Initialize filteredProjects
+            setShouldFetchData(false); // Set shouldFetchData to false after successful fetch
+          } else {
+            console.error("Failed to fetch projects:", data.message);
+          }
+        } catch (error) {
+          console.error("Error fetching projects:", error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [shouldFetchData, startDate, endDate]); // Ensure useEffect runs when startDate or endDate change
+
+  useEffect(() => {
+    if (searchTerm) {
+      const results = projects.filter((project) =>
+        project.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredProjects(results);
+    } else {
+      setFilteredProjects(projects); // Reset to all projects when search term is cleared
+    }
+  }, [searchTerm, projects]);
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    if (!event.target.value) {
+      setShouldFetchData(true); // Refetch all projects if search is cleared
+    }
+  };
+  console.log(filteredProjects.length);
 
   const getAssignUsers = async (selectedProjectId) => {
     console.log("this data is from selected projectid ", selectedProjectId);
@@ -92,39 +188,6 @@ const Projects = () => {
       console.error("Error fetching data:", error);
     }
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (shouldFetchData) {
-        const token = localStorage.getItem("token");
-        try {
-          const response = await fetch(
-            "https://d-admin-backend.onrender.com/api/project/all-projects",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          const data = await response.json();
-          console.log("API Response:", data); // Log the response
-          if (data.success) {
-            const sortedProjects = data.data.rows.sort((a, b) => a.id - b.id);
-            setProjects(sortedProjects);
-            setShouldFetchData(false); // Set shouldFetchData to true after successful deletion
-          } else {
-            console.error("Failed to fetch projects:", data.message);
-          }
-        } catch (error) {
-          console.error("Error fetching projects:", error);
-        }
-      }
-    };
-
-    fetchData();
-  }, [shouldFetchData, projects]);
-
-  console.log(projects);
 
   const handleEditProject = async (projectId) => {
     navigate(`/projects/editProject/${projectId}`);
@@ -449,47 +512,51 @@ const Projects = () => {
           </div>
         </div>
       )}
-      <div className=" bg-slate-100 pt-10 pl-[260px] h-[108vh]  z-[20]">
+      <div className=" bg-slate-100 pt-10 pl-[260px] h-[112vh]  z-[20]">
         <section class=" w-[71.25rem] px-[var(--padding-xl)] box-border text-left text-5xl text-bodytext-100 font-poppins flex justify-start flex flex-col items-start max-w-full">
           <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full text-[1.5rem] text-bodytext-100 mq750:flex-wrap">
-            <h2 class="m-0 h-[2.25rem] relative text-inherit tracking-[0.02em] font-semibold font-inherit flex items-center mq450:text-[1.19rem]">
-              Projects
-            </h2>
-            <div class="flex flex-row items-start justify-start gap-[1.38rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
-              <Link
-                to="/addNewProject"
-                class="cursor-pointer no-underline [border:none] py-[0.38rem] pr-[1.38rem] pl-[1.81rem] bg-coral-100 rounded-3xs flex flex-row items-center justify-end whitespace-nowrap hover:bg-chocolate-100"
-              >
-                <div class="relative text-[0.94rem] leading-[1.25rem] font-semibold font-poppins text-white text-left z-[1]">
-                  Add New
-                </div>
-              </Link>
-              <div class="flex flex-row items-start justify-start gap-[0.25rem]">
-                <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.56rem] pl-[0.5rem] gap-[0.38rem]">
-                  <img
-                    class="h-[1.31rem] w-[1.31rem] relative"
-                    alt=""
-                    src={calendar}
-                  />
+            <div className=" w-1/2 flex justify-between">
+              <h2 class="m-0 h-[2.5rem] text-[1.5rem] relative text-inherit tracking-[0.02em] font-semibold font-inherit flex items-center mq450:text-[1.19rem]">
+                Projects
+              </h2>
+              <div class="h-[2.5rem] w-[18.56rem] rounded-xl bg-white box-border flex flex-row items-start justify-start py-[0.69rem] px-[0.75rem] relative gap-[1.31rem] border-[1px] border-solid border-stroke">
+                <input
+                  class="w-[7.5rem] [border:none] [outline:none] font-poppins text-[0.75rem] bg-[transparent] h-[1.13rem] absolute my-0 mx-[!important] top-[0.69rem] left-[3.19rem] text-bodytext-50 text-left flex items-center z-[1]"
+                  placeholder="Search "
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
 
-                  <div class="relative font-medium">Oct 16 - Oct 23</div>
-                  <img
-                    class="h-[1.5rem] w-[1.5rem] relative min-h-[1.5rem]"
-                    alt=""
-                    src={arrowdown}
-                  />
-                </div>
-                <div class="rounded-lg bg-white flex flex-row items-center justify-start p-[0.25rem]">
-                  <img
-                    class="h-[1.31rem] w-[1.31rem] relative"
-                    alt=""
-                    src={setting}
-                  />
-                </div>
+                <img
+                  class="h-[45%] w-[6.06%] absolute my-0 mx-[!important] top-[27.5%] right-[89.87%] bottom-[27.5%] left-[4.07%] max-w-full overflow-hidden max-h-full z-[1]"
+                  alt=""
+                  src={search}
+                />
+              </div>
+            </div>
+            <div class="flex flex-row items-start justify-start gap-[1.38rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
+              {!user ||
+                (user.role !== "Developer" && (
+                  <>
+                    <Link
+                      to="/addNewProject"
+                      class="h-[2.5rem] cursor-pointer no-underline [border:none] py-[0.38rem] pr-[1.38rem] pl-[1.81rem] bg-coral-100 rounded-3xs flex flex-row items-center justify-end whitespace-nowrap hover:bg-chocolate-100"
+                    >
+                      <div class="relative text-[0.94rem] leading-[1.25rem] font-semibold font-poppins text-white text-left z-[1]">
+                        Add New
+                      </div>
+                    </Link>{" "}
+                  </>
+                ))}
+              {/* <div class="absolute z-10  ml-[240px]">Hello</div> */}
+
+              <div className="">
+                <CustomDateRangePicker onChange={handleDateRangeChange} />
               </div>
             </div>
           </div>
-          <div className="self-stretch flex flex-col mt-10 items-end justify-start gap-[1.44rem] max-w-full">
+          <div className="self-stretch flex flex-col mt-10 items-end justify-start gap-[0.5rem]  max-w-full">
             <div className="w-[68.31rem] relative text-[1.13rem] pb-0 tracking-[-0.02em] capitalize font-medium font-poppins text-black whitespace-pre-wrap text-left inline-block max-w-full">
               <div className="flex justify-between pr-4">
                 <p>Project's ID</p>
@@ -508,7 +575,7 @@ const Projects = () => {
             </div>
 
             <div className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
-              {projects.map((project) => (
+              {filteredProjects.map((project) => (
                 <div
                   key={project.id}
                   className="self-stretch rounded-2xl bg-white box-border flex items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] max-w-full border-[1px] border-solid border-whitesmoke"

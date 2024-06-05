@@ -734,17 +734,7 @@ const TeamMember = () => {
         <h2 class="settings10">Settings</h2>
         <img class="date-text-icon1" alt="" src={ArrowRight} />
 
-        <div class="setting-instance pr-3">
-          <div class="calendar6">
-            <img class="icon3" alt="" src={calendar} />
-
-            <div class="date3">Oct 16 - Oct 23</div>
-            <img class="iconarrow-down3" alt="" src={arrowdown} />
-          </div>
-          <div class="calendar7">
-            <img class="setting-icon3" alt="" src={setting} />
-          </div>
-        </div>
+      
         <div class="team-members">Team Member Information</div>
       </div>
       <div class="self-stretch mx-2 mt-2 flex flex-col items-end justify-start gap-[2.625rem_0rem] max-w-full text-[1rem] text-black mq750:gap-[2.625rem_0rem]">

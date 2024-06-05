@@ -42,17 +42,17 @@ function App() {
     const accessToken = localStorage.getItem("token");
     if (accessToken) {
       setToken(accessToken);
-    } else if (!isLoginPage) {
+    } else if (location.pathname !== "/login") {
       navigate("/login");
     }
-  }, []); // Empty dependency array ensures this effect runs only once during initial render
+  }, [location.pathname, navigate]); // Adding location.pathname and navigate as dependencies to re-run on path change
 
   const isLoginPage = location.pathname === "/login";
 
   if (!token && !isLoginPage) {
     return <Navigate to="/login" />;
   } else if (token && isLoginPage) {
-    // return <Navigate to="/dashboard" />;
+    return <Navigate to="/dashboard" />;
   }
 
   return (

@@ -30,26 +30,36 @@ const Settings = () => {
   const [token, setToken] = useState("");
   const navigate = useNavigate();
   const [shouldFetchData, setShouldFetchData] = useState(true);
+  const notifyDelete = () => toast.success("User deleted successfully");
 
   useEffect(() => {
     fetchMembers();
   }, [shouldFetchData]);
 
-  const notifyDelete = () => toast.success("User deleted successfully");
-
   const fetchMembers = () => {
     const token = localStorage.getItem("token");
+    const loggedInUser = JSON.parse(localStorage.getItem("user"));
+    console.log("logged in user", loggedInUser);
 
-    fetch("https://d-admin-backend.onrender.com/api/user/all-member", {
-      headers: {
-        Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-      },
-    })
+    console.log("Logged-in user details:", loggedInUser);
+
+    fetch(
+      "https://d-admin-backend.onrender.com/api/user/all-member?page=1&limit=300",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+        },
+      }
+    )
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          setMembers(data.data.rows);
-          setShouldFetchData(false); // Set shouldFetchData to true after successful deletion
+          // Filter out the logged-in user from the list of members
+          const filteredMembers = data.data.rows.filter(
+            (member) => member.id !== loggedInUser.id
+          );
+          setMembers(filteredMembers);
+          setShouldFetchData(false); // Set shouldFetchData to false after successful fetch
         } else {
           console.error("Failed to fetch members:", data.message);
         }
@@ -59,7 +69,7 @@ const Settings = () => {
       });
   };
 
-  console.log(members);
+  console.log(members.length);
 
   const handleEditClick = (memberId) => {
     navigate(`/settings/editMemberInfo/${memberId}`);
@@ -152,17 +162,6 @@ const Settings = () => {
           <h2 class="settings9">Settings</h2>
           <img class="date-text-icon1" alt="" src={ArrowRight} />
 
-          <div class="setting-instance">
-            <div class="calendar6">
-              <img class="icon3" alt="" src={calendar} />
-
-              <div class="date3">Oct 16 - Oct 23</div>
-              <img class="iconarrow-down3" alt="" src={arrowdown} />
-            </div>
-            <div class="calendar7">
-              <img class="setting-icon3" alt="" src={setting} />
-            </div>
-          </div>
           <div class="team-members">Team members</div>
         </div>
         <div class="rectangle-parent2">
@@ -191,12 +190,12 @@ const Settings = () => {
               src={orgcalendar}
             />
 
-            <img
+            {/* <img
               class="settings-panel-inner"
               loading="eager"
               alt=""
               src={clock}
-            />
+            /> */}
           </div>
           <div class="add-member-group-wrapper">
             <div class="add-member-group">
@@ -204,9 +203,9 @@ const Settings = () => {
                 Add member
               </Link>
               <Link class="team-members1 linkText">Team members</Link>
-              <Link to="/changePassword" class="change-password2 linkText">
-                change password
-              </Link>
+              {/* <Link to="/changePassword" class="change-password2 linkText"> */}
+                {/* change password */}
+              {/* </Link> */}
             </div>
           </div>
 

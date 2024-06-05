@@ -23,7 +23,7 @@ const Sidebar = () => {
   };
 
   return (
-    <>
+    <div className="sticky top-0 z-50">
       <div className={styles.sidebar}>
         <div className={styles.bg} />
         <div className={styles.menuSidebarWrapper}>
@@ -121,7 +121,7 @@ const Sidebar = () => {
               </Link>
 
               {!user ||
-                (user.role !== "developer" && (
+                (user.role == "Admin" && (
                   <Link
                     to="/settings"
                     className={styles.linkText}
@@ -150,7 +150,7 @@ const Sidebar = () => {
         <b className={styles.logoDesign}>logo design</b>
         <img className={styles.sidebarItem} alt="logo" src={logo} />
       </div>
-    </>
+    </div>
   );
 };
 
