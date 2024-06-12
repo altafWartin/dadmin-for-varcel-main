@@ -28,6 +28,7 @@ import "react-toastify/dist/ReactToastify.css";
 import DateRangePicker from "rsuite/DateRangePicker";
 import format from "date-fns/format";
 import "rsuite/DateRangePicker/styles/index.css";
+import zIndex from "@mui/material/styles/zIndex";
 
 const formatDate = (dateString) => {
   const dateObject = new Date(dateString);
@@ -132,7 +133,7 @@ const Workflow = () => {
       if (shouldFetchData) {
         const token = localStorage.getItem("token");
         // Initialize the base URL
-        let url = `${apiUrl}/api/workspace/all-workspaces`;
+        let url = `${apiUrl}/api/workflow/all-workflows`;
 
         // Check if startDate and endDate are defined and not empty or null
         if (startDate && endDate) {
@@ -585,7 +586,7 @@ const Workflow = () => {
           </div>
         </div>
       )}
-      <div className=" bg-slate-100 pt-10 pl-[260px] h-[112vh]  z-[20]">
+      <div className=" bg-slate-100 pt-10 pl-[260px] h-[132vh]  z-[20]">
         <section class=" w-[71.25rem] px-[var(--padding-xl)] box-border text-left text-5xl text-bodytext-100 font-poppins flex justify-start flex flex-col items-start max-w-full">
           <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full text-[1.5rem] text-bodytext-100 mq750:flex-wrap">
             <div className=" w-1/2 flex justify-between">
@@ -633,6 +634,19 @@ const Workflow = () => {
                       placement="bottomEnd"
                       direction="vertical"
                       placeholder="Select Date"
+                      sx={{
+                        backgroundColor: "rgb(249, 250, 251)", // bg-gray-50 equivalent
+                        borderColor: "rgb(209, 213, 219)", // border-gray-300 equivalent
+                        color: "rgb(17, 24, 39)", // text-gray-900 equivalent
+                        height: "5.13rem",
+                        zIndex: "0",
+                        padding: "0.5rem", // Add padding for better spacing
+                        borderRadius: "0.375rem", // Rounded corners for a smoother look
+                        fontSize: "1rem", // Adjust font size if needed
+                        width: "100%", // Adjust width to fit container
+                        boxShadow:
+                          "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)", // Subtle shadow for depth
+                      }}
                       renderValue={([start, end]) => {
                         return (
                           format(start, "MMM d") + " - " + format(end, "MMM d")
@@ -652,14 +666,14 @@ const Workflow = () => {
                 <p className="ml-2">Created</p>
                 <p className="pl-2">Status</p>
                 <p className="pl-5 pr-3">Users</p>
-                {!user ||
-                  (user.role == "Admin" && (
-                    <>
-                      <p>IsActive</p>
-                      <p className="pr-1">Edit</p>
-                      <p className="d-flex justify-end pr-5">Action</p>
-                    </>
-                  ))}
+                {/* {!user || */}
+                {/* (user.role !== "" && ( */}
+                {/* <> */}
+                <p>IsActive</p>
+                <p className="pr-1">Edit</p>
+                <p className="d-flex justify-end pr-5">Action</p>
+                {/* </> */}
+                {/* ))} */}
               </div>
             </div>
 
@@ -786,51 +800,48 @@ const Workflow = () => {
                         )}
                       </Menu>
                     </div>
-                    {!user ||
-                      (user.role == "Admin" && (
-                        <>
-                          <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <Form>
-                              <Form.Check
-                                type="switch"
-                                id={`custom-switch-${workspace.id}`}
-                                checked={workspace.isActive}
-                                onChange={() =>
-                                  handleSwitchChange(
-                                    workspace.id,
-                                    workspace.isActive
-                                  )
-                                }
-                              />
-                            </Form>
+                    {/* {!user || */}
+                    {/* (user.role == "Admin" && ( */}
+                    {/* <> */}
+                    <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
+                      <Form>
+                        <Form.Check
+                          type="switch"
+                          id={`custom-switch-${workspace.id}`}
+                          checked={workspace.isActive}
+                          onChange={() =>
+                            handleSwitchChange(workspace.id, workspace.isActive)
+                          }
+                        />
+                      </Form>
+                    </div>
+                    <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                      <button
+                        onClick={() => handleEditProject(workspace.id)}
+                        className="no-underline bg-white"
+                      >
+                        <div className="flex items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative">
+                          <div className="absolute inset-0 rounded-xl bg-coral-200"></div>
+                          <div className="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100">
+                            
                           </div>
-                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <button
-                              onClick={() => handleEditProject(workspace.id)}
-                              className="no-underline bg-white"
-                            >
-                              <div className="flex items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative">
-                                <div className="absolute inset-0 rounded-xl bg-coral-200"></div>
-                                <div className="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100">
-                                  
-                                </div>
-                              </div>
-                            </button>
-                          </div>
-                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <button
-                              onClick={() => openPopup(workspace.id)}
-                              className="bg-white justify-end"
-                            >
-                              <img
-                                className="h-[1.25rem] w-[1.28rem] relative"
-                                alt=""
-                                src={threedots}
-                              />
-                            </button>
-                          </div>
-                        </>
-                      ))}
+                        </div>
+                      </button>
+                    </div>
+                    <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                      <button
+                        onClick={() => openPopup(workspace.id)}
+                        className="bg-white justify-end"
+                      >
+                        <img
+                          className="h-[1.25rem] w-[1.28rem] relative"
+                          alt=""
+                          src={threedots}
+                        />
+                      </button>
+                    </div>
+                    {/* </> */}
+                    {/* ))} */}
                   </div>
                 </div>
               ))}

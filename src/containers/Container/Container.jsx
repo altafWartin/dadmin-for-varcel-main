@@ -56,8 +56,12 @@ const Container = () => {
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [startDateImage, setStartDateImage] = useState("");
+  const [endDateImage, setEndDateImage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState([]);
+  const [searchTermImage, setSearchTermImage] = useState("");
+  const [filteredImages, setFilteredImages] = useState([]);
 
   const handleDateRangeChange = (value) => {
     console.log("Date range changed:", value);
@@ -80,6 +84,27 @@ const Container = () => {
     }
   };
 
+  const handleDateRangeChangeImage = (value) => {
+    console.log("Date range changed:", value);
+    if (Array.isArray(value) && value.length === 2) {
+      const startDate = new Date(value[0]).toISOString().split("T")[0];
+      const endDate = new Date(value[1]).toISOString().split("T")[0];
+
+      setStartDateImage(startDate);
+      setEndDateImage(endDate);
+      console.log("Start Date:", startDate);
+      console.log("End Date:", endDate);
+      setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+    } else {
+      setStartDateImage("2023-04-01");
+      const today = new Date().toISOString().split("T")[0];
+      setEndDateImage(today);
+      // Handle the case when value is not in the expected format
+      console.log("Invalid date range:", value);
+      setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+    }
+  };
+
   const apiUrl = "https://d-admin-backend.onrender.com";
 
   const notifyAssign = (message) => {
@@ -87,6 +112,7 @@ const Container = () => {
   };
 
   const notifyDelete = () => toast.success("Container deleted successfully");
+  const notifyDeleteImage = () => toast.success("Image deleted successfully");
   const notifyStatus = () =>
     toast.success("Container status updated successfully");
 
@@ -102,28 +128,75 @@ const Container = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
+      if (shouldFetchData) {
         const token = localStorage.getItem("token");
-        const response = await fetch(
-          "https://d-admin-backend.onrender.com/api/images/all-images",
-          {
+
+        // Initialize the base URL
+        let url = `${apiUrl}/api/images/all-images`;
+
+        // Check if startDate and endDate are defined and not empty or null
+        if (startDateImage && endDateImage) {
+          url += `?startDate=${startDateImage}&endDate=${endDateImage}`;
+        }
+
+        try {
+          const response = await fetch(url, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
+          });
+          const data = await response.json();
+          console.log("API Response:", data); // Log the response
+          if (data.success) {
+            const sortedProjects = data.data.rows.sort((a, b) => a.id - b.id);
+
+            console.log("API Response:", data.data); // Log the response
+            setImageData(sortedProjects);
+            setShouldFetchData(false); // Set shouldFetchData to true after successful deletion
+          } else {
+            console.error("Failed to fetch projects:", data.message);
           }
-        );
-        const data = await response.json();
-        console.log("API Response:", data.data); // Log the response
-        setImageData(data.data.rows);
-      } catch (error) {
-        console.error("Error fetching image data:", error);
+        } catch (error) {
+          console.error("Error fetching projects:", error);
+        }
       }
     };
 
     fetchData();
-  }, []);
+  }, [shouldFetchData, startDate, endDate]); // Ensure useEffect runs when startDate or endDate change
 
-  const deleteImage = (data) => {};
+  const deleteImage = async (imageId) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await fetch(
+        `https://d-admin-backend.onrender.com/api/images/delete-image/${imageId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // Add any other headers if required, such as authorization headers
+          },
+          // Add body data if your API requires it for deletion
+          // body: JSON.stringify({}),
+        }
+      );
+
+      if (response.ok) {
+        // Handle successful deletion, e.g., update UI or show a success message
+        console.log("Project deleted successfully");
+        setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
+        notifyDeleteImage();
+        closePopup();
+      } else {
+        // Handle unsuccessful deletion, e.g., show an error message
+        console.error("Failed to delete project");
+      }
+    } catch (error) {
+      // Handle any network errors or exceptions
+      console.error("An error occurred:", error);
+    }
+  };
 
   const handleEditImage = async (imageId) => {
     console.log("this data is from selected projectid ", imageId);
@@ -229,6 +302,24 @@ const Container = () => {
 
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
+    if (!event.target.value) {
+      setShouldFetchData(true); // Refetch all projects if search is cleared
+    }
+  };
+
+  useEffect(() => {
+    if (searchTermImage) {
+      const results = imageData.filter((project) =>
+        project.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredImages(results);
+    } else {
+      setFilteredImages(imageData); // Reset to all projects when search term is cleared
+    }
+  }, [searchTermImage, imageData]);
+
+  const handleSearchChangeImage = (event) => {
+    setSearchTermImage(event.target.value);
     if (!event.target.value) {
       setShouldFetchData(true); // Refetch all projects if search is cleared
     }
@@ -487,6 +578,12 @@ const Container = () => {
     }
   };
 
+  const handleDownload = (imageUrl) => {
+    // Do something with the image URL, like downloading or displaying
+    console.log("Downloading image from:", imageUrl);
+    // window.location.href = fileUrl;
+  };
+
   return (
     <div>
       {" "}
@@ -633,7 +730,7 @@ const Container = () => {
           </div>
         </div>
       )}
-      <div className=" bg-slate-100 pt-10 pl-[260px] h-[208vh]  z-[20]">
+      <div className=" bg-slate-100 pt-10 pl-[260px] h-[250vh]  z-[20]">
         <section class=" w-[71.25rem] px-[var(--padding-xl)] box-border text-left text-5xl text-bodytext-100 font-poppins flex justify-start flex flex-col items-start max-w-full">
           <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full text-[1.5rem] text-bodytext-100 mq750:flex-wrap">
             <div className=" w-1/2 flex justify-between">
@@ -701,14 +798,14 @@ const Container = () => {
                 <p className="ml-2">Created</p>
                 <p className="pl-2">Status</p>
                 <p className="pl-5 pr-3">Users</p>
-                {!user ||
-                  (user.role !== "Developer" && (
-                    <>
-                      <p>IsActive</p>
-                      <p className="pr-1">Edit</p>
-                      <p className="d-flex justify-end pr-5">Action</p>
-                    </>
-                  ))}
+                {/* {!user || */}
+                {/* (user.role !== "Developer" && ( */}
+                <>
+                  <p>IsActive</p>
+                  <p className="pr-1">Edit</p>
+                  <p className="d-flex justify-end pr-5">Action</p>
+                </>
+                {/* ))} */}
               </div>
             </div>
 
@@ -836,51 +933,51 @@ const Container = () => {
                         )}
                       </Menu>
                     </div>
-                    {!user ||
-                      (user.role !== "Developer" && (
-                        <>
-                          <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <Form>
-                              <Form.Check
-                                type="switch"
-                                id={`custom-switch-${container.id}`}
-                                checked={container.isActive}
-                                onChange={() =>
-                                  handleSwitchChange(
-                                    container.id,
-                                    container.isActive
-                                  )
-                                }
-                              />
-                            </Form>
-                          </div>{" "}
-                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <button
-                              onClick={() => handleEditProject(container.id)}
-                              className="no-underline  bg-white"
-                            >
-                              <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                                <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                                <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                                  
-                                </div>
-                              </div>
-                            </button>
-                          </div>{" "}
-                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <button
-                              className="bg-white"
-                              onClick={() => openPopup(container.id)}
-                            >
-                              <img
-                                class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                                alt=""
-                                src={threedots}
-                              />
-                            </button>
+                    {/* {!user || */}
+                    {/* (user.role !== "Developer" && ( */}
+                    <>
+                      <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <Form>
+                          <Form.Check
+                            type="switch"
+                            id={`custom-switch-${container.id}`}
+                            checked={container.isActive}
+                            onChange={() =>
+                              handleSwitchChange(
+                                container.id,
+                                container.isActive
+                              )
+                            }
+                          />
+                        </Form>
+                      </div>{" "}
+                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <button
+                          onClick={() => handleEditProject(container.id)}
+                          className="no-underline  bg-white"
+                        >
+                          <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
+                            <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
+                            <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
+                              
+                            </div>
                           </div>
-                        </>
-                      ))}
+                        </button>
+                      </div>{" "}
+                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <button
+                          className="bg-white"
+                          onClick={() => openPopup(container.id)}
+                        >
+                          <img
+                            class="h-[1.25rem] w-[1.28rem] relative z-[1]"
+                            alt=""
+                            src={threedots}
+                          />
+                        </button>
+                      </div>
+                    </>
+                    {/* ))} */}
                   </div>
                 </div>
               ))}
@@ -892,6 +989,21 @@ const Container = () => {
             <h2 class="m-0 h-[2.25rem] relative text-inherit tracking-[0.02em] font-semibold font-inherit flex items-center mq450:text-[1.19rem]">
               Images
             </h2>
+            <div class="h-[2.5rem] w-[18.56rem] rounded-xl bg-white box-border flex flex-row items-start justify-start py-[0.69rem] px-[0.75rem] relative gap-[1.31rem] border-[1px] border-solid border-stroke">
+              <input
+                class="w-[7.5rem] [border:none] [outline:none] font-poppins text-[0.75rem] bg-[transparent] h-[1.13rem] absolute my-0 mx-[!important] top-[0.69rem] left-[3.19rem] text-bodytext-50 text-left flex items-center z-[1]"
+                placeholder="Search "
+                type="text"
+                value={searchTermImage}
+                onChange={handleSearchChangeImage}
+              />
+
+              <img
+                class="h-[45%] w-[6.06%] absolute my-0 mx-[!important] top-[27.5%] right-[89.87%] bottom-[27.5%] left-[4.07%] max-w-full overflow-hidden max-h-full z-[1]"
+                alt=""
+                src={search}
+              />
+            </div>
             <div class="flex flex-row items-start justify-start gap-[1.38rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
               <Link
                 to="/addImage"
@@ -902,27 +1014,22 @@ const Container = () => {
                   Add New
                 </div>
               </Link>
-              <div class="flex flex-row items-start justify-start gap-[0.25rem]">
+              <div class="flex w-[200px]  flex-row items-start justify-start gap-[0.25rem]">
                 <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.56rem] pl-[0.5rem] gap-[0.38rem]">
-                  <img
-                    class="h-[1.31rem] w-[1.31rem] relative"
-                    alt=""
-                    src={calendar}
-                  />
-
-                  <div class="relative font-medium">Oct 16 - Oct 23</div>
-                  <img
-                    class="h-[1.5rem] w-[1.5rem] relative min-h-[1.5rem]"
-                    alt=""
-                    src={arrowdown}
-                  />
-                </div>
-                <div class="rounded-lg bg-white flex flex-row items-center justify-start p-[0.25rem]">
-                  <img
-                    class="h-[1.31rem] w-[1.31rem] relative"
-                    alt=""
-                    src={setting}
-                  />
+                  <div class="relative font-medium">
+                    <DateRangePicker
+                      onChange={handleDateRangeChangeImage}
+                      editable={false}
+                      placement="bottomEnd"
+                      direction="vertical"
+                      placeholder="Select Date"
+                      renderValue={([start, end]) => {
+                        return (
+                          format(start, "MMM d") + " - " + format(end, "MMM d")
+                        );
+                      }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -930,25 +1037,23 @@ const Container = () => {
           <div className="self-stretch flex flex-col mt-10 items-end justify-start gap-[0.5rem]  max-w-full">
             <div className="w-[68.31rem] relative text-[1.13rem] pb-0 tracking-[-0.02em] capitalize font-medium font-poppins text-black whitespace-pre-wrap text-left inline-block max-w-full">
               <div className="flex justify-between pr-4">
-                <p className="w-[90px] border border-2 mr-0"> Image ID</p>
-                <p className="w-[100px] border border-2 pl-8 mr-0"> Name</p>
-                <p className="w-[140px] pl-5 border border-2 ml-10"> Created</p>
+                <p className="w-[90px]  mr-0"> Image ID</p>
+                <p className="w-[100px]  pl-8 mr-0"> Name</p>
+                <p className="w-[140px] pl-5  ml-10"> Created</p>
                 {/* <p className="pl-5 pr-3">Users</p> */}
-                {!user ||
-                  (user.role !== "Developer" && (
-                    <>
-                      <p className="w-[50px] border border-2 mr-0">Edit</p>
-                      <p className="w-[70px] border border-2 mr-0">Delete</p>
-                      <p className="d-flex justify-end w-[130px] border border-2">
-                        Download Zip
-                      </p>
-                    </>
-                  ))}
+                {/* {!user || */}
+                {/* (user.role !== "Developer" && ( */}
+                <>
+                  <p className="w-[50px] mr-0">Edit</p>
+                  <p className="w-[70px] mr-0">Delete</p>
+                  <p className="d-flex justify-end w-[130px] ">Download Zip</p>
+                </>
+                {/* ))} */}
               </div>
             </div>
 
             <div className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
-              {imageData.map((workspace) => (
+              {filteredImages.map((workspace) => (
                 <div
                   key={workspace.id}
                   className="self-stretch rounded-2xl bg-white box-border flex items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] max-w-full border-[1px] border-solid border-whitesmoke"
@@ -966,48 +1071,49 @@ const Container = () => {
                       {formatDate(workspace.created_at)}
                     </div>
 
-                    {!user ||
-                      (user.role !== "Developer" && (
-                        <>
-                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <button
-                              onClick={() => handleEditImage(workspace.id)}
-                              className="no-underline bg-white"
-                            >
-                              <div className="flex items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative">
-                                <div className="absolute inset-0 rounded-xl bg-coral-200"></div>
-                                <div className="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100">
-                                  
-                                </div>
-                              </div>
-                            </button>
+                    {/* {!user ||
+                      (user.role !== "Developer" && ( */}
+                    <>
+                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <button
+                          onClick={() => handleEditImage(workspace.id)}
+                          className="no-underline bg-white"
+                        >
+                          <div className="flex items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative">
+                            <div className="absolute inset-0 rounded-xl bg-coral-200"></div>
+                            <div className="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100">
+                              
+                            </div>
                           </div>
-                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <button
-                              onClick={() => openPopup(workspace.id)}
-                              className="bg-white justify-end"
-                            >
-                              <img
-                                className="h-[2.25rem] w-[2.28rem] relative"
-                                alt=""
-                                src={deleteIcon}
-                              />
-                            </button>
-                          </div>
-                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <button
-                              onClick={() => openPopup(workspace.id)}
-                              className="bg-white justify-end"
-                            >
-                              <img
-                                className="h-[2.25rem] w-[2.28rem] relative"
-                                alt=""
-                                src={downloadIcon}
-                              />
-                            </button>
-                          </div>
-                        </>
-                      ))}
+                        </button>
+                      </div>
+                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <button
+                          onClick={() => deleteImage(workspace.id)}
+                          className="bg-white justify-end"
+                        >
+                          <img
+                            className="h-[2.25rem] w-[2.28rem] relative"
+                            alt=""
+                            src={deleteIcon}
+                          />
+                        </button>
+                      </div>
+                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <a
+                          href={workspace.image}
+                          className="bg-white justify-end"
+                          //  onClick={() => handleDownload(workspace.image)}
+                        >
+                          <img
+                            className="h-[2.25rem] w-[2.28rem] relative"
+                            alt=""
+                            src={downloadIcon}
+                          />
+                        </a>
+                      </div>
+                    </>
+                    {/* ))} */}
                   </div>
                 </div>
               ))}

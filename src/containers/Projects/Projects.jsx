@@ -58,6 +58,7 @@ const Projects = () => {
   const [endDate, setEndDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProjects, setFilteredProjects] = useState([]);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   console.log("projects", projects);
 
@@ -552,7 +553,10 @@ const Projects = () => {
               {/* <div class="absolute z-10  ml-[240px]">Hello</div> */}
 
               <div className="">
-                <CustomDateRangePicker onChange={handleDateRangeChange} />
+                <CustomDateRangePicker
+                  isDropdownOpen={isDropdownOpen}
+                  onChange={handleDateRangeChange}
+                />
               </div>
             </div>
           </div>

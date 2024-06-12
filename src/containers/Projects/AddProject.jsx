@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.svg";
 import calendar from "../../assets/Icon/calendar.svg";
 import arrowdown from "../../assets/Icon/arrowdown.svg";
 import setting from "../../assets/Icon/setting.svg";
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
-
 
 import dayjs from "dayjs";
 import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
@@ -16,7 +15,6 @@ import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 const AddProject = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -25,12 +23,13 @@ const AddProject = () => {
   const navigate = useNavigate();
 
   const notifyAddProject = () => toast.success("Project add successfully");
-  const notifyerror = () => toast.error("Project with this name already exists.");
+  const notifyerror = () =>
+    toast.error("Project with this name already exists.");
   // Handle start date change
   const handleStartDateChange = (newStartDate) => {
     console.log(newStartDate, "newStart");
     // Format the newStartDate using dayjs
-    const formattedStartDate = dayjs(newStartDate).format('YYYY-MM-DD');
+    const formattedStartDate = dayjs(newStartDate).format("YYYY-MM-DD");
     // Set the formattedStartDate as the new start date
     setStartDate(formattedStartDate);
   };
@@ -38,7 +37,7 @@ const AddProject = () => {
   // Handle end date change
   const handleEndDateChange = (newEndDate) => {
     // Format the newEndDate using dayjs
-    const formattedEndDate = dayjs(newEndDate).format('YYYY-MM-DD');
+    const formattedEndDate = dayjs(newEndDate).format("YYYY-MM-DD");
     // Set the formattedEndDate as the new end date
     setEndDate(formattedEndDate);
   };
@@ -77,20 +76,20 @@ const AddProject = () => {
       const data = await response.json();
       console.log(data); // Handle success response
       notifyAddProject();
-      navigate('/projects')
+      navigate("/projects");
       // You can show a success message or redirect the user
     } catch (error) {
-      notifyerror()
+      notifyerror();
       console.error("Error:", error); // Handle error
       // You can show an error message to the user
     }
   };
 
   return (
-    <div className=" bg-slate-100  pt-10 pl-[260px] h-[95vh]">
+    <div className=" bg-slate-100  pt-10 pl-[260px] h-[120vh]">
       {" "}
       <ToastContainer />
-      <section class="w-[71.125rem] flex flex-col items-center justify-start py-[0rem] px-[1.25rem] box-border gap-[5rem_0rem] max-w-full text-left text-[1.5rem] text-midnightblue font-poppins lg:gap-[5rem_0rem] mq750:gap-[5rem_0rem]">
+      <section class="w-[71.125rem] flex flex-col items-center justify-start py-[0rem] px-[1.25rem] box-border gap-[2rem_0rem] max-w-full text-left text-[1.5rem] text-midnightblue font-poppins lg:gap-[5rem_0rem] mq750:gap-[5rem_0rem]">
         <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full mq750:flex-wrap">
           <div class="flex flex-row items-center justify-start gap-[0rem_0.344rem]">
             <h2 class="m-0 h-[2.25rem] relative text-inherit tracking-[0.02em] font-semibold font-inherit flex items-center mq450:text-[1.188rem]">
@@ -106,31 +105,7 @@ const AddProject = () => {
               Add Project
             </div>
           </div>
-          <div class="flex flex-row items-start justify-start gap-[0rem_1.375rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
-            <div class="flex flex-row items-start justify-start gap-[0rem_0.25rem]">
-              <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.625rem] pl-[0.5rem] gap-[0rem_0.375rem]">
-                <img
-                  class="h-[1.313rem] w-[1.313rem] relative"
-                  alt=""
-                  src={calendar}
-                />
-
-                <div class="relative font-medium">Oct 16 - Oct 23</div>
-                <img
-                  class="h-[1.5rem] w-[1.5rem] relative min-h-[1.5rem]"
-                  alt=""
-                  src={arrowdown}
-                />
-              </div>
-              <div class="rounded-lg bg-white flex flex-row items-center justify-start p-[0.25rem]">
-                <img
-                  class="h-[1.313rem] w-[1.313rem] relative"
-                  alt=""
-                  src={setting}
-                />
-              </div>
-            </div>
-          </div>
+      
         </div>
         <form
           onSubmit={handleSubmit}
@@ -188,7 +163,8 @@ const AddProject = () => {
                   required
                 />
               </div>
-              <div class="flex-1 flex flex-col items-start justify-start pt-[0.25rem] px-[0.5rem] pb-[1.13rem] box-border relative gap-[0.5rem] min-w-[15.88rem] max-w-full z-[3]">
+
+              <div class="flex-1 flex flex-col items-start justify-start pt-[0.25rem] px-[0.5rem]  box-border relative gap-[0.5rem] min-w-[15.88rem] max-w-full z-[3]">
                 <label
                   for="first_name"
                   class="block ml-2 text-sm uppercase font-medium text-bodytext-50 dark:text-white"
@@ -231,7 +207,6 @@ const AddProject = () => {
                         defaultValue={dayjs()}
                         value={startDate}
                         format="YYYY-MM-DD" // Specify the desired date format here
-
                         onChange={handleStartDateChange}
                         renderInput={(params) => <input {...params} />}
                       />
@@ -262,7 +237,6 @@ const AddProject = () => {
                         defaultValue={dayjs()}
                         value={endDate}
                         format="YYYY-MM-DD" // Specify the desired date format here
-
                         onChange={handleEndDateChange}
                         renderInput={(params) => <input {...params} />}
                       />

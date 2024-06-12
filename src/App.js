@@ -56,7 +56,7 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App flex flex-col min-h-screen">
       {!isLoginPage && <Sidebar />}
       {!isLoginPage && <Navbar />}
 

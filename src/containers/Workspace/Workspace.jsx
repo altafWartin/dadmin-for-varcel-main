@@ -585,7 +585,7 @@ const Workspace = () => {
           </div>
         </div>
       )}
-      <div className=" bg-slate-100 pt-10 pl-[260px] h-[112vh]  z-[20]">
+      <div className=" bg-slate-100 pt-10 pl-[260px] h-[132vh]   z-[20]">
         <section class=" w-[71.25rem] px-[var(--padding-xl)] box-border text-left text-5xl text-bodytext-100 font-poppins flex justify-start flex flex-col items-start max-w-full">
           <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full text-[1.5rem] text-bodytext-100 mq750:flex-wrap">
             <div className=" w-1/2 flex justify-between">
@@ -652,14 +652,14 @@ const Workspace = () => {
                 <p className="ml-2">Created</p>
                 <p className="pl-2">Status</p>
                 <p className="pl-5 pr-3">Users</p>
-                {!user ||
-                  (user.role !== "Developer" && (
-                    <>
-                      <p>IsActive</p>
-                      <p className="pr-1">Edit</p>
-                      <p className="d-flex justify-end pr-5">Action</p>
-                    </>
-                  ))}
+                {/* {!user || */}
+                {/* (user.role !== "Developer" && ( */}
+                <>
+                  <p>IsActive</p>
+                  <p className="pr-1">Edit</p>
+                  <p className="d-flex justify-end pr-5">Action</p>
+                </>
+                {/* ))} */}
               </div>
             </div>
 
@@ -789,53 +789,53 @@ const Workspace = () => {
                       </Menu>
                     </div>
 
-                    {!user ||
-                      (user.role !== "Developer" && (
-                        <>
-                          <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <Form className="content-center">
-                              <Form.Check
-                                type="switch"
-                                id={`custom-switch-${workspace.id}`}
-                                className="custom-switch content-center"
-                                // label={project.isActive ? "Active" : "Inactive"}
-                                checked={workspace.isActive}
-                                onChange={() =>
-                                  handleSwitchChange(
-                                    workspace.id,
-                                    workspace.isActive
-                                  )
-                                }
-                              />
-                            </Form>
+                    {/* {!user ||
+                      (user.role !== "Developer" && ( */}
+                    <>
+                      <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <Form className="content-center">
+                          <Form.Check
+                            type="switch"
+                            id={`custom-switch-${workspace.id}`}
+                            className="custom-switch content-center"
+                            // label={project.isActive ? "Active" : "Inactive"}
+                            checked={workspace.isActive}
+                            onChange={() =>
+                              handleSwitchChange(
+                                workspace.id,
+                                workspace.isActive
+                              )
+                            }
+                          />
+                        </Form>
+                      </div>
+                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <button
+                          onClick={() => handleEditProject(workspace.id)}
+                          className="no-underline  bg-white"
+                        >
+                          <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
+                            <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
+                            <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
+                              
+                            </div>
                           </div>
-                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <button
-                              onClick={() => handleEditProject(workspace.id)}
-                              className="no-underline  bg-white"
-                            >
-                              <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                                <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                                <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                                  
-                                </div>
-                              </div>
-                            </button>
-                          </div>
-                          <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                            <button
-                              className="bg-white"
-                              onClick={() => openPopup(workspace.id)}
-                            >
-                              <img
-                                class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                                alt=""
-                                src={threedots}
-                              />
-                            </button>
-                          </div>
-                        </>
-                      ))}
+                        </button>
+                      </div>
+                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <button
+                          className="bg-white"
+                          onClick={() => openPopup(workspace.id)}
+                        >
+                          <img
+                            class="h-[1.25rem] w-[1.28rem] relative z-[1]"
+                            alt=""
+                            src={threedots}
+                          />
+                        </button>
+                      </div>
+                    </>
+                    {/* ))} */}
                   </div>
                 </div>
               ))}

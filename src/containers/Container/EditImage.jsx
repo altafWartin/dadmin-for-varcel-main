@@ -132,31 +132,7 @@ const EditImage = () => {
               Add Image
             </div>
           </div>
-          <div class="flex flex-row items-start justify-start gap-[0rem_1.375rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
-            <div class="flex flex-row items-start justify-start gap-[0rem_0.25rem]">
-              <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.625rem] pl-[0.5rem] gap-[0rem_0.375rem]">
-                <img
-                  class="h-[1.313rem] w-[1.313rem] relative"
-                  alt=""
-                  src={calendar}
-                />
-
-                <div class="relative font-medium">Oct 16 - Oct 23</div>
-                <img
-                  class="h-[1.5rem] w-[1.5rem] relative min-h-[1.5rem]"
-                  alt=""
-                  src={arrowdown}
-                />
-              </div>
-              <div class="rounded-lg bg-white flex flex-row items-center justify-start p-[0.25rem]">
-                <img
-                  class="h-[1.313rem] w-[1.313rem] relative"
-                  alt=""
-                  src={setting}
-                />
-              </div>
-            </div>
-          </div>
+      
         </div>
         <form
           onSubmit={handleSubmit}

@@ -1,22 +1,14 @@
-import React from 'react'
+import React from 'react';
 
-const Footer = () => {
+export default function Footer() {
   return (
-    <div>
-      {/* <!-- TW Elements is free under AGPL, with commercial license required for specific uses. See more details: https://tw-elements.com/license/ and contact us for queries at tailwind@mdbootstrap.com -->  */}
-<footer
-  class="bg-white-200 text-center dark:bg-neutral-700 lg:text-left">
-  <div class="p-4 text-center text-neutral-700 dark:text-neutral-200">
-    © 2023 Copyright:
-    <a
-      class="text-neutral-800 dark:text-neutral-400"
-      href="https://tw-elements.com/"
-      >TW elements
-      </a>
-  </div>
-</footer>
-    </div>
-  )
+    <footer className="bg-gray-200  text-center text-lg-left w-full mt-auto z-999999">
+      <div className="text-center p-3" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
+        &copy; {new Date().getFullYear()} Copyright:{' '}
+        <a className="text-dark" href="https://mdbootstrap.com/">
+          MDBootstrap.com
+        </a>
+      </div>
+    </footer>
+  );
 }
-
-export default Footer

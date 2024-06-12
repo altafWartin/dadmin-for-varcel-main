@@ -30,13 +30,17 @@ const EditWorkspace = () => {
   const [dynamicFields, setDynamicFields] = useState([]);
   const [formData, setFormData] = useState({});
 
-// Function to handle input changes
-const handleInputChange = (name, value) => {
-  setFormData((prevData) => ({
-    ...prevData,
-    [name]: value,
-  }));
-};
+  console.log ("dynamicfields",dynamicFields)
+  console.log ("dynamic",dynamic)
+  console.log ("dynamicData",dynamicData)
+
+  // Function to handle input changes
+  const handleInputChange = (name, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
   useEffect(() => {
     const fetchWorkspaceById = async () => {
@@ -71,7 +75,9 @@ const handleInputChange = (name, value) => {
           value: field.value,
           // Add more properties as needed
         }));
-        setDynamicFields(updatedDynamicFields);
+        // setDynamicFields(updatedDynamicFields);
+        // setDynamic(updatedDynamicFields)
+        // setDynamicData(updatedDynamicFields)
       } catch (error) {
         console.error("Error fetching workspace:", error);
         // Handle errors or show an error message to the user
@@ -198,12 +204,6 @@ const handleInputChange = (name, value) => {
     setParamCount(paramCount - 1);
   };
 
-  // UseEffect to log changes in labelName and labelNames
-  useEffect(() => {
-    console.log(labelName, "labelName");
-    console.log(labelNames, "labelNames");
-  }, [labelName, labelNames]);
-
   // // Function to handle form submission
   // const handleSubmit = async (e) => {
   //   e.preventDefault();
@@ -329,31 +329,7 @@ const handleInputChange = (name, value) => {
                 Edit Workspace
               </div>
             </div>
-            <div class="flex flex-row items-start justify-end gap-[1.38rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
-              <div class="flex flex-row items-start justify-start gap-[0.25rem]">
-                <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.56rem] pl-[0.5rem] gap-[0.38rem]">
-                  <img
-                    class="h-[1.31rem] w-[1.31rem] relative"
-                    alt=""
-                    src={calendar}
-                  />
-
-                  <div class="relative font-medium">Oct 16 - Oct 23</div>
-                  <img
-                    class="h-[1.5rem] w-[1.5rem] relative min-h-[1.5rem]"
-                    alt=""
-                    src={arrowdown}
-                  />
-                </div>
-                <div class="rounded-lg bg-white flex flex-row items-center justify-start p-[0.25rem]">
-                  <img
-                    class="h-[1.31rem] w-[1.31rem] relative"
-                    alt=""
-                    src={setting}
-                  />
-                </div>
-              </div>
-            </div>
+     
           </div>
           <form
             onSubmit={handleSubmit}

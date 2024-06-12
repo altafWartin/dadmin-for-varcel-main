@@ -10,6 +10,7 @@ import close from "../../assets/Icon/close.png";
 
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 import logo from "../../assets/logo.svg";
+import { FormControl, Select, MenuItem } from "@mui/material";
 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,6 +20,51 @@ const AddNewWorkflow = () => {
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [labelName, setLabelName] = useState("");
   const [labelNames, setLabelNames] = useState([]);
+  const [seletedProjectId, setSeletedProjectId] = useState("");
+  const [projects, setProjects] = useState([]);
+
+  console.log("projectids", seletedProjectId);
+
+  const handleRoleChange = (event) => {
+    setSeletedProjectId(event.target.value);
+  };
+
+  const apiUrl = "https://d-admin-backend.onrender.com";
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+
+      // Initialize the base URL
+      let url = `${apiUrl}/api/project/all-projects`;
+
+      console.log(url);
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+        console.log("API Response:", data.data); // Log the response
+        const ids = data.data.rows;
+
+        // Logging the IDs to confirm
+        console.log("Extracted IDs:", ids);
+
+        if (data.success) {
+          setProjects(ids);
+        } else {
+          console.error("Failed to fetch projects:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchData();
+  }, []); // Ensure useEffect runs when startDate or endDate change
 
   const navigate = useNavigate();
 
@@ -90,9 +136,10 @@ const AddNewWorkflow = () => {
       const bodyData = {
         name: nameValue,
         description: descriptionValue,
-
+        projectId: seletedProjectId,
         dynamicData: dynamicDataValue,
       };
+      console.log(bodyData);
 
       // Send the POST request
       const response = await fetch(
@@ -182,31 +229,7 @@ const AddNewWorkflow = () => {
                 Add Workflow
               </div>
             </div>
-            <div class="flex flex-row items-start justify-end gap-[1.38rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
-              <div class="flex flex-row items-start justify-start gap-[0.25rem]">
-                <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.56rem] pl-[0.5rem] gap-[0.38rem]">
-                  <img
-                    class="h-[1.31rem] w-[1.31rem] relative"
-                    alt=""
-                    src={calendar}
-                  />
-
-                  <div class="relative font-medium">Oct 16 - Oct 23</div>
-                  <img
-                    class="h-[1.5rem] w-[1.5rem] relative min-h-[1.5rem]"
-                    alt=""
-                    src={arrowdown}
-                  />
-                </div>
-                <div class="rounded-lg bg-white flex flex-row items-center justify-start p-[0.25rem]">
-                  <img
-                    class="h-[1.31rem] w-[1.31rem] relative"
-                    alt=""
-                    src={setting}
-                  />
-                </div>
-              </div>
-            </div>
+   
           </div>
           <form
             onSubmit={handleSubmit}
@@ -277,6 +300,46 @@ const AddNewWorkflow = () => {
                     required
                   />
                 </div>
+              </div>
+              <div class="w-full flex-1  flex flex-col items-start justify-start  px-[0.5rem] pb-[1.13rem] box-border relative gap-[0.5rem] min-w-[15.88rem] max-w-full z-[3]">
+                <label
+                  for="first_name"
+                  class="block ml-2 text-sm font-medium text-bodytext-50 dark:text-white"
+                >
+                  SELECT PROJECT
+                </label>
+                <FormControl fullWidth>
+                  <Select
+                    labelId="role-select-label"
+                    id="role-select"
+                    value={seletedProjectId}
+                    onChange={handleRoleChange}
+                    displayEmpty // Allow the Select component to display the empty value as a placeholder
+                    sx={{
+                      backgroundColor: "rgb(249 250 251)", // bg-gray-50 equivalent
+                      borderColor: "rgb(209 213 219)", // border-gray-300 equivalent
+                      color: "rgb(17 24 39)", // text-gray-900 equivalent
+                      height: "3.13rem",
+                      fontSize: "0.875rem",
+                      borderRadius: "0.375rem",
+                      padding: "0.625rem",
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "black", // focus:ring-coral-100 equivalent
+                      },
+                      ".MuiSvgIcon-root": {
+                        color: "rgb(17 24 39)", // text-gray-900 equivalent for the dropdown icon
+                      },
+                    }}   >
+                    <MenuItem value="" disabled>
+                      Select Project
+                    </MenuItem>
+                    {projects.map((project) => (
+                      <MenuItem key={project.id} value={project.id}>
+                        {project.id} - {project.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </div>
 
               <div class="self-stretch items-start justify-start  max-w-full mq450:gap-[3rem]">

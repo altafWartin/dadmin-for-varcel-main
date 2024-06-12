@@ -35,12 +35,7 @@ const EditWorkspace = () => {
         console.log("Edit project response:", data);
         console.log(data.data.name);
 
-     
-
-
         const nameValue = data.data.name;
-
-
       } catch (error) {
         console.error("Error fetching workspace:", error);
         // Handle errors or show an error message to the user
@@ -88,11 +83,7 @@ const EditWorkspace = () => {
     setParamCount(paramCount - 1);
   };
 
-  // UseEffect to log changes in labelName and labelNames
-  useEffect(() => {
-    console.log(labelName, "labelName");
-    console.log(labelNames, "labelNames");
-  }, [labelName, labelNames]);
+
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
