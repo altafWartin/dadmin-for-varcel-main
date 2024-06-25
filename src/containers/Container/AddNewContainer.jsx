@@ -20,18 +20,60 @@ const AddNewContainer = () => {
   const [port, setPort] = useState(""); // Add this line
   const [endPoint, setEndpoint] = useState(""); // Add this line
   const [message, setMessage] = useState(""); // Add this line
+  const roles = ["Admin", "Project Manager", "Developer"];
 
   const [seletedProjectId, setSeletedProjectId] = useState("");
   const [projects, setProjects] = useState([]);
-
+  const [images, setImages] = useState([]);
+  const [seletedImageId,setSeletedImageId] = useState("");
   console.log("projectids", seletedProjectId);
 
   const handleRoleChange = (event) => {
     setSeletedProjectId(event.target.value);
   };
 
+  const handleImageChange = (event) => {
+    setSeletedImageId(event.target.value);
+  };
+
   const apiUrl = "https://d-admin-backend.onrender.com";
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+
+      // Initialize the base URL
+      let url = `${apiUrl}/api/images/all-images`;
+
+      console.log(url);
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+        console.log("API Response:", data.data); // Log the response
+        const ids = data.data.rows;
+
+        // Logging the IDs to confirm
+        console.log("Extracted IDs:", ids);
+
+        if (data.success) {
+          setImages(ids);
+        } else {
+          console.error("Failed to fetch projects:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    fetchData();
+  }, []); // Ensure useEffect runs when startDate or endDate change
+  
+  
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
@@ -378,15 +420,48 @@ const AddNewContainer = () => {
                 >
                   Image
                 </label>
-                <input
-                  type="text"
-                  id="name"
-                  class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                  placeholder="Image"
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  required
-                />
+                <FormControl fullWidth>
+                  <Select
+                    labelId="role-select-label"
+                    id="role-select"
+                    value={seletedImageId}
+                    onChange={handleImageChange}
+                    displayEmpty
+                    sx={{
+                      backgroundColor: "rgb(249 250 251)", // bg-gray-50 equivalent
+                      borderColor: "rgb(209 213 219)", // border-gray-300 equivalent
+                      color: "rgb(17 24 39)", // text-gray-900 equivalent
+                      height: "3.13rem",
+                      fontSize: "0.875rem",
+                      borderRadius: "0.375rem",
+                      padding: "0.625rem",
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "black", // focus:ring-coral-100 equivalent
+                      },
+                      ".MuiSvgIcon-root": {
+                        color: "rgb(17 24 39)", // text-gray-900 equivalent for the dropdown icon
+                      },
+                    }}
+                  >
+                    <MenuItem value="" disabled>
+                     Select Image
+                    </MenuItem>
+                    {images.map((image) => (
+                      <MenuItem key={image.id} value={image.id}>
+                        {image.id} - {image.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                {/* <input */}
+                {/* type="text" */}
+                {/* id="name" */}
+                {/* class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" */}
+                {/* placeholder="Image" */}
+                {/* value={image} */}
+                {/* onChange={(e) => setImage(e.target.value)} */}
+                {/* required */}
+                {/* /> */}
               </div>
             </div>
           </div>

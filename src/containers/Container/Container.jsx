@@ -730,261 +730,8 @@ const Container = () => {
           </div>
         </div>
       )}
-      <div className=" bg-slate-100 pt-10 pl-[260px] h-[250vh]  z-[20]">
-        <section class=" w-[71.25rem] px-[var(--padding-xl)] box-border text-left text-5xl text-bodytext-100 font-poppins flex justify-start flex flex-col items-start max-w-full">
-          <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full text-[1.5rem] text-bodytext-100 mq750:flex-wrap">
-            <div className=" w-1/2 flex justify-between">
-              {" "}
-              <h2 class="m-0 h-[2.25rem] relative text-inherit tracking-[0.02em] font-semibold font-inherit flex items-center mq450:text-[1.19rem]">
-                Containers
-              </h2>
-              <div class="h-[2.5rem] w-[18.56rem] rounded-xl bg-white box-border flex flex-row items-start justify-start py-[0.69rem] px-[0.75rem] relative gap-[1.31rem] border-[1px] border-solid border-stroke">
-                <input
-                  class="w-[7.5rem] [border:none] [outline:none] font-poppins text-[0.75rem] bg-[transparent] h-[1.13rem] absolute my-0 mx-[!important] top-[0.69rem] left-[3.19rem] text-bodytext-50 text-left flex items-center z-[1]"
-                  placeholder="Search "
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
-
-                <img
-                  class="h-[45%] w-[6.06%] absolute my-0 mx-[!important] top-[27.5%] right-[89.87%] bottom-[27.5%] left-[4.07%] max-w-full overflow-hidden max-h-full z-[1]"
-                  alt=""
-                  src={search}
-                />
-              </div>
-            </div>
-            <div class="flex flex-row items-start justify-start gap-[1.38rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
-              {!user ||
-                (user.role !== "Project Manager" && (
-                  <>
-                    {" "}
-                    <Link
-                      to="/addNewContainer"
-                      class="cursor-pointer h-[2.5rem] no-underline [border:none] py-[0.38rem] pr-[1.38rem] pl-[1.81rem] bg-coral-100 rounded-3xs flex flex-row items-center justify-end whitespace-nowrap hover:bg-chocolate-100"
-                    >
-                      <div class="relative text-[0.94rem] leading-[1.25rem] font-semibold font-poppins text-white text-left z-[1]">
-                        Add New
-                      </div>
-                    </Link>
-                  </>
-                ))}
-
-              <div class="flex w-[200px]  flex-row items-start justify-start gap-[0.25rem]">
-                <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.56rem] pl-[0.5rem] gap-[0.38rem]">
-                  <div class="relative font-medium">
-                    <DateRangePicker
-                      onChange={handleDateRangeChange}
-                      editable={false}
-                      placement="bottomEnd"
-                      direction="vertical"
-                      placeholder="Select Date"
-                      renderValue={([start, end]) => {
-                        return (
-                          format(start, "MMM d") + " - " + format(end, "MMM d")
-                        );
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="self-stretch flex flex-col mt-10 items-end justify-start gap-[0.5rem]  max-w-full">
-            <div className="w-[68.31rem] relative text-[1.13rem] pb-0 tracking-[-0.02em] capitalize font-medium font-poppins text-black whitespace-pre-wrap text-left inline-block max-w-full">
-              <div className="flex justify-between pr-4">
-                <p>Container ID</p>
-                <p>Name</p>
-                <p className="ml-2">Created</p>
-                <p className="pl-2">Status</p>
-                <p className="pl-5 pr-3">Users</p>
-                {/* {!user || */}
-                {/* (user.role !== "Developer" && ( */}
-                <>
-                  <p>IsActive</p>
-                  <p className="pr-1">Edit</p>
-                  <p className="d-flex justify-end pr-5">Action</p>
-                </>
-                {/* ))} */}
-              </div>
-            </div>
-
-            <div className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
-              {filteredProjects.map((container) => (
-                <div
-                  key={container.id}
-                  className="self-stretch rounded-2xl bg-white box-border flex items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] max-w-full border-[1px] border-solid border-whitesmoke"
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <div className="text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
-                      {container.id}
-                    </div>
-                    <div className=" w-[100px] text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
-                      {container.name.length > 15
-                        ? `${container.name.slice(0, 15)}...`
-                        : container.name}
-                    </div>
-                    <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                      {formatDate(container.created_at)}
-                    </div>
-                    <div className="text-[0.88rem] d-flex justify-content-center w-[100px]  tracking-[-0.02em] font-poppins text-bodytext-50">
-                      <button className="cursor-pointer py-[0.31rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex items-center justify-center border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:border-chocolate-100">
-                        <div className="text-[0.88rem] flex items-center justify-center leading-[1.25rem] font-manrope text-coral-100">
-                          {container.status}
-                        </div>
-                      </button>
-                    </div>
-                    <div className="flex items-center">
-                      <List
-                        component="nav"
-                        aria-label="Device settings"
-                        sx={{ bgcolor: "background.paper" }}
-                      >
-                        <ListItemButton
-                          id="lock-button"
-                          aria-haspopup="listbox"
-                          aria-controls="lock-menu"
-                          aria-label="when device is locked"
-                          aria-expanded={open ? "true" : undefined}
-                          onClick={(event) =>
-                            handleClickListItem(event, container.id)
-                          } // Pass event and projectId
-                        >
-                          <img
-                            className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                            loading="lazy"
-                            alt=""
-                            src={p3}
-                          />
-                          <img
-                            className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                            loading="lazy"
-                            alt=""
-                            src={p2}
-                          />
-                          <img
-                            className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
-                            loading="lazy"
-                            alt=""
-                            src={p4}
-                          />
-                        </ListItemButton>
-                      </List>
-                      <Menu
-                        id="lock-menu"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleClose}
-                        MenuListProps={{
-                          "aria-labelledby": "lock-button",
-                          role: "listbox",
-                          className:
-                            "bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto",
-                        }}
-                      >
-                        {!users ||
-                        users.length == 0 ||
-                        users.every((user) => !user.isContainerAssign) ? (
-                          <MenuItem disabled>No users found</MenuItem>
-                        ) : (
-                          users.map((user, index) =>
-                            // Assuming the condition for not showing isContainerAssign is false
-                            !user.isContainerAssign ? null : (
-                              <MenuItem
-                                key={index}
-                                disabled={index === 0}
-                                selected={index === selectedIndex}
-                                onClick={(event) =>
-                                  handleMenuItemClick(event, index)
-                                }
-                                className="px-4 py-3 flex items-center"
-                              >
-                                <div className="mr-4">
-                                  {user.profilePic ? (
-                                    <img
-                                      className="h-12 w-12 rounded-full"
-                                      src={user.profilePic}
-                                      alt=""
-                                    />
-                                  ) : (
-                                    <span className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
-                                      <img
-                                        className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center"
-                                        loading="lazy"
-                                        alt=""
-                                        src={p2}
-                                      />
-                                    </span>
-                                  )}
-                                </div>
-                                <div>
-                                  <ListItemText
-                                    primary={`User ID: ${user.id}`}
-                                    className="text-gray-800 mb-1"
-                                  />
-                                  <ListItemText
-                                    primary={`Name: ${user.name}`}
-                                    className="text-gray-600 text-sm"
-                                  />
-                                </div>
-                              </MenuItem>
-                            )
-                          )
-                        )}
-                      </Menu>
-                    </div>
-                    {/* {!user || */}
-                    {/* (user.role !== "Developer" && ( */}
-                    <>
-                      <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
-                        <Form>
-                          <Form.Check
-                            type="switch"
-                            id={`custom-switch-${container.id}`}
-                            checked={container.isActive}
-                            onChange={() =>
-                              handleSwitchChange(
-                                container.id,
-                                container.isActive
-                              )
-                            }
-                          />
-                        </Form>
-                      </div>{" "}
-                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                        <button
-                          onClick={() => handleEditProject(container.id)}
-                          className="no-underline  bg-white"
-                        >
-                          <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
-                            <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
-                            <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
-                              
-                            </div>
-                          </div>
-                        </button>
-                      </div>{" "}
-                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                        <button
-                          className="bg-white"
-                          onClick={() => openPopup(container.id)}
-                        >
-                          <img
-                            class="h-[1.25rem] w-[1.28rem] relative z-[1]"
-                            alt=""
-                            src={threedots}
-                          />
-                        </button>
-                      </div>
-                    </>
-                    {/* ))} */}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-        <section class=" w-[71.25rem] mt-16 px-[var(--padding-xl)] box-border text-left text-5xl text-bodytext-100 font-poppins flex justify-start flex flex-col items-start max-w-full">
+      <div className=" bg-slate-100 pt-2 pl-[260px] h-[250vh]  z-[20]">
+        <section class=" w-[71.25rem] mt-4 px-[var(--padding-xl)] box-border text-left text-5xl text-bodytext-100 font-poppins flex justify-start flex flex-col items-start max-w-full">
           <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full text-[1.5rem] text-bodytext-100 mq750:flex-wrap">
             <h2 class="m-0 h-[2.25rem] relative text-inherit tracking-[0.02em] font-semibold font-inherit flex items-center mq450:text-[1.19rem]">
               Images
@@ -1103,7 +850,7 @@ const Container = () => {
                         <a
                           href={workspace.image}
                           className="bg-white justify-end"
-                          //  onClick={() => handleDownload(workspace.image)}
+                        //  onClick={() => handleDownload(workspace.image)}
                         >
                           <img
                             className="h-[2.25rem] w-[2.28rem] relative"
@@ -1119,7 +866,260 @@ const Container = () => {
               ))}
             </div>
           </div>
+        </section> <section class=" w-[71.25rem] px-[var(--padding-xl)] box-border text-left text-5xl text-bodytext-100 font-poppins flex justify-start flex flex-col items-start max-w-full">
+          <div class="self-stretch flex flex-row items-center justify-between gap-[1.25rem] max-w-full text-[1.5rem] text-bodytext-100 mq750:flex-wrap">
+            <div className=" w-1/2 flex justify-between">
+              {" "}
+              <h2 class="m-0 h-[2.25rem] relative text-inherit tracking-[0.02em] font-semibold font-inherit flex items-center mq450:text-[1.19rem]">
+                Containers
+              </h2>
+              <div class="h-[2.5rem] w-[18.56rem] rounded-xl bg-white box-border flex flex-row items-start justify-start py-[0.69rem] px-[0.75rem] relative gap-[1.31rem] border-[1px] border-solid border-stroke">
+                <input
+                  class="w-[7.5rem] [border:none] [outline:none] font-poppins text-[0.75rem] bg-[transparent] h-[1.13rem] absolute my-0 mx-[!important] top-[0.69rem] left-[3.19rem] text-bodytext-50 text-left flex items-center z-[1]"
+                  placeholder="Search "
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                />
+
+                <img
+                  class="h-[45%] w-[6.06%] absolute my-0 mx-[!important] top-[27.5%] right-[89.87%] bottom-[27.5%] left-[4.07%] max-w-full overflow-hidden max-h-full z-[1]"
+                  alt=""
+                  src={search}
+                />
+              </div>
+            </div>
+            <div class="flex flex-row items-start justify-start gap-[1.38rem] max-w-full text-right text-[0.75rem] mq450:flex-wrap">
+              {!user ||
+                (user.role !== "Project Manager" && (
+                  <>
+                    {" "}
+                    <Link
+                      to="/addNewContainer"
+                      class="cursor-pointer h-[2.5rem] no-underline [border:none] py-[0.38rem] pr-[1.38rem] pl-[1.81rem] bg-coral-100 rounded-3xs flex flex-row items-center justify-end whitespace-nowrap hover:bg-chocolate-100"
+                    >
+                      <div class="relative text-[0.94rem] leading-[1.25rem] font-semibold font-poppins text-white text-left z-[1]">
+                        Add New
+                      </div>
+                    </Link>
+                  </>
+                ))}
+
+              <div class="flex w-[200px]  flex-row items-start justify-start gap-[0.25rem]">
+                <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.56rem] pl-[0.5rem] gap-[0.38rem]">
+                  <div class="relative font-medium">
+                    <DateRangePicker
+                      onChange={handleDateRangeChange}
+                      editable={false}
+                      placement="bottomEnd"
+                      direction="vertical"
+                      placeholder="Select Date"
+                      renderValue={([start, end]) => {
+                        return (
+                          format(start, "MMM d") + " - " + format(end, "MMM d")
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="self-stretch flex flex-col mt-10 items-end justify-start gap-[0.5rem]  max-w-full">
+            <div className="w-[68.31rem] relative text-[1.13rem] pb-0 tracking-[-0.02em] capitalize font-medium font-poppins text-black whitespace-pre-wrap text-left inline-block max-w-full">
+              <div className="flex justify-between pr-4">
+                <p>Container ID</p>
+                <p>Name</p>
+                <p className="ml-2">Created</p>
+                <p className="pl-2">Status</p>
+                <p className="pl-5 pr-3">Users</p>
+                {/* {!user || */}
+                {/* (user.role !== "Developer" && ( */}
+                <>
+                  <p>IsActive</p>
+                  <p className="pr-1">Edit</p>
+                  <p className="d-flex justify-end pr-5">Action</p>
+                </>
+                {/* ))} */}
+              </div>
+            </div>
+
+            <div className="w-full space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
+              {filteredProjects.map((container) => (
+                <div
+                  key={container.id}
+                  className="self-stretch rounded-2xl bg-white box-border flex items-center justify-between py-[1rem] pr-[2.31rem] pl-[1.31rem] max-w-full border-[1px] border-solid border-whitesmoke"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <div className="text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
+                      {container.id}
+                    </div>
+                    <div className=" w-[100px] text-[0.88rem] ml-8 tracking-[-0.02em] font-poppins text-bodytext-50">
+                      {container.name.length > 13
+                        ? `${container.name.slice(0, 13)}...`
+                        : container.name}
+                    </div>
+                    <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                      {formatDate(container.created_at)}
+                    </div>
+                    <div className="text-[0.88rem] d-flex justify-content-center w-[100px]  tracking-[-0.02em] font-poppins text-bodytext-50">
+                      <button className="cursor-pointer py-[0.31rem] pl-[0.69rem] bg-[transparent] rounded-3xs flex items-center justify-center border-[1px] border-solid border-coral-100 hover:bg-chocolate-200 hover:border-chocolate-100">
+                        <div className="text-[0.88rem] flex items-center justify-center leading-[1.25rem] font-manrope text-coral-100">
+                          {container.status}
+                        </div>
+                      </button>
+                    </div>
+                    <div className="flex items-center">
+                      <List
+                        component="nav"
+                        aria-label="Device settings"
+                        sx={{ bgcolor: "background.paper" }}
+                      >
+                        <ListItemButton
+                          id="lock-button"
+                          aria-haspopup="listbox"
+                          aria-controls="lock-menu"
+                          aria-label="when device is locked"
+                          aria-expanded={open ? "true" : undefined}
+                          onClick={(event) =>
+                            handleClickListItem(event, container.id)
+                          } // Pass event and projectId
+                        >
+                          <img
+                            className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                            loading="lazy"
+                            alt=""
+                            src={p3}
+                          />
+                          <img
+                            className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                            loading="lazy"
+                            alt=""
+                            src={p2}
+                          />
+                          <img
+                            className="self-stretch ml-[-10px] h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
+                            loading="lazy"
+                            alt=""
+                            src={p4}
+                          />
+                        </ListItemButton>
+                      </List>
+                      <Menu
+                        id="lock-menu"
+                        anchorEl={anchorEl}
+                        open={open}
+                        onClose={handleClose}
+                        MenuListProps={{
+                          "aria-labelledby": "lock-button",
+                          role: "listbox",
+                          className:
+                            "bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto",
+                        }}
+                      >
+                        {!users ||
+                          users.length == 0 ||
+                          users.every((user) => !user.isContainerAssign) ? (
+                          <MenuItem disabled>No users found</MenuItem>
+                        ) : (
+                          users.map((user, index) =>
+                            // Assuming the condition for not showing isContainerAssign is false
+                            !user.isContainerAssign ? null : (
+                              <MenuItem
+                                key={index}
+                                disabled={index === 0}
+                                selected={index === selectedIndex}
+                                onClick={(event) =>
+                                  handleMenuItemClick(event, index)
+                                }
+                                className="px-4 py-3 flex items-center"
+                              >
+                                <div className="mr-4">
+                                  {user.profilePic ? (
+                                    <img
+                                      className="h-12 w-12 rounded-full"
+                                      src={user.profilePic}
+                                      alt=""
+                                    />
+                                  ) : (
+                                    <span className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                      <img
+                                        className="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center"
+                                        loading="lazy"
+                                        alt=""
+                                        src={p2}
+                                      />
+                                    </span>
+                                  )}
+                                </div>
+                                <div>
+                                  <ListItemText
+                                    primary={`User ID: ${user.id}`}
+                                    className="text-gray-800 mb-1"
+                                  />
+                                  <ListItemText
+                                    primary={`Name: ${user.name}`}
+                                    className="text-gray-600 text-sm"
+                                  />
+                                </div>
+                              </MenuItem>
+                            )
+                          )
+                        )}
+                      </Menu>
+                    </div>
+                    {/* {!user || */}
+                    {/* (user.role !== "Developer" && ( */}
+                    <>
+                      <div className=" tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <Form>
+                          <Form.Check
+                            type="switch"
+                            id={`custom-switch-${container.id}`}
+                            checked={container.isActive}
+                            onChange={() =>
+                              handleSwitchChange(
+                                container.id,
+                                container.isActive
+                              )
+                            }
+                          />
+                        </Form>
+                      </div>{" "}
+                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <button
+                          onClick={() => handleEditProject(container.id)}
+                          className="no-underline  bg-white"
+                        >
+                          <div class="flex flex-row items-center justify-center py-[0.63rem] pr-[0.69rem] pl-[0.94rem] relative z-[1]">
+                            <div class="h-full w-full absolute my-0 mx-[!important] top-[0rem] right-[0rem] bottom-[0rem] left-[0rem] rounded-xl bg-coral-200"></div>
+                            <div class="relative text-[1.13rem] leading-[1.5rem] font-font-awesome-6-pro text-coral-100 text-left z-[1]">
+                              
+                            </div>
+                          </div>
+                        </button>
+                      </div>{" "}
+                      <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                        <button
+                          className="bg-white"
+                          onClick={() => openPopup(container.id)}
+                        >
+                          <img
+                            class="h-[1.25rem] w-[1.28rem] relative z-[1]"
+                            alt=""
+                            src={threedots}
+                          />
+                        </button>
+                      </div>
+                    </>
+                    {/* ))} */}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
+
       </div>
     </div>
   );

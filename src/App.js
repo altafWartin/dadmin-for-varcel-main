@@ -35,25 +35,36 @@ import Resource from "./containers/Container/Resource.jsx";
 
 function App() {
   const [token, setToken] = useState("");
+  const [currentPath, setCurrentPath] = useState(""); // State to hold current path
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
+    // Retrieve token from localStorage
     const accessToken = localStorage.getItem("token");
     if (accessToken) {
       setToken(accessToken);
-    } else if (location.pathname !== "/login") {
+    } else {
+      // If token doesn't exist, navigate to login page
       navigate("/login");
     }
-  }, [location.pathname, navigate]); // Adding location.pathname and navigate as dependencies to re-run on path change
+
+    // Retrieve currentPath from localStorage
+    const storedPath = localStorage.getItem("currentPath");
+    if (storedPath) {
+      setCurrentPath(storedPath);
+    } else {
+      // If no stored path, set the current location pathname
+      setCurrentPath(location.pathname);
+    }
+  }, [navigate, location.pathname]);
+
+  // Save current path to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("currentPath", location.pathname);
+  }, [location.pathname]);
 
   const isLoginPage = location.pathname === "/login";
-
-  if (!token && !isLoginPage) {
-    return <Navigate to="/login" />;
-  } else if (token && isLoginPage) {
-    return <Navigate to="/dashboard" />;
-  }
 
   return (
     <div className="App flex flex-col min-h-screen">
@@ -62,18 +73,9 @@ function App() {
 
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/"
-          element={
-            token ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
-          }
-        />
+        <Route path="/" element={<Navigate to={currentPath} />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/workspace" element={<Workspace />} />
-        <Route
-          path="/workspace/editWorkspace/:workspaceId"
-          element={<EditWorkspace />}
-        />
         <Route path="/projects" element={<Projects />} />
         <Route path="/addNewProject" element={<AddProject />} />
         <Route

@@ -10,6 +10,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const EditContainer = () => {
+  const [projectId, setProjectId] = useState("");
   const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -27,7 +28,7 @@ const EditContainer = () => {
   console.log("containerId", containerId);
   const navigate = useNavigate();
 
-  console.log("id",id)
+  console.log("id", id)
   const notifyAddContainer = () => toast.success(message);
   const notifyError = () => toast.error(message);
 
@@ -58,6 +59,7 @@ const EditContainer = () => {
         // Assuming you have state variables like name, description, status, etc.
 
         // Populate input fields with container data
+        setProjectId(containerData.data.projectId || "");
         setId(containerData.data.id || "");
         setName(containerData.data.name || "");
         setDescription(containerData.data.description || "");
@@ -82,9 +84,9 @@ const EditContainer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     console.log("Form submitted");
-  
+
     const formData = {
       id,
       name,
@@ -98,11 +100,11 @@ const EditContainer = () => {
       endPoint,
     };
     console.log("Form data:", formData);
-  
+
     try {
       const token = localStorage.getItem("token");
       console.log("Token:", token);
-  
+
       const response = await fetch(
         "https://d-admin-backend.onrender.com/api/container/update-container",
         {
@@ -114,16 +116,16 @@ const EditContainer = () => {
           body: JSON.stringify(formData),
         }
       );
-  
+
       console.log("Response:", response);
-  
+
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
-  
+
       const data = await response.json();
       console.log("Data:", data);
-  
+
       setMessage(data.message);
       if (data.success === true) {
         notifyAddContainer();
@@ -138,7 +140,7 @@ const EditContainer = () => {
       // You can show an error message to the user
     }
   };
-  
+
 
   return (
     <div className=" bg-slate-100  pt-10 pl-[260px] h-[180vh]">
@@ -160,7 +162,7 @@ const EditContainer = () => {
               Edit Container
             </div>
           </div>
-       
+
         </div>
         <form
           onSubmit={handleSubmit}
@@ -200,6 +202,24 @@ const EditContainer = () => {
             </div>
           </div>
           <div class="self-stretch flex flex-col items-start justify-start gap-[0.5rem] max-w-full">
+            <div class="self-stretch  flex flex-row flex-wrap items-start justify-center gap-[2.69rem] max-w-full mq450:gap-[2.69rem]">
+              <div class="flex-1 w-[200px] flex flex-col items-start justify-center pt-[0.25rem] px-[0.5rem] pb-[1.13rem] box-border relative gap-[0.5rem] z-[3]">
+                <div class="center flex justify-center w-full">
+                  <div>
+                    <label
+                      for="first_name"
+                      class="block text-sm font-medium text-bodytext-50 dark:text-white"
+                    >
+                      PROJECT ID
+                    </label>
+
+                    <div class="bg-gray-50 border w-[300px] h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                      {projectId}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="self-stretch flex flex-row flex-wrap items-start justify-start gap-[2.69rem] max-w-full mq450:gap-[2.69rem]">
               <div class="flex-1  flex flex-col items-start justify-start pt-[0.25rem] px-[0.5rem] pb-[1.13rem] box-border relative gap-[0.5rem] min-w-[15.88rem] max-w-full z-[3]">
                 <label

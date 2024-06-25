@@ -141,51 +141,51 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isSubmitting} // Pass the event object to handleLogin
-                className=" w-full no-underline cursor-pointer border-none p-2 bg-orange rounded-lg flex items-center justify-center box-border max-w-full whitespace-nowrap hover:bg-chocolate"
+                className=" w-full no-underline mt-12 cursor-pointer border-none p-2 bg-orange rounded-lg flex items-center justify-center box-border max-w-full whitespace-nowrap hover:bg-chocolate"
               >
                 <div className="h-10 w-full relative rounded-lg bg-coral hidden"></div>
                 <div className="relative text-lg leading-10 capitalize font-semibold font-poppins text-white text-left">
                   Sign In
                 </div>
               </button>
-              <div className="w-full flex flex-col items-center justify-center">
-                <div className=" w-full flex flex-row items-end justify-center pt-3 pb-1 box-border">
-                  <button className="cursor-pointer py-2 pr-3 pl-4 bg-transparent flex-1 rounded-lg box-border flex items-center justify-center gap-2 max-w-full whitespace-nowrap border-1 border-solid border-darkslategray-200 hover:bg-dimgray-400 hover:border-dimgray-300">
-                    <img
-                      className="h-6 w-6 relative object-cover min-h-6"
-                      alt=""
-                      src={google}
-                    />
-                    <div className=" w-full relative text-sm leading-5 font-medium font-poppins text-dimgray-200 text-left">
-                      Sign In with Google
-                    </div>
-                  </button>
-                </div>
-                <div className=" w-full flex flex-row items-end justify-center pt-3 pb-1 box-border">
-                  <button className="cursor-pointer py-2 pr-3 pl-4 bg-transparent flex-1 rounded-lg box-border flex items-center justify-center gap-2 max-w-full whitespace-nowrap border-1 border-solid border-darkslategray-200 hover:bg-dimgray-400 hover:border-dimgray-300">
-                    <img
-                      className="h-6 w-6 relative object-cover min-h-6"
-                      alt=""
-                      src={twitter}
-                    />
-                    <div className=" w-full relative text-sm leading-5 font-medium font-poppins text-dimgray-200 text-left">
-                      Sign In with Twitter
-                    </div>
-                  </button>
-                </div>
-              </div>
+              {/* <div className="w-full flex flex-col items-center justify-center"> */}
+                {/* <div className=" w-full flex flex-row items-end justify-center pt-3 pb-1 box-border"> */}
+                  {/* <button className="cursor-pointer py-2 pr-3 pl-4 bg-transparent flex-1 rounded-lg box-border flex items-center justify-center gap-2 max-w-full whitespace-nowrap border-1 border-solid border-darkslategray-200 hover:bg-dimgray-400 hover:border-dimgray-300"> */}
+                    {/* <img */}
+                      {/* className="h-6 w-6 relative object-cover min-h-6" */}
+                      {/* alt="" */}
+                      {/* src={google} */}
+                    {/* /> */}
+                    {/* <div className=" w-full relative text-sm leading-5 font-medium font-poppins text-dimgray-200 text-left"> */}
+                      {/* Sign In with Google */}
+                    {/* </div> */}
+                  {/* </button> */}
+                {/* </div> */}
+                {/* <div className=" w-full flex flex-row items-end justify-center pt-3 pb-1 box-border"> */}
+                  {/* <button className="cursor-pointer py-2 pr-3 pl-4 bg-transparent flex-1 rounded-lg box-border flex items-center justify-center gap-2 max-w-full whitespace-nowrap border-1 border-solid border-darkslategray-200 hover:bg-dimgray-400 hover:border-dimgray-300"> */}
+                    {/* <img */}
+                      {/* className="h-6 w-6 relative object-cover min-h-6" */}
+                      {/* alt="" */}
+                      {/* src={twitter} */}
+                    {/* /> */}
+                    {/* <div className=" w-full relative text-sm leading-5 font-medium font-poppins text-dimgray-200 text-left"> */}
+                      {/* Sign In with Twitter */}
+                    {/* </div> */}
+                  {/* </button> */}
+                {/* </div> */}
+              {/* </div> */}
             </div>
-            <div className="w-full mt-3 flex flex-row items-start justify-start gap-1">
-              <div className="text-sm leading-5 font-poppins text-dimgray-200 text-left">
-                Already have an Account?
-              </div>
-              <Link
-                to="/signUp"
-                className="text-sm leading-5 font-medium font-poppins text-coral text-left"
-              >
-                SignUp
-              </Link>
-            </div>
+            {/* <div className="w-full mt-3 flex flex-row items-start justify-start gap-1"> */}
+              {/* <div className="text-sm leading-5 font-poppins text-dimgray-200 text-left"> */}
+                {/* Already have an Account? */}
+              {/* </div> */}
+              {/* <Link */}
+                {/* to="/signUp" */}
+                {/* className="text-sm leading-5 font-medium font-poppins text-coral text-left" */}
+              {/* > */}
+                {/* SignUp */}
+              {/* </Link> */}
+            {/* </div> */}
           </form>
         )}
       </Formik>

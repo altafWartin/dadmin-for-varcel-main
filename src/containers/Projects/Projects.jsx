@@ -563,9 +563,10 @@ const Projects = () => {
           <div className="self-stretch flex flex-col mt-10 items-end justify-start gap-[0.5rem]  max-w-full">
             <div className="w-[68.31rem] relative text-[1.13rem] pb-0 tracking-[-0.02em] capitalize font-medium font-poppins text-black whitespace-pre-wrap text-left inline-block max-w-full">
               <div className="flex justify-between pr-4">
-                <p>Project's ID</p>
+                <p className="">Project's ID</p>
                 <p>Name</p>
-                <p className="ml-2">Created</p>
+                <p className="">Start Date</p>
+                <p className="">End Date</p>
                 <p className="pl-5 pr-3">Users</p>
                 {!user ||
                   (user.role !== "Developer" && (
@@ -594,7 +595,10 @@ const Projects = () => {
                         : project.name}
                     </div>
                     <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
-                      {formatDate(project.created_at)}
+                      {formatDate(project.startDate)}
+                    </div>
+                    <div className="text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50">
+                      {formatDate(project.endDate)}
                     </div>
 
                     <div className="flex items-center">

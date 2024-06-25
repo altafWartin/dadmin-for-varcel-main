@@ -17,6 +17,8 @@ const EditWorkspace = () => {
   // Static fields state
   // Static fields state
   const [name, setName] = useState("");
+  const [projectId, setProjectId] = useState("");
+
   const [description, setDescription] = useState("");
   const [source, setSource] = useState("");
   const [dynamicData, setDynamicData] = useState([]);
@@ -60,6 +62,7 @@ const EditWorkspace = () => {
         console.log("Edit project response:", data.data);
 
         // Update static fields state
+        setProjectId(data.data.projectId );
         setName(data.data.name);
         setDescription(data.data.description);
         setSource(data.data.source);
@@ -369,6 +372,24 @@ const EditWorkspace = () => {
               </div>
             </div>
             <div class="self-stretch flex flex-col items-start justify-start gap-[0.5rem] max-w-full">
+            <div class="self-stretch  flex flex-row flex-wrap items-start justify-center gap-[2.69rem] max-w-full mq450:gap-[2.69rem]">
+              <div class="flex-1 w-[200px] flex flex-col items-start justify-center pt-[0.25rem] px-[0.5rem] pb-[1.13rem] box-border relative gap-[0.5rem] z-[3]">
+                <div class="center flex justify-center w-full">
+                  <div>
+                    <label
+                      for="first_name"
+                      class="block text-sm font-medium text-bodytext-50 dark:text-white"
+                    >
+                      PROJECT ID
+                    </label>
+
+                    <div class="bg-gray-50 border w-[300px] h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                      {projectId}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
               <div class="self-stretch flex flex-row flex-wrap items-start justify-start gap-[2.69rem] max-w-full mq450:gap-[2.69rem]">
                 <div class="flex-1  flex flex-col items-start justify-start pt-[0.25rem] px-[0.5rem] pb-[1.13rem] box-border relative gap-[0.5rem] min-w-[15.88rem] max-w-full z-[3]">
                   <label

@@ -56,6 +56,7 @@ const AddImage = () => {
     formData.append("repository", repository);
     formData.append("file", selectedFile);
 
+    console.log(formData);
     try {
       const token = localStorage.getItem("token"); // Retrieve token from localStorage
       const headers = {
@@ -74,7 +75,7 @@ const AddImage = () => {
       if (response.ok) {
         const data = await response.json();
         console.log("Image uploaded successfully:", data);
-        navigate("/container");
+        // navigate("/container");
         // Handle success (e.g., show a success message, clear the form, etc.)
       } else {
         const errorData = await response.json();
