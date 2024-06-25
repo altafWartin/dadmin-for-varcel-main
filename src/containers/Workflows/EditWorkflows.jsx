@@ -1,20 +1,67 @@
 import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.svg";
-
-import calendar from "../../assets/Icon/calendar.svg";
-import arrowdown from "../../assets/Icon/arrowdown.svg";
-import setting from "../../assets/Icon/setting.svg";
 import close from "../../assets/Icon/close.png";
-
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 
 const EditWorkflow = () => {
+  const { workflowId } = useParams();
   const [projectId, setProjectId] = useState("");
-
   const [paramCount, setParamCount] = useState(0);
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [labelName, setLabelName] = useState("");
   const [labelNames, setLabelNames] = useState([]);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [dynamicFields, setDynamicFields] = useState([]);
+
+  useEffect(() => {
+    const fetchWorkflowById = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `https://d-admin-backend.onrender.com/api/workflow/get-workflow/${workflowId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await response.json();
+        console.log("Edit project response:", data.data);
+
+        // Update static fields state
+        setProjectId(data.data.projectId);
+        setName(data.data.name);
+        setDescription(data.data.description);
+
+        // Assuming dynamicFields is an array of objects where each object represents a dynamic field
+        // Update dynamic fields state
+        const updatedDynamicFields = data.data.dynamicData.map((field) => ({
+          key: field.key,
+          value: field.value,
+          // Add more properties as needed
+        }));
+        // setDynamicFields(updatedDynamicFields);
+        // setDynamic(updatedDynamicFields)
+        // setDynamicData(updatedDynamicFields)
+      } catch (error) {
+        console.error("Error fetching workspace:", error);
+        // Handle errors or show an error message to the user
+      }
+    };
+
+    if (workflowId) {
+      fetchWorkflowById();
+    }
+  }, [workflowId]);
+
+
+
+
+
 
   const openPopup = () => {
     setPopupOpen(true);
@@ -51,6 +98,63 @@ const EditWorkflow = () => {
     console.log(labelName, "labelName");
     console.log(labelNames, "labelNames");
   }, [labelName, labelNames]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      console.log("Form submitted");
+
+      // Get form input values
+      const id = workflowId;
+      const nameValue = name;
+      const descriptionValue = description;
+
+
+      // Assuming dynamicData is an array of objects containing key-value pairs
+      const dynamicDataValue = dynamicFields.map((field) => ({
+        key: field.key,
+        value: field.value,
+        // Add more properties as needed
+      }));
+
+      // Log dynamicDataValue
+      console.log("Dynamic data:", dynamicDataValue);
+
+      // Check if dynamicDataValue is not empty before sending the request
+      if (dynamicDataValue.length === 0) {
+        throw new Error("Dynamic Data Value cannot be empty.");
+      }
+
+      // Prepare the body data for the POST request
+      const bodyData = {
+        id: id,
+        name: nameValue,
+        description: descriptionValue,
+
+        dynamicData: dynamicDataValue,
+      };
+      console.log("Body data:", bodyData); // Log the body data for debugging
+
+      // Send the POST request
+      const response = await fetch(
+        "https://d-admin-backend.onrender.com/api/workspace/update-workspace",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(bodyData),
+        }
+      );
+
+      // Parse the response JSON
+      const data = await response.json();
+      console.log("Response data:", data); // Handle response data here
+    } catch (error) {
+      console.error("Error:", error.message);
+    }
+  };
 
   return (
     <div className="containerBody">
@@ -117,7 +221,7 @@ const EditWorkflow = () => {
           </div>
 
         </div>
-        <form class="m-0 w-[57.44rem] rounded-3xl bg-white flex flex-col items-center justify-start pt-[2.13rem] pb-[2.75rem] pr-[2.81rem] pl-[2.75rem] box-border relative gap-[1.56rem] max-w-full z-[2] mq1050:pl-[1.38rem] mq1050:pr-[1.38rem] mq1050:box-border mq750:pt-[1.38rem] mq750:pb-[1.81rem] mq750:box-border">
+        <form onSubmit={handleSubmit} class="m-0 w-[57.44rem] rounded-3xl bg-white flex flex-col items-center justify-start pt-[2.13rem] pb-[2.75rem] pr-[2.81rem] pl-[2.75rem] box-border relative gap-[1.56rem] max-w-full z-[2] mq1050:pl-[1.38rem] mq1050:pr-[1.38rem] mq1050:box-border mq750:pt-[1.38rem] mq750:pb-[1.81rem] mq750:box-border">
           <div class="w-[24.44rem] h-[5.13rem] relative hidden max-w-full z-[0]">
             <div class="absolute w-full top-[1.81rem] right-[0rem] left-[0rem] rounded-lg box-border h-[3.13rem] border-[1px] border-solid border-darkslategray-300"></div>
             <div class="absolute top-[3.31rem] right-[1rem] w-[1rem] h-[0.63rem]">
@@ -181,6 +285,8 @@ const EditWorkflow = () => {
                 <input
                   type="text"
                   id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                   placeholder="Name"
                   required
@@ -195,7 +301,9 @@ const EditWorkflow = () => {
                 </label>
                 <input
                   type="text"
-                  id="name"
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   class="bg-gray-50 border  h-[3.13rem] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                   placeholder="Description"
                   required
@@ -220,7 +328,7 @@ const EditWorkflow = () => {
                   <div className="flex items-center w-full">
                     <input
                       type="text"
-                      // id={labelNames[index]} // You can set the id if needed
+                      id={labelNames[index]} // You can set the id if needed
                       className="bg-gray-50 border h-[3.13rem] capitalize border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-coral-100 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                       placeholder={labelNames[index]}
                       required
