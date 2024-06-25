@@ -88,6 +88,10 @@ function App() {
           path="/workflow/editWorkflow/:workflowId"
           element={<EditWorkflow />}
         />
+        <Route
+          path="/workspace/editWorkspace/:workspaceId"
+          element={<EditWorkspace />}
+        />
         <Route path="/addNewWorkflow" element={<AddNewWorkflow />} />
         <Route path="/container" element={<Resource />} />
         <Route path="/addNewContainer" element={<AddNewContainer />} />
