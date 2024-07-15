@@ -119,7 +119,7 @@ const EditWorkflow = () => {   const apiUrl = process.env.REACT_APP_API_URL;
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(bodyData),
+          body: JSON.stringify(bodyData),    
         }
       );
 
