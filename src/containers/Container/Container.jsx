@@ -42,6 +42,8 @@ const formatDate = (dateString) => {
 };
 
 const Container = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [containers, setContainers] = useState([]);
   const [projects, setProjects] = useState([]);
   const [shouldFetchData, setShouldFetchData] = useState(true);
@@ -105,7 +107,6 @@ const Container = () => {
     }
   };
 
-  const apiUrl = "https://d-admin-backend.onrender.com";
 
   const notifyAssign = (message) => {
     toast.success(` ${message}`);
@@ -170,7 +171,7 @@ const Container = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/images/delete-image/${imageId}`,
+        `${apiUrl}/api/images/delete-image/${imageId}`,
         {
           method: "DELETE",
           headers: {
@@ -223,7 +224,7 @@ const Container = () => {
     const token = localStorage.getItem("token");
     try {
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/container/get-assign-container/${projectId}`, // corrected URL interpolation
+        `${apiUrl}/api/container/get-assign-container/${projectId}`, // corrected URL interpolation
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -343,7 +344,7 @@ const Container = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/container/delete-container/${selectedProjectId}`,
+        `${apiUrl}/api/container/delete-container/${selectedProjectId}`,
         {
           method: "DELETE",
           headers: {
@@ -447,7 +448,7 @@ const Container = () => {
 
     try {
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/container/assign-container",
+        `${apiUrl}/api/container/assign-container`,
         {
           method: "POST",
           headers: {
@@ -488,14 +489,13 @@ const Container = () => {
 
     const token = localStorage.getItem("token");
     const newIsActive = !currentIsActive; // Flip the currentIsActive value
-    const apiUrl = `https://d-admin-backend.onrender.com/api/container/change-active-inactive`;
     const requestBody = JSON.stringify({
       id: containerId,
       isActive: newIsActive,
     });
     console.log("requestBody", requestBody);
 
-    fetch(apiUrl, {
+    fetch(`${apiUrl}/api/container/change-active-inactive`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

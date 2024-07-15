@@ -11,6 +11,8 @@ import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 import FileUpload from "../../assets/Icon/FileUpload.svg";
 
 const EditImage = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [id, setId] = useState("");
   const [imageName, setImageName] = useState("");
   const [imageTag, setImageTag] = useState("");
@@ -28,7 +30,7 @@ const EditImage = () => {
     const fetchImageData = async () => {
       try {
         const response = await fetch(
-          `https://d-admin-backend.onrender.com/api/images/get-image/${imageId}`,
+          `${apiUrl}/api/images/get-image/${imageId}`,
           {
             headers: {
               Authorization: `Bearer ${storedToken}`,
@@ -90,7 +92,7 @@ const EditImage = () => {
       };
 
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/images/update-images",
+        `${apiUrl}/api/images/update-images`,
         {
           method: "PATCH",
           headers: headers, // Add the headers to the request
@@ -132,7 +134,7 @@ const EditImage = () => {
               Add Image
             </div>
           </div>
-      
+
         </div>
         <form
           onSubmit={handleSubmit}

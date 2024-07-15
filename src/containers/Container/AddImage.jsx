@@ -11,6 +11,8 @@ import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 import FileUpload from "../../assets/Icon/FileUpload.svg";
 
 const AddImage = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [previewImage, setPreviewImage] = useState(null);
   const [imageName, setImageName] = useState("");
   const [imageTag, setImageTag] = useState("");
@@ -64,7 +66,7 @@ const AddImage = () => {
       };
 
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/images/add-images",
+        `${apiUrl}/api/images/add-images`,
         {
           method: "POST",
           headers: headers, // Add the headers to the request

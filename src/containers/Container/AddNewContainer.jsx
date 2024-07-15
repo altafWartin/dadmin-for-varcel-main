@@ -9,7 +9,8 @@ import { FormControl, Select, MenuItem } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const AddNewContainer = () => {
+const AddNewContainer = () => {  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [image, setImage] = useState("");
@@ -36,7 +37,6 @@ const AddNewContainer = () => {
     setSeletedImageId(event.target.value);
   };
 
-  const apiUrl = "https://d-admin-backend.onrender.com";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,7 +135,7 @@ const AddNewContainer = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/container/add-container",
+        `${apiUrl}/api/container/add-container`,
         {
           method: "POST",
           headers: {

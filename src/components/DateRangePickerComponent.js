@@ -8,7 +8,6 @@ import format from "date-fns/format";
 import "rsuite/DateRangePicker/styles/index.css";
 
 const CustomDateRangePicker = ({ onChange, isDropdownOpen }) => {
-  console.log("navbar", onChange, isDropdownOpen);
   return (
     <div
       className={`flex w-[200px] flex-row items-start justify-start gap-[0.25rem] ${

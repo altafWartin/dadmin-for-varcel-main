@@ -11,7 +11,8 @@ import arrowdown from "../../assets/Icon/arrowdown.svg";
 import setting from "../../assets/Icon/setting.svg";
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 
-const EditMemberInfo = () => {
+const EditMemberInfo = () => {  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [token, setToken] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +33,7 @@ const EditMemberInfo = () => {
       }
       try {
         const response = await fetch(
-          `https://d-admin-backend.onrender.com/api/user/get-member/${memberId}`,
+          `${apiUrl}/api/user/get-member/${memberId}`,
           {
             method: "GET",
             headers: {
@@ -76,7 +77,7 @@ const EditMemberInfo = () => {
       }
 
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/user/update-member`,
+        `${apiUrl}/api/user/update-member`,
         {
           method: "PATCH",
           headers: {

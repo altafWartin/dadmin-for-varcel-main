@@ -25,7 +25,8 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${date}`;
 };
 
-const Settings = () => {
+const Settings = () => {   const apiUrl = process.env.REACT_APP_API_URL;
+
   const [members, setMembers] = useState([]);
   const [token, setToken] = useState("");
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ const Settings = () => {
     console.log("Logged-in user details:", loggedInUser);
 
     fetch(
-      "https://d-admin-backend.onrender.com/api/user/all-member?page=1&limit=300",
+      `${apiUrl}/api/user/all-member?page=1&limit=300`,
       {
         headers: {
           Authorization: `Bearer ${token}`, // Include the token in the Authorization header
@@ -86,7 +87,7 @@ const Settings = () => {
 
     // Call the API to update the active status
     fetch(
-      "https://d-admin-backend.onrender.com/api/user/change-active-inactive",
+      `${apiUrl}/api/user/change-active-inactive`,
       {
         method: "PATCH",
         headers: {
@@ -121,7 +122,7 @@ const Settings = () => {
     const token = localStorage.getItem("token");
 
     fetch(
-      `https://d-admin-backend.onrender.com/api/user/delete-member/${memberId}`,
+      `${apiUrl}/api/user/delete-member/${memberId}`,
       {
         method: "DELETE",
         headers: {

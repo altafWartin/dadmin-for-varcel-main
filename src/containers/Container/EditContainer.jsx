@@ -9,7 +9,8 @@ import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const EditContainer = () => {
+const EditContainer = () => {  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [projectId, setProjectId] = useState("");
   const [id, setId] = useState("");
   const [name, setName] = useState("");
@@ -42,7 +43,7 @@ const EditContainer = () => {
     const fetchContainerData = async () => {
       try {
         const response = await fetch(
-          `https://d-admin-backend.onrender.com/api/container/get-container/${containerId}`, // Assuming 2 is the container ID
+          `${apiUrl}/api/container/get-container/${containerId}`, // Assuming 2 is the container ID
           {
             headers: {
               Authorization: `Bearer ${storedToken}`,
@@ -106,7 +107,7 @@ const EditContainer = () => {
       console.log("Token:", token);
 
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/container/update-container",
+        `${apiUrl}/api/container/update-container`,
         {
           method: "PATCH",
           headers: {

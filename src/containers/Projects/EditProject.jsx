@@ -16,6 +16,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const EditProject = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [id, setId] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -42,7 +44,7 @@ const EditProject = () => {
     const fetchProjectData = async () => {
       try {
         const response = await fetch(
-          `https://d-admin-backend.onrender.com/api/project/get-project/${projectId}`,
+          `${apiUrl}/api/project/get-project/${projectId}`,
           {
             headers: {
               Authorization: `Bearer ${storedToken}`,
@@ -108,7 +110,7 @@ const EditProject = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/project/update-project",
+        `${apiUrl}/api/project/update-project`,
         {
           method: "PATCH",
           headers: {

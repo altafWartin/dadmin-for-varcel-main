@@ -16,6 +16,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const AddProject = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -58,7 +60,7 @@ const AddProject = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/project/add-project",
+        `${apiUrl}/api/project/add-project`,
         {
           method: "POST",
           headers: {

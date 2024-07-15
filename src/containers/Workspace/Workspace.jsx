@@ -38,6 +38,8 @@ const formatDate = (dateString) => {
 };
 
 const Workspace = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [containers, setContainers] = useState([]);
   const [projects, setProjects] = useState([]);
   const [shouldFetchData, setShouldFetchData] = useState(true);
@@ -76,7 +78,6 @@ const Workspace = () => {
   };
   const user = JSON.parse(localStorage.getItem("user")); // Retrieve user from localStorage
 
-  const apiUrl = "https://d-admin-backend.onrender.com";
 
   const notifyAssign = (message) => {
     toast.success(` ${message}`);
@@ -203,7 +204,7 @@ const Workspace = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/workspace/delete-workspace/${selectedProjectId}`,
+        `${apiUrl}/api/workspace/delete-workspace/${selectedProjectId}`,
         {
           method: "DELETE",
           headers: {
@@ -307,7 +308,7 @@ const Workspace = () => {
 
     try {
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/workspace/assign-workspace",
+        `${apiUrl}/api/workspace/assign-workspace`,
         {
           method: "POST",
           headers: {
@@ -627,16 +628,22 @@ const Workspace = () => {
               <div class="flex w-[200px]  flex-row items-start justify-start gap-[0.25rem]">
                 <div class="rounded-lg bg-white flex flex-row items-center justify-start py-[0.25rem] pr-[0.56rem] pl-[0.5rem] gap-[0.38rem]">
                   <div class="relative font-medium">
+                    <style>
+                      {`
+          .custom-date-range-picker .rs-picker-menu {
+            z-index: 1 !important;
+          }
+        `}
+                    </style>
                     <DateRangePicker
                       onChange={handleDateRangeChange}
                       editable={false}
                       placement="bottomEnd"
                       direction="vertical"
                       placeholder="Select Date"
+                      className="custom-date-range-picker"
                       renderValue={([start, end]) => {
-                        return (
-                          format(start, "MMM d") + " - " + format(end, "MMM d")
-                        );
+                        return format(start, 'MMM d') + ' - ' + format(end, 'MMM d');
                       }}
                     />
                   </div>
@@ -738,8 +745,8 @@ const Workspace = () => {
                         }}
                       >
                         {!users ||
-                        users.length == 0 ||
-                        users.every((user) => !user.isWorkspaceAssign) ? (
+                          users.length == 0 ||
+                          users.every((user) => !user.isWorkspaceAssign) ? (
                           <MenuItem disabled>No users found</MenuItem>
                         ) : (
                           users.map((user, index) =>

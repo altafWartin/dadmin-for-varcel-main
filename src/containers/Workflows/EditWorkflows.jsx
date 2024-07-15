@@ -4,7 +4,8 @@ import logo from "../../assets/logo.svg";
 import close from "../../assets/Icon/close.png";
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 
-const EditWorkflow = () => {
+const EditWorkflow = () => {   const apiUrl = process.env.REACT_APP_API_URL;
+
   const { workflowId } = useParams();
   const [projectId, setProjectId] = useState("");
   const [paramCount, setParamCount] = useState(0);
@@ -27,7 +28,7 @@ const EditWorkflow = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await fetch(
-          `https://d-admin-backend.onrender.com/api/workflow/get-workflow/${workflowId}`,
+          `${apiUrl}/api/workflow/get-workflow/${workflowId}`,
           {
             method: "GET",
             headers: {
@@ -108,9 +109,6 @@ const EditWorkflow = () => {
       };
 
       console.log("bodyData", bodyData);
-      if (dynamicFields.length === 0) {
-        throw new Error("Dynamic Data Value cannot be empty.");
-      }
 
       const token = localStorage.getItem("token");
       const response = await fetch(

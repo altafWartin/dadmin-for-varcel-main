@@ -15,7 +15,8 @@ import { FormControl, Select, MenuItem } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const AddNewWorkspace = () => {
+const AddNewWorkspace = () => {   const apiUrl = process.env.REACT_APP_API_URL;
+
   const [paramCount, setParamCount] = useState(0);
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [labelName, setLabelName] = useState("");
@@ -28,8 +29,6 @@ const AddNewWorkspace = () => {
   const handleRoleChange = (event) => {
     setSeletedProjectId(event.target.value);
   };
-
-  const apiUrl = "https://d-admin-backend.onrender.com";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,10 +134,7 @@ const AddNewWorkspace = () => {
       // Log dynamicDataValue
       console.log("Dynamic data:", dynamicDataValue);
   
-      // Check if dynamicDataValue is not empty before sending the request
-      if (dynamicDataValue.length === 0) {
-        throw new Error("Dynamic Data Value cannot be empty.");
-      }
+
   
       // Prepare the body data for the POST request
       const bodyData = {
@@ -149,12 +145,12 @@ const AddNewWorkspace = () => {
         provider: providersValue,
         projectId:seletedProjectId,
         ide: ideValue,
-        dynamicData: dynamicDataValue,
+        dynamicData: dynamicDataValue.length > 0 ? dynamicDataValue : [],
       };
   
       // Send the POST request
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/workspace/add-workspace",
+        `${apiUrl}/api/workspace/add-workspace`,
         {
           method: "POST",
           headers: {

@@ -11,6 +11,8 @@ import google from "../../assets/Icon/google.png";
 import twitter from "../../assets/Icon/twitter.png";
 
 const Login = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [formType, setFormType] = useState("signup");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,7 +46,7 @@ const Login = () => {
           console.log("Form values:", values); // Log form values
           try {
             const response = await fetch(
-              `https://d-admin-backend.onrender.com/api/user/login`,
+              `${apiUrl}/api/user/login`,
               {
                 method: "POST",
                 headers: {

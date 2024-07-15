@@ -16,6 +16,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const AddNewWorkflow = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [paramCount, setParamCount] = useState(0);
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [labelName, setLabelName] = useState("");
@@ -29,7 +31,6 @@ const AddNewWorkflow = () => {
     setSeletedProjectId(event.target.value);
   };
 
-  const apiUrl = "https://d-admin-backend.onrender.com";
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,11 +128,7 @@ const AddNewWorkflow = () => {
       // Log dynamicDataValue
       console.log("Dynamic data:", dynamicDataValue);
 
-      // Check if dynamicDataValue is not empty before sending the request
-      if (dynamicDataValue.length === 0) {
-        throw new Error("Dynamic Data Value cannot be empty.");
-      }
-
+   
       // Prepare the body data for the POST request
       const bodyData = {
         name: nameValue,
@@ -141,9 +138,11 @@ const AddNewWorkflow = () => {
       };
       console.log(bodyData);
 
+      console.log("apiUrl", apiUrl)
+
       // Send the POST request
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/workflow/add-workflow",
+        `${apiUrl}/api/workflow/add-workflow`,
         {
           method: "POST",
           headers: {
@@ -229,7 +228,7 @@ const AddNewWorkflow = () => {
                 Add Workflow
               </div>
             </div>
-   
+
           </div>
           <form
             onSubmit={handleSubmit}

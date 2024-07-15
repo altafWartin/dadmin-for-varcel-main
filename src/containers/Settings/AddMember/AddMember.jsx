@@ -16,6 +16,8 @@ import setting from "../../../assets/Icon/setting.svg";
 import ArrowRight from "../../../assets/Icon/ArrowRight.svg";
 
 const AddMember = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [token, setToken] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
   const roles = ["Admin", "Project Manager", "Developer"];
@@ -111,7 +113,7 @@ const AddMember = () => {
                 console.log("Form values:", values); // Log form values
                 try {
                   const response = await fetch(
-                    `https://d-admin-backend.onrender.com/api/user/add-member`,
+                    `${apiUrl}/api/user/add-member`,
                     {
                       method: "POST",
                       headers: {

@@ -38,7 +38,8 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${date}`;
 };
 
-const Workflow = () => {
+const Workflow = () => {   const apiUrl = process.env.REACT_APP_API_URL;
+
   const [containers, setContainers] = useState([]);
   const [projects, setProjects] = useState([]);
   const [shouldFetchData, setShouldFetchData] = useState(true);
@@ -77,8 +78,6 @@ const Workflow = () => {
       setShouldFetchData(true); // Set shouldFetchData to true after successful deletion
     }
   };
-
-  const apiUrl = "https://d-admin-backend.onrender.com";
 
   const notifyAssign = (message) => {
     toast.success(` ${message}`);
@@ -204,7 +203,7 @@ const Workflow = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/workflow/delete-workflow/${selectedProjectId}`,
+        `${apiUrl}/api/workflow/delete-workflow/${selectedProjectId}`,
         {
           method: "DELETE",
           headers: {
@@ -308,7 +307,7 @@ const Workflow = () => {
 
     try {
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/workflow/assign-workflow",
+        `${apiUrl}/api/workflow/assign-workflow`,
         {
           method: "POST",
           headers: {

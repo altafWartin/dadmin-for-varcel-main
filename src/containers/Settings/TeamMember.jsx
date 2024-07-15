@@ -89,7 +89,8 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${date}`;
 };
 
-const TeamMember = () => {
+const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
+
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [selectedButton, setSelectedButton] = useState("project");
   const [isAssignPopupOpen, setAssignPopupOpen] = useState(false);
@@ -140,7 +141,7 @@ const TeamMember = () => {
 
       try {
         const response = await fetch(
-          `https://d-admin-backend.onrender.com/api/user/get-member/${memberId}`,
+          `${apiUrl}/api/user/get-member/${memberId}`,
           { headers }
         );
 
@@ -173,7 +174,7 @@ const TeamMember = () => {
 
       try {
         const response = await fetch(
-          `https://d-admin-backend.onrender.com/api/setting/get-user-projects`,
+          `${apiUrl}/api/setting/get-user-projects`,
           {
             method: "POST",
             headers: {
@@ -205,7 +206,7 @@ const TeamMember = () => {
 
       try {
         const response = await fetch(
-          `https://d-admin-backend.onrender.com/api/setting/get-user-workspaces`,
+          `${apiUrl}/api/setting/get-user-workspaces`,
           {
             method: "POST",
             headers: {
@@ -237,7 +238,7 @@ const TeamMember = () => {
 
       try {
         const response = await fetch(
-          `https://d-admin-backend.onrender.com/api/setting/get-user-workflow`,
+          `${apiUrl}/api/setting/get-user-workflow`,
           {
             method: "POST",
             headers: {
@@ -269,7 +270,7 @@ const TeamMember = () => {
 
       try {
         const response = await fetch(
-          `https://d-admin-backend.onrender.com/api/setting/get-user-containers`,
+          `${apiUrl}/api/setting/get-user-containers`,
           {
             method: "POST",
             headers: {
@@ -300,7 +301,7 @@ const TeamMember = () => {
 
     try {
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/setting/get-assign-user-projects/${memberId}`,
+        `${apiUrl}/api/setting/get-assign-user-projects/${memberId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -335,7 +336,7 @@ const TeamMember = () => {
 
     try {
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/setting/get-assign-user-workspaces/${memberId}`,
+        `${apiUrl}/api/setting/get-assign-user-workspaces/${memberId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -370,7 +371,7 @@ const TeamMember = () => {
 
     try {
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/setting/get-assign-user-workflows/${memberId}`,
+        `${apiUrl}/api/setting/get-assign-user-workflows/${memberId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -403,7 +404,7 @@ const TeamMember = () => {
 
     try {
       const response = await fetch(
-        `https://d-admin-backend.onrender.com/api/setting/get-assign-user-containers/${memberId}`,
+        `${apiUrl}/api/setting/get-assign-user-containers/${memberId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -489,7 +490,7 @@ const TeamMember = () => {
 
     try {
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/setting/assign-projects-to-user",
+        `${apiUrl}/api/setting/assign-projects-to-user`,
         {
           method: "POST",
           headers: {
@@ -546,7 +547,7 @@ const TeamMember = () => {
 
     try {
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/setting/assign-workspaces-to-user",
+        `${apiUrl}/api/setting/assign-workspaces-to-user`,
         {
           method: "POST",
           headers: {
@@ -603,7 +604,7 @@ const TeamMember = () => {
 
     try {
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/setting/assign-workflows-to-user",
+        `${apiUrl}/api/setting/assign-workflows-to-user`,
         {
           method: "POST",
           headers: {
@@ -660,7 +661,7 @@ const TeamMember = () => {
 
     try {
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/setting/assign-containers-to-user",
+        `${apiUrl}/api/setting/assign-containers-to-user`,
         {
           method: "POST",
           headers: {

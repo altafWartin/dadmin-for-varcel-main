@@ -15,6 +15,8 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
 const ChangePassword = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -57,7 +59,7 @@ const ChangePassword = () => {
       const token = localStorage.getItem("token");
 
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/user/change-password",
+        `${apiUrl}/api/user/change-password`,
         {
           method: "PATCH",
           headers: {

@@ -16,6 +16,8 @@ import {
 } from "react-bootstrap";
 
 const Navbar = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
+
   const [file, setFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState("");
   const [loginUser, setLoginUser] = useState(null);
@@ -61,7 +63,7 @@ const Navbar = () => {
       console.log("Token found:", token);
 
       const response = await fetch(
-        "https://d-admin-backend.onrender.com/api/user/update-profile-pic",
+        `${apiUrl}/api/user/update-profile-pic`,
         {
           method: "PATCH",
           headers: {
@@ -144,14 +146,7 @@ const Navbar = () => {
       <header class="self-stretch z-2000  bg-white flex flex-row items-center justify-between py-[1rem] pr-[0.7rem] ml-[17.75rem] gap-[1.25rem] top-[0] z-[0] sticky text-left text-[0.88rem] text-text-100 font-poppins lg:pl-[1.38rem] lg:pr-[1.5rem] lg:box-border">
         <div class="h-[2.5rem] w-[18.56rem] "></div>
         <div class="flex flex-row items-center justify-start gap-[2rem] mq450:gap-[2rem]">
-          <div class="flex flex-row items-start justify-start gap-[1rem]">
-            <img
-              class="h-[2.5rem] w-[2.5rem] relative object-contain min-h-[2.5rem]"
-              loading="eager"
-              alt=""
-              src={Notification}
-            />
-          </div>
+
           <div className="flex flex-row items-center justify-start gap-[0.94rem]">
             <div className="flex flex-col items-end justify-start">
               <div className="flex items-center font-semibold">{fullName}</div>
@@ -180,31 +175,27 @@ const Navbar = () => {
                   variant="white"
                   id="dropdown-basic"
                 ></Dropdown.Toggle>
-                <Dropdown.Menu style={{ position: "absolute", zIndex: 999 }}>
-                  <DropdownItem
+                <Dropdown.Menu style={{ height: "60px", padding: "5px", position: "absolute", zIndex: 999 }}>
+                  <DropdownItem style={{ padding: "0px", }}
                     onClick={() => onClick("changePassword")}
                     eventKey={1}
                   >
                     Change Password
                   </DropdownItem>
-                  <DropdownItem
-                    onClick={() => onClick("updateProfile")}
-                    eventKey={2}
-                  >
-                    Update Profile
-                  </DropdownItem>
-                  <DropdownItem onClick={() => onClick("logout")} eventKey={3}>
+      
+                  <DropdownItem style={{ padding: "0px", }}
+                    onClick={() => onClick("logout")} eventKey={3}>
                     Logout
                   </DropdownItem>
                 </Dropdown.Menu>
               </Dropdown>
             </div>
 
-          
+
           </div>
           <div className="hidden">
 
-          <CustomDateRangePicker isDropdownOpen={isDropdownOpen}  />
+            <CustomDateRangePicker isDropdownOpen={isDropdownOpen} />
           </div>
         </div>
       </header>
