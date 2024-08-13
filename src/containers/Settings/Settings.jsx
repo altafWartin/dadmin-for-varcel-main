@@ -16,6 +16,7 @@ import clipboard from "../../assets/Icon/clipboard-text.svg";
 import clock from "../../assets/Icon/clock.svg";
 import ArrowRight from "../../assets/Icon/ArrowRight.svg";
 import file2 from "../../assets/Images/File 2.png";
+import EmailModal from './Mail/EmailModal';
 
 const formatDate = (dateString) => {
   const dateObject = new Date(dateString);
@@ -25,11 +26,35 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${date}`;
 };
 
-const Settings = () => {   const apiUrl = process.env.REACT_APP_API_URL;
+const Settings = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const [members, setMembers] = useState([]);
   const [token, setToken] = useState("");
   const navigate = useNavigate();
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [modalEmail, setModalEmail] = useState('');
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsButtonDisabled(false);
+    }, 10000);
+
+    return () => clearTimeout(timer); // Clean up the timer on component unmount
+  }, []);
+  const handleOpenModal = (email) => {
+    console.log('Modal opened', email);
+    setModalEmail(email);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
+
+
   const [shouldFetchData, setShouldFetchData] = useState(true);
   const notifyDelete = () => toast.success("User deleted successfully");
 
@@ -205,7 +230,7 @@ const Settings = () => {   const apiUrl = process.env.REACT_APP_API_URL;
               </Link>
               <Link class="team-members1 linkText">Team members</Link>
               {/* <Link to="/changePassword" class="change-password2 linkText"> */}
-                {/* change password */}
+              {/* change password */}
               {/* </Link> */}
             </div>
           </div>
@@ -214,51 +239,54 @@ const Settings = () => {   const apiUrl = process.env.REACT_APP_API_URL;
             <h3 class="team-members2">Team members</h3>
             <ul class="pl-0 space-y-3 overflow-y-auto scrollbar-thumb-dark-700 h-[450px]">
               {members.map((member) => (
-                <li key={member.id} class="user-detai flex mb-2 mr-5">
-                  <div className=" w-full flex justify-between gap-2">
-                    <div className="w-full flex justify-start">
-                      <div class="team-members-l">
+                <li key={member.id} className="w-[700px] user-detail flex mb-2 mr-5">
+                  <div className="w-full flex justify-between gap-2">
+                    <div className="flex justify-start">
+                      <div className="team-members-l">
                         <button
-                          class="no-underline flex bg-white text-gray-900"
+                          className="no-underline flex bg-white text-gray-900"
                           onClick={() => navigateToTeamMember(member.id)}
                         >
                           <img
-                            class="team-members-list-item mr-3"
+                            className="team-members-list-item mr-3"
                             loading="eager"
                             alt=""
                             src={file2}
                           />
-
-                          <div class="john-fred-group">
-                            <div class="john-fred1">{member.fullName}</div>
-                            <div class="johnfredgmailcom1">
-                              {member.email.length > 15
-                                ? `${member.email.slice(0, 12)}...`
-                                : member.email}
-                            </div>
+                          <div className="john-fred-group">
+                            <div className="john-fred1">{member.fullName}</div>
+                            <div className="johnfredgmailcom1">{member.role}</div>
                           </div>
                         </button>
                       </div>
                     </div>
-                    <div className="w-full  flex justify-end">
-                      <div className="w-[200px] bg-oraangelight h-[80%] flex items-center justify-center">
-                        <button className="flex items-center justify-center h-full w-full">
-                          <div className="project-manager">{member.role}</div>
-                        </button>
-                      </div>
-
+                    <div className="flex items-center">
+                      <button
+                        className="h-[60px] w-[40px] bg-white mx-3 d-flex justify-content-center align-items-center"
+                        onClick={() => handleOpenModal(member.email)}
+                        disabled={isButtonDisabled}
+                        style={{ 
+                          cursor: isButtonDisabled ? 'not-allowed' : 'pointer' 
+                        }}
+                      >
+                        <i
+                          className="bi bi-envelope-arrow-up text-orange"
+                          style={{ fontSize: '24px' }}
+                        ></i>
+                      </button>
+                      <EmailModal isOpen={isModalOpen} onClose={handleCloseModal} email={modalEmail} />
                       <button
                         onClick={() => handleDeleteMember(member.id)}
-                        className=" h-[60px] w-[]60px] mx-3 mt-2 bg-white d-flex justify-content-center align-items-center"
+                        className="h-[60px] w-[40px] mx-3 bg-white d-flex justify-content-center align-items-center"
                       >
                         <img
-                          class="delete-icon justify-content-center align-items-center"
+                          className="delete-icon"
                           loading="eager"
                           alt=""
                           src={Deleteiconn}
                         />
                       </button>
-                      <div class=" w-[100px] toggle-button mx-8 d-flex justify-content-center align-items-center">
+                      <div className="w-[100px] toggle-button mx-8 d-flex justify-content-center align-items-center">
                         <Form className="content-center">
                           <Form.Check
                             type="switch"
@@ -271,11 +299,11 @@ const Settings = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                         </Form>
                       </div>
                       <button
-                        className=" h-[60px] w-[]60px] mx-3 mt-2 bg-white d-flex justify-content-center align-items-center"
+                        className="h-[60px] w-[40px] mx-3 bg-white d-flex justify-content-center align-items-center"
                         onClick={() => handleEditClick(member.id)}
                       >
                         <img
-                          className="delete-icon justify-content-end align-items-center "
+                          className="delete-icon"
                           loading="eager"
                           alt=""
                           src={EditButton}
@@ -284,6 +312,8 @@ const Settings = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                     </div>
                   </div>
                 </li>
+
+
               ))}
             </ul>
           </div>

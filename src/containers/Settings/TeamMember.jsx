@@ -89,7 +89,8 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${date}`;
 };
 
-const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
+const TeamMember = () => {
+  const apiUrl = process.env.REACT_APP_API_URL;
 
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [selectedButton, setSelectedButton] = useState("project");
@@ -165,8 +166,8 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
 
     fetchData();
   }, [memberId]);
- 
-  console.log(memberData,"Member")
+
+  console.log(memberData, "Member")
 
   useEffect(() => {
     const fetchProjects = async (memberId) => {
@@ -735,7 +736,7 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
         <h2 class="settings10">Settings</h2>
         <img class="date-text-icon1" alt="" src={ArrowRight} />
 
-      
+
         <div class="team-members">Team Member Information</div>
       </div>
       <div class="self-stretch mx-2 mt-2 flex flex-col items-end justify-start gap-[2.625rem_0rem] max-w-full text-[1rem] text-black mq750:gap-[2.625rem_0rem]">
@@ -750,16 +751,16 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
               />
 
               <div class="flex flex-col items-center justify-start py-[0rem] px-[0.25rem]">
-    
-                  <>
-                    <div class="relative font-medium z-[1]">
-                      {name}
-                    </div>
-                    <div class="relative text-[0.875rem] capitalize text-darkslategray-100 z-[2]">
-                {role}
-                    </div>
-                  </>
-               
+
+                <>
+                  <div class="relative font-medium z-[1]">
+                    {name}
+                  </div>
+                  <div class="relative text-[0.875rem] capitalize text-darkslategray-100 z-[2]">
+                    {role}
+                  </div>
+                </>
+           
               </div>
             </div>
             <div class="flex-1 rounded-xl bg-white flex flex-col items-start justify-start pt-[2.625rem] pb-[3.688rem] pr-[3.125rem] pl-[2.25rem] box-border gap-[0.75rem] min-w-[35.313rem] max-w-full text-[1.25rem] text-midnightblue mq750:min-w-full mq1050:pr-[1.563rem] mq1050:box-border">
@@ -769,11 +770,10 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
               </h3>
               <div class="self-stretch flex flex-row items-start justify-center gap-[0rem_1.25rem] mq1050:flex-wrap">
                 <button
-                  className={`cursor-pointer [border:none] py-[0.938rem] pr-[2.188rem] pl-[2.438rem] rounded-3xs flex flex-row items-center justify-center whitespace-nowrap z-[2] ${
-                    selectedButton === "project"
-                      ? "bg-coral-100 text-white"
-                      : "bg-f5f7fb text-gray-700 hover:bg-chocolate-100"
-                  }`}
+                  className={`cursor-pointer [border:none] py-[0.938rem] pr-[2.188rem] pl-[2.438rem] rounded-3xs flex flex-row items-center justify-center whitespace-nowrap z-[2] ${selectedButton === "project"
+                    ? "bg-coral-100 text-white"
+                    : "bg-f5f7fb text-gray-700 hover:bg-chocolate-100"
+                    }`}
                   onClick={() => handleButtonClick("project")}
                 >
                   <div class="relative w-[120px] text-[0.938rem] leading-[1.25rem] font-semibold font-manrope z-[1]">
@@ -782,11 +782,10 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                 </button>
 
                 <button
-                  className={`cursor-pointer [border:none] py-[0.938rem] pr-[1.188rem] pl-[1.375rem] rounded-3xs flex flex-row items-center justify-center whitespace-nowrap z-[2] ${
-                    selectedButton === "workspaces"
-                      ? "bg-coral-100 text-white"
-                      : "bg-f5f7fb text-gray-700 hover:bg-chocolate-100"
-                  }`}
+                  className={`cursor-pointer [border:none] py-[0.938rem] pr-[1.188rem] pl-[1.375rem] rounded-3xs flex flex-row items-center justify-center whitespace-nowrap z-[2] ${selectedButton === "workspaces"
+                    ? "bg-coral-100 text-white"
+                    : "bg-f5f7fb text-gray-700 hover:bg-chocolate-100"
+                    }`}
                   onClick={() => handleButtonClick("workspaces")}
                 >
                   <div class="relative w-[120px] text-[0.938rem] leading-[1.25rem] font-semibold font-manrope z-[1]">
@@ -794,11 +793,10 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                   </div>
                 </button>
                 <button
-                  className={`cursor-pointer [border:none] py-[0.938rem] pr-[1.5rem] pl-[1.688rem] rounded-3xs flex flex-row items-center justify-center whitespace-nowrap z-[2] ${
-                    selectedButton === "workflows"
-                      ? "bg-coral-100 text-white"
-                      : "bg-f5f7fb text-gray-700 hover:bg-chocolate-100"
-                  }`}
+                  className={`cursor-pointer [border:none] py-[0.938rem] pr-[1.5rem] pl-[1.688rem] rounded-3xs flex flex-row items-center justify-center whitespace-nowrap z-[2] ${selectedButton === "workflows"
+                    ? "bg-coral-100 text-white"
+                    : "bg-f5f7fb text-gray-700 hover:bg-chocolate-100"
+                    }`}
                   onClick={() => handleButtonClick("workflows")}
                 >
                   <div class="relative w-[120px] text-[0.938rem] leading-[1.25rem] font-semibold font-manrope z-[1]">
@@ -806,11 +804,10 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                   </div>
                 </button>
                 <button
-                  className={`cursor-pointer [border:none] py-[0.938rem] pr-[1.438rem] pl-[1.688rem] rounded-3xs flex flex-row items-center justify-center whitespace-nowrap z-[2] ${
-                    selectedButton === "resources"
-                      ? "bg-coral-100 text-white"
-                      : "bg-f5f7fb text-gray-700 hover:bg-chocolate-100"
-                  }`}
+                  className={`cursor-pointer [border:none] py-[0.938rem] pr-[1.438rem] pl-[1.688rem] rounded-3xs flex flex-row items-center justify-center whitespace-nowrap z-[2] ${selectedButton === "resources"
+                    ? "bg-coral-100 text-white"
+                    : "bg-f5f7fb text-gray-700 hover:bg-chocolate-100"
+                    }`}
                   onClick={() => handleButtonClick("resources")}
                 >
                   <div class="relative w-[120px] text-[0.938rem] leading-[1.25rem] font-semibold font-manrope z-[1]">
@@ -958,7 +955,7 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                             className="custom-switch content-center"
                             label={project.isActive ? "Active" : "Inactive"}
                             checked={project.isActive}
-                            // onChange={handleSwitchChange}
+                          // onChange={handleSwitchChange}
                           />
                         </Form>
                       </div>
@@ -966,8 +963,8 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                   </div>
                   <div
                     className="hover-div"
-                    // onMouseEnter={() => handleMouseEnter(project.index)}
-                    // onMouseLeave={handleMouseLeave}
+                  // onMouseEnter={() => handleMouseEnter(project.index)}
+                  // onMouseLeave={handleMouseLeave}
                   >
                     <img
                       className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
@@ -1191,7 +1188,7 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                             className="custom-switch content-center"
                             label={workspace.isActive ? "Active" : "Inactive"}
                             checked={workspace.isActive}
-                            // onChange={handleSwitchChange}
+                          // onChange={handleSwitchChange}
                           />
                         </Form>
                       </div>
@@ -1199,8 +1196,8 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                   </div>
                   <div
                     className="hover-div"
-                    // onMouseEnter={() => handleMouseEnter(workspace.index)}
-                    // onMouseLeave={handleMouseLeave}
+                  // onMouseEnter={() => handleMouseEnter(workspace.index)}
+                  // onMouseLeave={handleMouseLeave}
                   >
                     <img
                       className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
@@ -1428,7 +1425,7 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                             className="custom-switch content-center"
                             label={workflow.isActive ? "Active" : "Inactive"}
                             checked={workflow.isActive}
-                            // onChange={handleSwitchChange}
+                          // onChange={handleSwitchChange}
                           />
                         </Form>
                       </div>
@@ -1436,8 +1433,8 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                   </div>
                   <div
                     className="hover-div"
-                    // onMouseEnter={() => handleMouseEnter(workspace.index)}
-                    // onMouseLeave={handleMouseLeave}
+                  // onMouseEnter={() => handleMouseEnter(workspace.index)}
+                  // onMouseLeave={handleMouseLeave}
                   >
                     <img
                       className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"
@@ -1643,7 +1640,7 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                       </div>
                       <div class="flex flex-col items-start justify-start py-[0rem] pr-[1.38rem] pl-[0rem]">
                         <div class="relative text-[0.88rem] tracking-[-0.02em] font-poppins text-bodytext-50 text-left z-[1]">
-           
+
                           {formatDate(workspace.created_at)}
 
                         </div>
@@ -1665,7 +1662,7 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                             className="custom-switch content-center"
                             label={container.isActive ? "Active" : "Inactive"}
                             checked={container.isActive}
-                            // onChange={handleSwitchChange}
+                          // onChange={handleSwitchChange}
                           />
                         </Form>
                       </div>
@@ -1673,8 +1670,8 @@ const TeamMember = () => {   const apiUrl = process.env.REACT_APP_API_URL;
                   </div>
                   <div
                     className="hover-div"
-                    // onMouseEnter={() => handleMouseEnter(workspace.index)}
-                    // onMouseLeave={handleMouseLeave}
+                  // onMouseEnter={() => handleMouseEnter(workspace.index)}
+                  // onMouseLeave={handleMouseLeave}
                   >
                     <img
                       className="self-stretch h-[1.5rem] absolute relative max-w-full overflow-hidden shrink-0"

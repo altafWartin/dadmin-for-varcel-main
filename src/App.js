@@ -112,7 +112,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
 
-      {!isLoginPage && <Footer />}
+      {/* {!isLoginPage && <Footer />} */}
     </div>
   );
 }
